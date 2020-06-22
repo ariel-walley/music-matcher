@@ -1,5 +1,6 @@
 import React from 'react';
 import QueryString from 'querystring';
+import Lodash from 'lodash';
 
 class Home extends React.Component {
     constructor(props) {
@@ -14,6 +15,7 @@ class Home extends React.Component {
         this.handleChange = this.handleChange.bind(this);
         this.prepareUsers = this.prepareUsers.bind(this);
         this.preparePlaylists = this.preparePlaylists.bind(this);
+        this.analyzePlaylists = this.analyzePlaylists.bind(this);
     }
 
     async getAccessToken() {
@@ -28,9 +30,10 @@ class Home extends React.Component {
           'Authorization': 'Basic ' + window.btoa(process.env.REACT_APP_CLIENT_ID + ':' + process.env.REACT_APP_SECRET_KEY)
         },
         body: QueryString.stringify(body)
-      }).then((response) => {
-        return response.json();
       }).then((data) => {
+        return data.json();
+      }).then((data) => {
+        console.log(data);
         this.setState({accessToken: data.access_token});
       }).catch((err) => {
         console.log(err);
@@ -50,20 +53,19 @@ class Home extends React.Component {
     }
 
     preparePlaylists(data, userName) {
-     
       let playlists = {};
       for (let i = 0; i < data.length; i++) {
         playlists[data[i].name] = [];
       }
-      let userPlaylistsLocal = this.state.userPlaylists
-      userPlaylistsLocal[userName] = playlists
+      let userPlaylistsLocal = this.state.userPlaylists;
+      userPlaylistsLocal[userName] = playlists;
       this.setState({ 
         userPlaylists: userPlaylistsLocal
       });
     }
          
-    getUserMusic(userName) {    
-      fetch('https://api.spotify.com/v1/users/' + userName + '/playlists?limit = 50', {
+    async getUserMusic(userName) {   
+      await fetch('https://api.spotify.com/v1/users/' + userName + '/playlists?limit=50', {
         headers: {
           'Authorization': 'Bearer ' + this.state.accessToken
           }
@@ -79,35 +81,35 @@ class Home extends React.Component {
     async componentDidMount() {
       this.prepareUsers(this.usernames);
       await this.getAccessToken();
-      this.getUserMusic('emilytcarlsen');
-      this.getUserMusic('ariel.walley');
-
+      await this.getUserMusic('emilytcarlsen');
+      await this.getUserMusic('ariel.walley');
+      await this.getUserMusic('1229503923'); 
+      this.analyzePlaylists();
     }
+  
 
     handleChange(event) {
       this.setState({fieldInput: event.target.value});
       console.log(this.state.fieldInput);
-
     }
-   
+
+    analyzePlaylists() {
+      let arielsMusic = this.state.userPlaylists['ariel.walley'];
+      let emilysMusic = this.state.userPlaylists['emilytcarlsen'];
+      let davesMusic = this.state.userPlaylists['1229503923'];
+      let array1 = Object.keys(arielsMusic);
+      let array2 = Object.keys(emilysMusic);
+      let array3 = Object.keys(davesMusic);
+      let duplicates = Lodash.intersection(array1, array2, array3);
+      console.log(duplicates);
+    }
+
     render () {
       return (
         <div>
           <p>This is the home page!</p>
           <label>What user do you want to search for?</label>
           <input type='text' value={this.state.title} onChange={this.handleChange}/>
-          <p>List of Ariel's Playlists</p>
-          {/* {this.state.userPlaylists.emilytcarlsen.map(playlist => (
-            <li key={playlist.id}>{playlist}</li>
-          ))}
-          <ul>
-            {this.state.userPlaylists.emilytcarlsen.map(playlist => (
-            <li key={playlist.id}>{playlist}</li>
-            ))}
-          </ul>
-           <p>List of Emily's Playlists</p>
-          <ul>
-            </ul> */}
         </div>
       );
     }
