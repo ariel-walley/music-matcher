@@ -13,8 +13,7 @@ class Home extends React.Component {
         this.getAccessToken = this.getAccessToken.bind(this);
         this.getUserMusic = this.getUserMusic.bind(this);
         this.handleChange = this.handleChange.bind(this);
-        this.prepareUsers = this.prepareUsers.bind(this);
-        this.preparePlaylists = this.preparePlaylists.bind(this);
+        this.prepareState = this.prepareState.bind(this);
         this.analyzePlaylists = this.analyzePlaylists.bind(this);
     }
 
@@ -40,19 +39,7 @@ class Home extends React.Component {
       })
     }
 
-    usernames = ['ariel.walley', 'emilytcarlsen'];
-
-    prepareUsers(usernames) {
-      let users = {}
-      for (let i = 0; i < usernames.length; i++) {
-        users[usernames[i]] = {}
-      }
-      this.setState({
-        userPlaylists: users
-      });
-    }
-
-    preparePlaylists(data, userName) {
+    prepareState(data, userName) {
       let playlists = {};
       for (let i = 0; i < data.length; i++) {
         playlists[data[i].name] = [];
@@ -72,14 +59,13 @@ class Home extends React.Component {
         }).then((response) => {
           return response.json();
         }).then((response) => {
-          this.preparePlaylists(response.items, userName);
+          this.prepareState(response.items, userName);
         }).catch((err) => {
           console.log(err);
         });
     }
     
     async componentDidMount() {
-      this.prepareUsers(this.usernames);
       await this.getAccessToken();
       await this.getUserMusic('emilytcarlsen');
       await this.getUserMusic('ariel.walley');
