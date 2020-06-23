@@ -11,9 +11,11 @@ class Home extends React.Component {
           userPlaylists: {}
         };
         this.getAccessToken = this.getAccessToken.bind(this);
-        this.getUserMusic = this.getUserMusic.bind(this);
+        this.getUserPlaylists = this.getUserPlaylists.bind(this);
+        this.getUserSongs = this.getUserSongs.bind(this);
         this.handleChange = this.handleChange.bind(this);
-        this.prepareState = this.prepareState.bind(this);
+        this.preparePlaylists = this.preparePlaylists.bind(this);
+        this.prepareSongs = this.prepareSongs.bind(this);
         this.analyzePlaylists = this.analyzePlaylists.bind(this);
     }
 
@@ -39,19 +41,45 @@ class Home extends React.Component {
       })
     }
 
-    prepareState(data, userName) {
+    preparePlaylists(data, userName) {
       let playlists = {};
       for (let i = 0; i < data.length; i++) {
-        playlists[data[i].name] = [];
+        playlists[data[i].id] = [];
       }
       let userPlaylistsLocal = this.state.userPlaylists;
-      userPlaylistsLocal[userName] = playlists;
+      userPlaylistsLocal[userName] = playlists; //sets this.state.userPlaylists[username] = playlists;
+      this.setState({ 
+        userPlaylists: userPlaylistsLocal //this.state.userPlaylists[userName] = playlists object
+      });
+    }
+
+    prepareSongs(data, userName, playlistID) {
+      console.log(data);
+      console.log(userName);
+      console.log(playlistID);
+      let songs = ['foo', 'bar']
+      let userPlaylistsLocal = this.state.userPlaylists;
+      userPlaylistsLocal[userName][playlistID] = songs
+
+      //let songs = ['foo', 'bar'];
+      /*let songs = [];
+      for (let i = 0; i < data.length; i++) {
+        songs.push(data[i]);
+      } */
+
       this.setState({ 
         userPlaylists: userPlaylistsLocal
       });
-    }
          
-    async getUserMusic(userName) {   
+      /*this.setState(prevState => ({
+        userPlaylists : {[userName]: {                   // object that we want to update
+            ...prevState[userName],    // keep all other key-value pairs
+            [playlistID]: songs       // update the value of specific key
+        }}
+      }))*/
+    }
+
+    async getUserPlaylists(userName) {   
       await fetch('https://api.spotify.com/v1/users/' + userName + '/playlists?limit=50', {
         headers: {
           'Authorization': 'Bearer ' + this.state.accessToken
@@ -59,7 +87,21 @@ class Home extends React.Component {
         }).then((response) => {
           return response.json();
         }).then((response) => {
-          this.prepareState(response.items, userName);
+          this.preparePlaylists(response.items, userName);
+        }).catch((err) => {
+          console.log(err);
+        });
+    }
+
+    async getUserSongs(userName, playlistID) {    
+      await fetch('https://api.spotify.com/v1/playlists/' + playlistID + '/tracks?fields=items(track(id,name,album(images,name),artists(name)))', {
+        headers: {
+          'Authorization': 'Bearer ' + this.state.accessToken
+          }
+        }).then((response) => {
+          return response.json();
+        }).then((response) => {
+          this.prepareSongs(response, userName, playlistID);
         }).catch((err) => {
           console.log(err);
         });
@@ -67,10 +109,13 @@ class Home extends React.Component {
     
     async componentDidMount() {
       await this.getAccessToken();
-      await this.getUserMusic('emilytcarlsen');
-      await this.getUserMusic('ariel.walley');
-      await this.getUserMusic('1229503923'); 
+      await this.getUserPlaylists('emilytcarlsen');
+      await this.getUserPlaylists('ariel.walley');
+      await this.getUserPlaylists('1229503923'); 
       this.analyzePlaylists();
+      this.getUserSongs('ariel.walley', '5l2aOjOmaPLo7ZBfzjYeUE'); //traveling music
+      this.getUserSongs('emilytcarlsen', '35UxjUQDst2gDbnLyyIicQ'); //early 2020
+      this.getUserSongs('1229503923', '2ksQopr0tKOP3OgutwowPl') //contemplative
     }
   
 
