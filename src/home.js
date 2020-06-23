@@ -12,11 +12,12 @@ class Home extends React.Component {
         };
         this.getAccessToken = this.getAccessToken.bind(this);
         this.getUserPlaylists = this.getUserPlaylists.bind(this);
-        this.getUserSongs = this.getUserSongs.bind(this);
-        this.handleChange = this.handleChange.bind(this);
         this.preparePlaylists = this.preparePlaylists.bind(this);
+        this.getUserSongs = this.getUserSongs.bind(this);
         this.prepareSongs = this.prepareSongs.bind(this);
+        this.prepKeys = this.prepKeys.bind(this);
         this.analyzePlaylists = this.analyzePlaylists.bind(this);
+        this.handleChange = this.handleChange.bind(this);        
     }
 
     async getAccessToken() {
@@ -41,31 +42,6 @@ class Home extends React.Component {
       })
     }
 
-    preparePlaylists(data, userName) {
-      let playlists = {};
-      for (let i = 0; i < data.length; i++) {
-        playlists[data[i].id] = [];
-      }
-      let userPlaylistsLocal = this.state.userPlaylists;
-      userPlaylistsLocal[userName] = playlists; //sets this.state.userPlaylists[username] = playlists;
-      this.setState({ 
-        userPlaylists: userPlaylistsLocal //this.state.userPlaylists[userName] = playlists object
-      });
-    }
-
-    prepareSongs(data, userName, playlistID) {
-      let songs = [];
-      for (let i = 0; i < data.items.length; i++) {
-        songs.push(data.items[i].track.name);
-      }
-      console.log(songs);
-      let userPlaylistsLocal = this.state.userPlaylists;
-      userPlaylistsLocal[userName][playlistID] = songs
-      this.setState({ 
-        userPlaylists: userPlaylistsLocal
-      });
-    }
-
     async getUserPlaylists(userName) {   
       await fetch('https://api.spotify.com/v1/users/' + userName + '/playlists?limit=50', {
         headers: {
@@ -78,6 +54,18 @@ class Home extends React.Component {
         }).catch((err) => {
           console.log(err);
         });
+    }
+
+    preparePlaylists(data, userName) {
+      let playlists = {};
+      for (let i = 0; i < data.length; i++) {
+        playlists[data[i].id] = [];
+      }
+      let userPlaylistsLocal = this.state.userPlaylists;
+      userPlaylistsLocal[userName] = playlists;
+      this.setState({ 
+        userPlaylists: userPlaylistsLocal
+      });
     }
 
     async getUserSongs(userName, playlistID) {    
@@ -93,23 +81,39 @@ class Home extends React.Component {
           console.log(err);
         });
     }
-    
+
+    prepareSongs(data, userName, playlistID) {
+      let songs = [];
+      for (let i = 0; i < data.items.length; i++) {
+        songs.push(data.items[i].track.name);
+      }
+      let userPlaylistsLocal = this.state.userPlaylists;
+      userPlaylistsLocal[userName][playlistID] = songs
+      this.setState({ 
+        userPlaylists: userPlaylistsLocal
+      });
+    }
+
+    prepKeys () {
+      Object.keys(this.state.userPlaylists).forEach((val1) => {
+        console.log(val1);
+        Object.keys(this.state.userPlaylists[val1]).forEach((val2) => {
+          console.log(val2);
+          this.getUserSongs(val1, val2);
+        })
+      });
+    }
+
     async componentDidMount() {
       await this.getAccessToken();
       await this.getUserPlaylists('emilytcarlsen');
       await this.getUserPlaylists('ariel.walley');
       await this.getUserPlaylists('1229503923'); 
+      console.log(this.state.userPlaylists);
+      this.prepKeys();
       this.analyzePlaylists();
-      this.getUserSongs('ariel.walley', '5l2aOjOmaPLo7ZBfzjYeUE'); //traveling music
-      this.getUserSongs('emilytcarlsen', '35UxjUQDst2gDbnLyyIicQ'); //early 2020
-      this.getUserSongs('1229503923', '2ksQopr0tKOP3OgutwowPl') //contemplative
-    }
-  
 
-    handleChange(event) {
-      this.setState({fieldInput: event.target.value});
-      console.log(this.state.fieldInput);
-    }
+    }      
 
     analyzePlaylists() {
       let arielsMusic = this.state.userPlaylists['ariel.walley'];
@@ -119,7 +123,12 @@ class Home extends React.Component {
       let array2 = Object.keys(emilysMusic);
       let array3 = Object.keys(davesMusic);
       let duplicates = Lodash.intersection(array1, array2, array3);
-      console.log(duplicates);
+      //console.log(duplicates);
+    }
+
+    handleChange(event) {
+      this.setState({fieldInput: event.target.value});
+      console.log(this.state.fieldInput);
     }
 
     render () {
