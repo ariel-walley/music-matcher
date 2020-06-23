@@ -54,29 +54,16 @@ class Home extends React.Component {
     }
 
     prepareSongs(data, userName, playlistID) {
-      console.log(data);
-      console.log(userName);
-      console.log(playlistID);
-      let songs = ['foo', 'bar']
+      let songs = [];
+      for (let i = 0; i < data.items.length; i++) {
+        songs.push(data.items[i].track.name);
+      }
+      console.log(songs);
       let userPlaylistsLocal = this.state.userPlaylists;
       userPlaylistsLocal[userName][playlistID] = songs
-
-      //let songs = ['foo', 'bar'];
-      /*let songs = [];
-      for (let i = 0; i < data.length; i++) {
-        songs.push(data[i]);
-      } */
-
       this.setState({ 
         userPlaylists: userPlaylistsLocal
       });
-         
-      /*this.setState(prevState => ({
-        userPlaylists : {[userName]: {                   // object that we want to update
-            ...prevState[userName],    // keep all other key-value pairs
-            [playlistID]: songs       // update the value of specific key
-        }}
-      }))*/
     }
 
     async getUserPlaylists(userName) {   
