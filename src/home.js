@@ -1,6 +1,7 @@
 import React from 'react';
 import DisplayData from './userdata';
 import QueryString from 'querystring';
+import _ from 'lodash';
 
 class Home extends React.Component {
     constructor(props) {
@@ -20,6 +21,7 @@ class Home extends React.Component {
         this.prepKeys = this.prepKeys.bind(this);
         this.compileSongs = this.compileSongs.bind(this);
         this.handleChange = this.handleChange.bind(this);
+        this.removeDuplicates = this.removeDuplicates.bind(this);
     }
 
     async getAccessToken() {
@@ -124,16 +126,17 @@ class Home extends React.Component {
       setTimeout(() => {
         this.compileSongs();
       }, 15000);
+      setTimeout(() => {
+        Object.keys(this.state.userPlaylists).forEach((user) => {
+          this.removeDuplicates(user);
+        })
+      }, 20000)
     }      
 
     compileSongs() {
-                              //if you put allSongs here, all the songs will go in one array, which is pushed to the first user
-      console.log('your function is running now');
       Object.keys(this.state.userPlaylists).forEach((user) => {
         let allSongs = [];
-        console.log(user);
         Object.keys(this.state.userPlaylists[user]).forEach((playlist) => {
-          console.log(playlist);
           Object.values(this.state.userPlaylists[user][playlist]).forEach((song) => {
             allSongs.push(song);
           });
@@ -146,7 +149,16 @@ class Home extends React.Component {
       })
     }
 
-    // how to handle duplicates... first, assemble all songs from user into one array. remove duplicates. combine all uers songs into one array. return duplicates.
+    removeDuplicates(userName) {
+      let allSongs = this.state.userPlaylists[userName].allSongs;
+      allSongs = _.uniq(allSongs);
+      let userPlaylistsLocal = this.state.userPlaylists;
+      userPlaylistsLocal[userName].allSongs = allSongs;
+      this.setState({
+        userPlaylists: userPlaylistsLocal
+      });
+      console.log(this.state.userPlaylists[userName].allSongs);
+    }
 
     handleChange(event) {
       this.setState({fieldInput: event.target.value});
