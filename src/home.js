@@ -127,9 +127,10 @@ class Home extends React.Component {
     }      
 
     compileSongs() {
-      let allSongs = [];
+                              //if you put allSongs here, all the songs will go in one array, which is pushed to the first user
       console.log('your function is running now');
       Object.keys(this.state.userPlaylists).forEach((user) => {
+        let allSongs = [];
         console.log(user);
         Object.keys(this.state.userPlaylists[user]).forEach((playlist) => {
           console.log(playlist);
