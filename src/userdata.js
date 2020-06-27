@@ -10,7 +10,7 @@ class DisplayData extends React.Component {
       if (this.props.data.loaded === false) {
         return (
           <div>
-            <p>State not yet updated</p>
+            <p>Loading...</p>
           </div>
         )
       } else {
@@ -45,7 +45,6 @@ class DisplayData extends React.Component {
           
         return (
           <div>
-          <p>state updated</p>
           {display}
           </div> 
         ) 
@@ -55,13 +54,6 @@ class DisplayData extends React.Component {
   render() {
     return(
       <div>
-        <h1>User</h1>
-        <ol>
-          <li>Playlist</li>
-          <ol>
-            <li>Song</li>
-          </ol>
-        </ol>
         {this.adaptData()}
       </div>
     )

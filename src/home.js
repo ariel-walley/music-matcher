@@ -72,7 +72,7 @@ class Home extends React.Component {
       }
       let userPlaylistsLocal = this.state.userPlaylists;
       userPlaylistsLocal[userName] = playlists;
-      
+
       this.setState({ 
         userPlaylists: userPlaylistsLocal
       });
