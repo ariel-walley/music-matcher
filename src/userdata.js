@@ -15,41 +15,22 @@ class DisplayData extends React.Component {
         )
       } else {
         let display = [];
-
-        Object.keys(this.props.data.userPlaylists).map((user) => {              
-          display.push(
-            <div>
-              <h1 key={user}>{user}</h1>
-                <ol>
-                  {
-                  Object.keys(this.props.data.userPlaylists[user]).map((playlist) => {
-                    return (
-                      <li key={user + playlist}>    
-                        {playlist}
-                        <ol>
-                          {
-                          this.props.data.userPlaylists[user][playlist].map((song) => {
-                            return (
-                              <li key={user + playlist + song}>{song}</li>
-                            )
-                          })
-                          }
-                        </ol>
-                      </li>)
-                  })
-                  }
-                </ol>
-            </div>
-          );             
-        });
-          
         return (
           <div>
-          {display}
-          </div> 
-        ) 
+            <h1>Here is a list of songs you have in common!</h1>
+            <ul>
+              { 
+              this.props.data.duplicates.forEach((song) => {
+                display.push(<li key={song}>{song}</li>);
+              })
+              }
+              {display}
+            </ul>
+          </div>  
+        )
       }
-    };
+    }
+          
 
   render() {
     return(

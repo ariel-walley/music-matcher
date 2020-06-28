@@ -22,6 +22,7 @@ class Home extends React.Component {
         this.compileSongs = this.compileSongs.bind(this);
         this.handleChange = this.handleChange.bind(this);
         this.removeDuplicates = this.removeDuplicates.bind(this);
+        this.findDuplicateSongs = this.findDuplicateSongs.bind(this);
     }
 
     async getAccessToken() {
@@ -104,9 +105,6 @@ class Home extends React.Component {
       this.setState({ 
         userPlaylists: userPlaylistsLocal
       });
-      this.setState({
-        loaded: true
-      })
     }
 
     prepKeys () {
@@ -125,12 +123,15 @@ class Home extends React.Component {
       }, 2000);
       setTimeout(() => {
         this.compileSongs();
-      }, 15000);
+      }, 10000);
       setTimeout(() => {
         Object.keys(this.state.userPlaylists).forEach((user) => {
           this.removeDuplicates(user);
         })
-      }, 20000)
+      }, 15000)
+      setTimeout(() => {
+        this.findDuplicateSongs();
+      },20000)
     }      
 
     compileSongs() {
@@ -157,7 +158,22 @@ class Home extends React.Component {
       this.setState({
         userPlaylists: userPlaylistsLocal
       });
-      console.log(this.state.userPlaylists[userName].allSongs);
+    }
+
+    findDuplicateSongs() {
+      let arrays = [];
+      Object.keys(this.state.userPlaylists).forEach((user) => {
+        arrays.push(this.state.userPlaylists[user].allSongs);
+      }); 
+
+      let duplicates = _.intersection(...arrays);
+      this.setState({
+        duplicates: duplicates
+      });
+      console.log(this.state.duplicates);
+      this.setState({
+        loaded: true
+      })
     }
 
     handleChange(event) {
