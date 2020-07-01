@@ -7,7 +7,7 @@ class DisplayData extends React.Component {
     }
 
     adaptData() {
-      if (this.props.data.loaded === false) {
+      if (this.props.data.duplicatesFound === false) {
         return (
           <div>
             <p>Loading...</p>

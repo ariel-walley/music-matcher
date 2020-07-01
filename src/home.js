@@ -9,20 +9,16 @@ class Home extends React.Component {
         this.state = {
           accessToken: '',
           fieldInput: '',
-          userPlaylists: {},
-          loaded: false
+          duplicatesFound: false
         };
         this.getAccessToken = this.getAccessToken.bind(this);
-        this.getUserPlaylists = this.getUserPlaylists.bind(this);
         this.getUserData = this.getUserData.bind(this);
-        this.preparePlaylists = this.preparePlaylists.bind(this);
-        this.getUserSongs = this.getUserSongs.bind(this);
-        this.prepareSongs = this.prepareSongs.bind(this);
-        this.prepKeys = this.prepKeys.bind(this);
-        this.compileSongs = this.compileSongs.bind(this);
-        this.handleChange = this.handleChange.bind(this);
-        this.removeDuplicates = this.removeDuplicates.bind(this);
+        this.prepPlaylists = this.prepPlaylists.bind(this);
+        this.startSongs = this.startSongs.bind(this);
+        this.fetchSongs = this.fetchSongs.bind(this);
+        this.prepSongs = this.prepSongs.bind(this);
         this.findDuplicateSongs = this.findDuplicateSongs.bind(this);
+        this.handleChange = this.handleChange.bind(this);
     }
 
     async getAccessToken() {
@@ -47,139 +43,93 @@ class Home extends React.Component {
       })
     }
 
-    async getUserData(users) { //hi, i'm a new function for the next commit!
-      users.forEach( async (user) => {
-        await this.getUserPlaylists(user);
-      }
-      )
-    } 
+    async getUserData(userName) {   
+      try {
+        let response = await fetch(`https://api.spotify.com/v1/users/${userName}/playlists?limit=50`, {
+          headers: {
+            'Authorization': 'Bearer ' + this.state.accessToken
+          },
+        });
+        let data = await response.json();
+        let playlists = this.prepPlaylists(data.items); 
+        let allSongs = await this.startSongs(playlists);
+        let allUniqSongs = _.uniq(allSongs);
+        return allUniqSongs;
+      } catch(err) {
+          console.log(err);
+      };
+    }
 
-    async getUserPlaylists(userName) {   
-      await fetch('https://api.spotify.com/v1/users/' + userName + '/playlists?limit=50', {
+    prepPlaylists(data) { 
+      let playlists = [];
+      for (let playlist of data) {
+        playlists.push(playlist.id);
+      }
+      return playlists;
+    }
+
+    async startSongs (playlists) {
+      let allSongs = [];
+      for(let playlistID of playlists) {
+        let playlistData = await this.fetchSongs(playlistID);
+        allSongs.push(playlistData);
+      }
+      return allSongs.flat();
+    }
+
+    async fetchSongs(playlistID) {   
+      try {
+      let response = await fetch('https://api.spotify.com/v1/playlists/' + playlistID + '/tracks?fields=items(track(id,name,album(images,name),artists(name)))', {
         headers: {
           'Authorization': 'Bearer ' + this.state.accessToken
           }
-        }).then((response) => {
-          return response.json();
-        }).then((response) => {
-          this.preparePlaylists(response.items, userName);
-        }).catch((err) => {
-          console.log(err);
-        });
-    }
-
-    preparePlaylists(data, userName) {   
-      let playlists = {};
-      for (let i = 0; i < data.length; i++) {
-        playlists[data[i].id] = [];
+      });
+      let data = await response.json();
+      let prepSongs = this.prepSongs(data.items);
+      return prepSongs;
+      } catch (err) {
+        console.log(err);
       }
-      let userPlaylistsLocal = this.state.userPlaylists;
-      userPlaylistsLocal[userName] = playlists;
-
-      this.setState({ 
-        userPlaylists: userPlaylistsLocal
-      });
     }
 
-    async getUserSongs(userName, playlistID) {    
-      await fetch('https://api.spotify.com/v1/playlists/' + playlistID + '/tracks?fields=items(track(id,name,album(images,name),artists(name)))', {
-        headers: {
-          'Authorization': 'Bearer ' + this.state.accessToken
-          }
-        }).then((response) => {
-          return response.json();
-        }).then((response) => {
-          this.prepareSongs(response, userName, playlistID);
-        }).catch((err) => {
-          console.log(err);
-        });
-    }
-
-    prepareSongs(data, userName, playlistID) {
-      let songs = [];
-      for (let i = 0; i < data.items.length; i++) {
-        songs.push(data.items[i].track.name);
+    prepSongs(data) {
+      let songs = []; 
+      for (let song in data) {
+        songs.push(data[song].track.name);
       }
-      let userPlaylistsLocal = this.state.userPlaylists;
-      userPlaylistsLocal[userName][playlistID] = songs
-      this.setState({ 
-        userPlaylists: userPlaylistsLocal
-      });
+      return songs;
     }
 
-    prepKeys () {
-      Object.keys(this.state.userPlaylists).forEach((val1) => {
-        Object.keys(this.state.userPlaylists[val1]).forEach((val2) => {
-          this.getUserSongs(val1, val2);
-        })
-      });
-    }
-
-    async componentDidMount() { //this setTimeout needs to be addressed
-      await this.getAccessToken();
-      await this.getUserData(['emilytcarlsen', 'ariel.walley', '1229503923']); 
-      setTimeout(() => { //this setTimeout very much needs to go away
-        this.prepKeys();
-      }, 2000);
-      setTimeout(() => {
-        this.compileSongs();
-      }, 10000);
-      setTimeout(() => {
-        Object.keys(this.state.userPlaylists).forEach((user) => {
-          this.removeDuplicates(user);
-        })
-      }, 15000)
-      setTimeout(() => {
-        this.findDuplicateSongs();
-      },20000)
-    }      
-
-    compileSongs() {
-      Object.keys(this.state.userPlaylists).forEach((user) => {
-        let allSongs = [];
-        Object.keys(this.state.userPlaylists[user]).forEach((playlist) => {
-          Object.values(this.state.userPlaylists[user][playlist]).forEach((song) => {
-            allSongs.push(song);
-          });
-        });
-        let userPlaylistsLocal = this.state.userPlaylists;
-        userPlaylistsLocal[user].allSongs = allSongs;
-        this.setState({ 
-          userPlaylists: userPlaylistsLocal
-        });
-      })
-    }
-
-    removeDuplicates(userName) {
-      let allSongs = this.state.userPlaylists[userName].allSongs;
-      allSongs = _.uniq(allSongs);
-      let userPlaylistsLocal = this.state.userPlaylists;
-      userPlaylistsLocal[userName].allSongs = allSongs;
-      this.setState({
-        userPlaylists: userPlaylistsLocal
-      });
-    }
-
-    findDuplicateSongs() {
-      let arrays = [];
-      Object.keys(this.state.userPlaylists).forEach((user) => {
-        arrays.push(this.state.userPlaylists[user].allSongs);
-      }); 
-
+    async findDuplicateSongs(arrays) {
       let duplicates = _.intersection(...arrays);
       this.setState({
         duplicates: duplicates
       });
       console.log(this.state.duplicates);
       this.setState({
-        loaded: true
-      })
+        duplicatesFound: true
+      });
     }
 
     handleChange(event) {
       this.setState({fieldInput: event.target.value});
       console.log(this.state.fieldInput);
     }
+
+    async componentDidMount() {
+      try {
+        await this.getAccessToken();
+        let users = ['emilytcarlsen', 'ariel.walley', '1229503923'];
+        let compareSongs = [];
+        for (let user of users) {
+          let uniqSongs = await this.getUserData(user);
+          compareSongs.push(uniqSongs);
+        }
+        this.findDuplicateSongs(compareSongs);
+      } catch (err) {
+        console.log(err);
+      }
+    }    
 
     render () {
       return (
