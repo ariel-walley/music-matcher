@@ -18,6 +18,7 @@ class Home extends React.Component {
         this.fetchSongs = this.fetchSongs.bind(this);
         this.prepSongs = this.prepSongs.bind(this);
         this.findDuplicateSongs = this.findDuplicateSongs.bind(this);
+        this.getDuplicatesInfo = this.getDuplicatesInfo.bind(this);
         this.handleChange = this.handleChange.bind(this);
     }
 
@@ -95,20 +96,51 @@ class Home extends React.Component {
     prepSongs(data) {
       let songs = []; 
       for (let song in data) {
-        songs.push(data[song].track.name);
+        songs.push(data[song].track.id);
       }
       return songs;
     }
 
     async findDuplicateSongs(arrays) {
       let duplicates = _.intersection(...arrays);
-      this.setState({
-        duplicates: duplicates
-      });
-      console.log(this.state.duplicates);
-      this.setState({
-        duplicatesFound: true
-      });
+      _.pull(duplicates, null);
+      let allDuplicateInfo = [];
+
+      while(duplicates.length) {
+        let splitDuplicates = duplicates.splice(0,50);
+        let apiDuplicates = splitDuplicates.join(",");
+        let duplicateInfo = await this.getDuplicatesInfo(apiDuplicates);
+        for (let song of duplicateInfo.tracks) {
+          let artists = [];
+          for (let artist of song.artists) {
+            artists.push(artist.name);
+          };
+          allDuplicateInfo.push(
+            { "id": song.id,
+              "name": song.name,
+              "artist": artists,
+              "image": song.album.images[2].url
+            }
+          );
+        };
+        this.setState({
+          duplicateData: allDuplicateInfo,
+          duplicatesFound: true
+        }); 
+      }
+    }
+
+    async getDuplicatesInfo(duplicates) {     
+      try {
+        let response = await fetch('https://api.spotify.com/v1/tracks/?ids=' + duplicates, {
+          headers: {
+            'Authorization': 'Bearer ' + this.state.accessToken
+            }
+        });
+        return await response.json();
+        } catch (err) {
+          console.log(err);
+        }
     }
 
     handleChange(event) {
@@ -119,13 +151,14 @@ class Home extends React.Component {
     async componentDidMount() {
       try {
         await this.getAccessToken();
-        let users = ['emilytcarlsen', 'ariel.walley', '1229503923'];
+        let users = ['emilytcarlsen', 'ariel.walley'];
         let compareSongs = [];
         for (let user of users) {
-          let uniqSongs = await this.getUserData(user);
-          compareSongs.push(uniqSongs);
-        }
-        this.findDuplicateSongs(compareSongs);
+          let uniqSongs = await this.getUserData(user); //gets user data and filters our users' duplicate songs (i.e., user added the same song to multiple playlists);
+          compareSongs.push(uniqSongs); //
+        };
+        let duplicateSongs = await this.findDuplicateSongs(compareSongs);
+        //this.getDuplicatesInfo(duplicateSongs);
       } catch (err) {
         console.log(err);
       }
@@ -136,7 +169,7 @@ class Home extends React.Component {
         <div>
           <p>This is the home page!</p>
           <label>What user do you want to search for?</label>
-          <input type='text' value={this.state.title} onChange={this.handleChange}/>
+          <input type='text' onChange={this.handleChange}/>
           <DisplayData data={this.state}/>
         </div>
       );
