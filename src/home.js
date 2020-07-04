@@ -118,7 +118,7 @@ class Home extends React.Component {
           allDuplicateInfo.push(
             { "id": song.id,
               "name": song.name,
-              "artist": artists,
+              "artist": artists.join(", "),
               "image": song.album.images[2].url
             }
           );
