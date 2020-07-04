@@ -110,6 +110,7 @@ class Home extends React.Component {
         let splitDuplicates = duplicates.splice(0,50);
         let apiDuplicates = splitDuplicates.join(",");
         let duplicateInfo = await this.getDuplicatesInfo(apiDuplicates);
+        console.log(duplicateInfo);
         for (let song of duplicateInfo.tracks) {
           let artists = [];
           for (let artist of song.artists) {
@@ -119,7 +120,8 @@ class Home extends React.Component {
             { "id": song.id,
               "name": song.name,
               "artist": artists.join(", "),
-              "image": song.album.images[2].url
+              "image": song.album.images[1].url,
+              "albumName": `The cover art of the song's album: ${song.album.name}`
             }
           );
         };
@@ -155,10 +157,9 @@ class Home extends React.Component {
         let compareSongs = [];
         for (let user of users) {
           let uniqSongs = await this.getUserData(user); //gets user data and filters our users' duplicate songs (i.e., user added the same song to multiple playlists);
-          compareSongs.push(uniqSongs); //
+          compareSongs.push(uniqSongs);
         };
         let duplicateSongs = await this.findDuplicateSongs(compareSongs);
-        //this.getDuplicatesInfo(duplicateSongs);
       } catch (err) {
         console.log(err);
       }

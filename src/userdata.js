@@ -1,15 +1,23 @@
 import React from 'react';
 import styled from 'styled-components';
 
-const Div = styled.div`
-  width: 50%;
-  margin: 0 auto 10px auto;
+const MainContainer = styled.div`
+  background-image: radial-gradient( circle farthest-corner at 10% 20%,  rgba(243,94,131,1) 17.1%, rgba(236,212,80,1) 89.7% );
+  display: flex;
+  align-items: center;
+  align-content: center;
+  flex-wrap: wrap;
+  justify-content: space-between;
+`;
+
+const CardContainer = styled.div`
+  width: 40%;
+  margin: 0 auto;
   align-items: center;
   align-content: center;
   justify-content: flex-start;
   display: flex;
-  background-image: radial-gradient( circle farthest-corner at 10% 20%,  rgba(243,94,131,1) 17.1%, rgba(236,212,80,1) 89.7% );
-  border-radius: 25px;
+  border-radius: 15px;
   padding: 18px;
 `;
 
@@ -46,13 +54,13 @@ class DisplayData extends React.Component {
       let display = [];
       this.props.data.duplicateData.map((duplicate) => {
         display.push(
-        <Div>
-          <Img src={duplicate.image} alt="album image"/>
+        <CardContainer key={duplicate.id}>
+          <Img src={duplicate.image} alt={duplicate.albumName} />
           <div>
             <SongTitle>{duplicate.name}</SongTitle>
             <Artist> by {duplicate.artist}</Artist>
           </div>
-        </Div>); 
+        </CardContainer>); 
       })
       return display;
     }
@@ -68,9 +76,9 @@ class DisplayData extends React.Component {
         return (
           <div>
             <h1>Here is a list of songs you have in common!</h1>
-            <ol>
+            <MainContainer>
               {this.formatData()}
-            </ol>
+            </MainContainer>
           </div>  
         )
       }
