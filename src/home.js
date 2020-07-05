@@ -13,7 +13,6 @@ class Home extends React.Component {
         };
         this.getAccessToken = this.getAccessToken.bind(this);
         this.getUserData = this.getUserData.bind(this);
-        this.prepPlaylists = this.prepPlaylists.bind(this);
         this.startSongs = this.startSongs.bind(this);
         this.fetchSongs = this.fetchSongs.bind(this);
         this.prepSongs = this.prepSongs.bind(this);
@@ -44,29 +43,29 @@ class Home extends React.Component {
       })
     }
 
-    async getUserData(userName) {   
-      try {
-        let response = await fetch(`https://api.spotify.com/v1/users/${userName}/playlists?limit=50`, {
-          headers: {
-            'Authorization': 'Bearer ' + this.state.accessToken
-          },
-        });
-        let data = await response.json();
-        let playlists = this.prepPlaylists(data.items); 
-        let allSongs = await this.startSongs(playlists);
-        let allUniqSongs = _.uniq(allSongs);
-        return allUniqSongs;
-      } catch(err) {
-          console.log(err);
-      };
-    }
-
-    prepPlaylists(data) { 
+    async getUserData(user) {   
       let playlists = [];
-      for (let playlist of data) {
-        playlists.push(playlist.id);
+      let next = `https://api.spotify.com/v1/users/${user}/playlists?limit=50`;
+
+      while(next != null) {
+        try {
+          let response = await fetch(next, {
+            headers: {
+              'Authorization': 'Bearer ' + this.state.accessToken
+            },
+          });
+          let data = await response.json();
+          let playlistsChunk = data.items.map(playlist => { return playlist.id });
+          playlists.push(...playlistsChunk);
+          next = data.next;
+        } catch(err) {
+            console.error(err);
+        };
       }
-      return playlists;
+
+      let allSongs = await this.startSongs(playlists);
+      let allUniqSongs = _.uniq(allSongs);
+      return allUniqSongs;
     }
 
     async startSongs (playlists) {
@@ -78,19 +77,27 @@ class Home extends React.Component {
       return allSongs.flat();
     }
 
-    async fetchSongs(playlistID) {   
-      try {
-      let response = await fetch('https://api.spotify.com/v1/playlists/' + playlistID + '/tracks?fields=items(track(id,name,album(images,name),artists(name)))', {
-        headers: {
-          'Authorization': 'Bearer ' + this.state.accessToken
-          }
-      });
-      let data = await response.json();
-      let prepSongs = this.prepSongs(data.items);
-      return prepSongs;
-      } catch (err) {
-        console.log(err);
+    async fetchSongs(playlistID) {
+      let playlistSongs = [];
+      let next = `https://api.spotify.com/v1/playlists/${playlistID}/tracks?fields=items(track(id,name,album(images,name),artists(name))),limit,next,offset,previous,total`
+      
+      while(next !=null) {
+        try {
+          let response = await fetch(next, {
+            headers: {
+              'Authorization': 'Bearer ' + this.state.accessToken
+              }
+          });
+          
+          let data = await response.json();
+          let songsChunk = data.items.map(song => { return song.track.id });
+          playlistSongs.push(...songsChunk);
+          next = data.next;
+        } catch (err) {
+          console.log(err);
+        }
       }
+      return playlistSongs;
     }
 
     prepSongs(data) {
@@ -121,7 +128,7 @@ class Home extends React.Component {
               "name": song.name,
               "artist": artists.join(", "),
               "image": song.album.images[1].url,
-              "albumName": `The cover art of the song's album: ${song.album.name}`
+              "albumName": `The cover art of the song's all: ${song.album.name}`
             }
           );
         };
