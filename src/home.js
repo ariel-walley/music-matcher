@@ -4,20 +4,30 @@ import QueryString from 'querystring';
 import _ from 'lodash';
 import styled from 'styled-components';
 import GlobalStyle from './globalStyles';
-import Triangles from './triangles';
+
+const MainContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+`;
 
 const Header = styled.h1`
   text-align: center;
-  margin: 20px;
-  padding: 0;
+  margin: 20px auto 0 auto;
   font-size: 70px;
   color: white;
 `;
 
-const Instructions = styled.p`
+const About = styled.p`
+  text-align: center;
+  margin: 0 auto 30px auto;
+  font-weight: 5500px;
+  font-size: 18px;
+  color: white;
+`;
+
+const InputLabels = styled.label`
   text-align: center;
   margin: 10px;
-  padding: 0;
   font-weight: 700px;
   font-size: 20px;
   color: white;
@@ -25,16 +35,31 @@ const Instructions = styled.p`
 
 const InputDiv = styled.div`
   margin: 0 auto;
-  padding: 0;
   text-align: center;
 `;
 
 const InputField = styled.input`
   margin: 20px;
-  padding: 0;
   border: 0;
   height: 35px;
   width: 250px;
+  border-radius: 5px;
+`;
+
+const Tutorial = styled.p`
+  text-align: center;
+  margin: 10px;
+  font-weight: 5500px;
+  font-size: 18px;
+  color: white;
+`;
+
+const SubmitButton = styled.button`
+  margin: 10px auto;
+  padding: 7px;
+  background-color: white;
+  font-size: 16px;
+  border: 0;
   border-radius: 5px;
 `;
 
@@ -194,14 +219,14 @@ class Home extends React.Component {
 
     async componentDidMount() {
       try {
-        await this.getAccessToken();
+        /* await this.getAccessToken();
         let users = ['1229503923', 'ariel.walley'];
         let compareSongs = [];
         for (let user of users) {
           let uniqSongs = await this.getUserData(user); //gets user data and filters our users' duplicate songs (i.e., user added the same song to multiple playlists);
           compareSongs.push(uniqSongs);
         };
-        let duplicateSongs = await this.findDuplicateSongs(compareSongs);
+        let duplicateSongs = await this.findDuplicateSongs(compareSongs); */
       } catch (err) {
         console.log(err);
       }
@@ -211,11 +236,16 @@ class Home extends React.Component {
       return (
           <div>
             <GlobalStyle/>
-            <Header>Welcome to Music Matcher!</Header>
-            <Instructions>Enter your username here:</Instructions>
-            <InputDiv><InputField type="text" onChange={this.handleChange}/></InputDiv>
-            <Instructions>Enter up to three other users to compare your music picks:</Instructions>
-            <InputDiv><InputField type="text" onChange={this.handleChange}/></InputDiv>
+            <MainContainer> 
+              <Header>Welcome to Music Matcher!</Header>
+              <About>Find out which songs you and your friends have in common in your public playlists in Spotify!</About>
+              <InputLabels for="your_username">Enter your Spotify username here:</InputLabels>
+              <InputDiv><InputField type="text" id="your_username"/></InputDiv>
+              <InputLabels for="friends_usernames">Enter up to three other Spotify users to compare your music picks:</InputLabels>
+              <InputDiv><InputField type="text" id="friends_usernames"/></InputDiv>
+              <Tutorial>Not sure how to find a Spotify username? Click here for help!</Tutorial>
+              <SubmitButton type="submit">Submit</SubmitButton>
+            </MainContainer>
             <DisplayData data={this.state}/>
           </div>
       );
