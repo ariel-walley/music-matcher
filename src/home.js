@@ -2,6 +2,41 @@ import React from 'react';
 import DisplayData from './userdata';
 import QueryString from 'querystring';
 import _ from 'lodash';
+import styled from 'styled-components';
+import GlobalStyle from './globalStyles';
+import Triangles from './triangles';
+
+const Header = styled.h1`
+  text-align: center;
+  margin: 20px;
+  padding: 0;
+  font-size: 70px;
+  color: white;
+`;
+
+const Instructions = styled.p`
+  text-align: center;
+  margin: 10px;
+  padding: 0;
+  font-weight: 700px;
+  font-size: 20px;
+  color: white;
+`;
+
+const InputDiv = styled.div`
+  margin: 0 auto;
+  padding: 0;
+  text-align: center;
+`;
+
+const InputField = styled.input`
+  margin: 20px;
+  padding: 0;
+  border: 0;
+  height: 35px;
+  width: 250px;
+  border-radius: 5px;
+`;
 
 class Home extends React.Component {
     constructor(props) {
@@ -160,7 +195,7 @@ class Home extends React.Component {
     async componentDidMount() {
       try {
         await this.getAccessToken();
-        let users = ['emilytcarlsen', 'ariel.walley'];
+        let users = ['1229503923', 'ariel.walley'];
         let compareSongs = [];
         for (let user of users) {
           let uniqSongs = await this.getUserData(user); //gets user data and filters our users' duplicate songs (i.e., user added the same song to multiple playlists);
@@ -174,12 +209,15 @@ class Home extends React.Component {
 
     render () {
       return (
-        <div>
-          <p>This is the home page!</p>
-          <label>What user do you want to search for?</label>
-          <input type='text' onChange={this.handleChange}/>
-          <DisplayData data={this.state}/>
-        </div>
+          <div>
+            <GlobalStyle/>
+            <Header>Welcome to Music Matcher!</Header>
+            <Instructions>Enter your username here:</Instructions>
+            <InputDiv><InputField type="text" onChange={this.handleChange}/></InputDiv>
+            <Instructions>Enter up to three other users to compare your music picks:</Instructions>
+            <InputDiv><InputField type="text" onChange={this.handleChange}/></InputDiv>
+            <DisplayData data={this.state}/>
+          </div>
       );
     }
 };
