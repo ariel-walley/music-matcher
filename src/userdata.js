@@ -2,21 +2,35 @@ import React from 'react';
 import styled from 'styled-components';
 
 const MainContainer = styled.div`
-  background-image: radial-gradient( circle farthest-corner at 10% 20%,  rgba(243,94,131,1) 17.1%, rgba(236,212,80,1) 89.7% );
+  background-image: radial-gradient(circle farthest-corner at 10% 20%,  rgba(243,94,131,1), rgba(236,212,80,1));
+`;
+
+const Header = styled.h1`
+  text-align: center;
+  margin: 20px;
+`;
+
+const Loading = styled.p`
+  color: white;
+  font-size: 20px;
+  font-weight: 550px;
+`;
+
+const CardContainer = styled.div`
   display: flex;
   align-items: center;
   align-content: center;
   flex-wrap: wrap;
-  justify-content: space-between;
+  justify-content: left;
 `;
 
-const CardContainer = styled.div`
+const Card = styled.div`
   width: 40%;
   margin: 0 auto;
+  display: flex;
   align-items: center;
   align-content: center;
   justify-content: flex-start;
-  display: flex;
   border-radius: 15px;
   padding: 18px;
 `;
@@ -46,38 +60,51 @@ const Img = styled.img`
 class DisplayData extends React.Component {
   constructor(props) {
     super(props);        
-    this.formatData = this.formatData.bind(this);
+    this.formatCard = this.formatCard.bind(this);
     this.renderData = this.renderData.bind(this);
     }
 
-    formatData() {
+    formatCard() {
       let display = [];
       this.props.data.duplicateData.map((duplicate) => {
         display.push(
-        <CardContainer key={duplicate.id}>
+        <Card key={duplicate.id}>
           <Img src={duplicate.image} alt={duplicate.albumName} />
           <div>
             <SongTitle>{duplicate.name}</SongTitle>
             <Artist> by {duplicate.artist}</Artist>
           </div>
-        </CardContainer>); 
+        </Card>); 
       })
       return display;
+    }
+
+    formatHeader() {
+      let length = this.props.data.duplicateData.length;
+      if (length === 0) {
+        return <Header>You have no songs in common.</Header>
+      } else if (length === 1) {
+        return <Header>You have 1 song in common!</Header>
+      } else {
+        return <Header>You have {length} songs in common!</Header>
+      }
     }
 
     renderData() {
       if (this.props.data.duplicatesFound === false) {
         return (
           <div>
-            <p>Loading...</p>
+            <Loading>Loading...</Loading>
           </div>
         )
       } else {
         return (
           <div>
-            <h1>Here is a list of songs you have in common!</h1>
             <MainContainer>
-              {this.formatData()}
+              {this.formatHeader()}
+              <CardContainer>
+                {this.formatCard()}
+              </CardContainer>
             </MainContainer>
           </div>  
         )
