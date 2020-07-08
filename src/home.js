@@ -69,7 +69,8 @@ class Home extends React.Component {
         this.state = {
           accessToken: '',
           fieldInput: '',
-          duplicatesFound: false
+          duplicatesFound: false,
+          mainUsername: ''
         };
         this.getAccessToken = this.getAccessToken.bind(this);
         this.getUserData = this.getUserData.bind(this);
@@ -79,6 +80,7 @@ class Home extends React.Component {
         this.findDuplicateSongs = this.findDuplicateSongs.bind(this);
         this.getDuplicatesInfo = this.getDuplicatesInfo.bind(this);
         this.handleChange = this.handleChange.bind(this);
+        this.displayOtherUsers = this.displayOtherUsers.bind(this);
     }
 
     async getAccessToken() {
@@ -213,14 +215,30 @@ class Home extends React.Component {
     }
 
     handleChange(event) {
-      this.setState({fieldInput: event.target.value});
-      console.log(this.state.fieldInput);
+      this.setState({
+        mainUsername: event.target.value
+      })
+    }
+
+    displayOtherUsers() {
+      if (this.state.mainUsername.length > 2) {
+        return (
+          <div>
+          <InputLabels>Enter up to three other Spotify users to compare your music picks:</InputLabels>
+              <InputDiv>
+                <InputField type="text" id="friend1_usernames"/>
+                <InputField type="text" id="friend2_usernames"/>
+                <InputField type="text" id="friend3_usernames"/>
+              </InputDiv>
+          </div>
+        )  
+      }
     }
 
     async componentDidMount() {
       try {
         /* await this.getAccessToken();
-        let users = ['1229503923', 'ariel.walley'];
+        let users = ['skylarhaven', 'ariel.walley'];
         let compareSongs = [];
         for (let user of users) {
           let uniqSongs = await this.getUserData(user); //gets user data and filters our users' duplicate songs (i.e., user added the same song to multiple playlists);
@@ -240,9 +258,10 @@ class Home extends React.Component {
               <Header>Welcome to Music Matcher!</Header>
               <About>Find out which songs you and your friends have in common in your public playlists in Spotify!</About>
               <InputLabels for="your_username">Enter your Spotify username here:</InputLabels>
-              <InputDiv><InputField type="text" id="your_username"/></InputDiv>
-              <InputLabels for="friends_usernames">Enter up to three other Spotify users to compare your music picks:</InputLabels>
-              <InputDiv><InputField type="text" id="friends_usernames"/></InputDiv>
+              <InputDiv>
+                <InputField type="text" id="your_username" onChange={this.handleChange}/>
+              </InputDiv>
+              {this.displayOtherUsers()}
               <Tutorial>Not sure how to find a Spotify username? Click here for help!</Tutorial>
               <SubmitButton type="submit">Submit</SubmitButton>
             </MainContainer>
