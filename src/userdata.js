@@ -3,6 +3,7 @@ import styled from 'styled-components';
 
 const MainContainer = styled.div`
   background-image: radial-gradient(circle farthest-corner at 10% 20%,  rgba(243,94,131,1), rgba(236,212,80,1));
+  font-family: 'Open Sans', sans-serif;
 `;
 
 const Header = styled.h1`

@@ -1,4 +1,5 @@
 import React from 'react';
+import './App.css';
 import DisplayData from './userdata';
 import QueryString from 'querystring';
 import _ from 'lodash';
@@ -8,6 +9,7 @@ import GlobalStyle from './globalStyles';
 const MainContainer = styled.div`
   display: flex;
   flex-direction: column;
+  justify-content; center;
 `;
 
 const Header = styled.h1`
@@ -70,7 +72,8 @@ class Home extends React.Component {
           accessToken: '',
           fieldInput: '',
           duplicatesFound: false,
-          mainUsername: ''
+          mainUsername: '',
+          display: false
         };
         this.getAccessToken = this.getAccessToken.bind(this);
         this.getUserData = this.getUserData.bind(this);
@@ -79,7 +82,8 @@ class Home extends React.Component {
         this.prepSongs = this.prepSongs.bind(this);
         this.findDuplicateSongs = this.findDuplicateSongs.bind(this);
         this.getDuplicatesInfo = this.getDuplicatesInfo.bind(this);
-        this.handleChange = this.handleChange.bind(this);
+        this.handleChangeMain = this.handleChangeMain.bind(this);
+        this.handleChangeFriend = this.handleChangeFriend.bind(this);
         this.displayOtherUsers = this.displayOtherUsers.bind(this);
     }
 
@@ -214,22 +218,32 @@ class Home extends React.Component {
         }
     }
 
-    handleChange(event) {
+    handleChangeMain(event) {
       this.setState({
         mainUsername: event.target.value
       })
+      if (this.state.mainUsername.length > 1) {
+        this.setState({
+          display: true
+        })
+      }
+    }
+
+    handleChangeFriend(event, id) {
+      console.log(event);
+      console.log(id);
     }
 
     displayOtherUsers() {
-      if (this.state.mainUsername.length > 2) {
+      if (this.state.display === true) {
         return (
-          <div>
-          <InputLabels>Enter up to three other Spotify users to compare your music picks:</InputLabels>
-              <InputDiv>
-                <InputField type="text" id="friend1_usernames"/>
-                <InputField type="text" id="friend2_usernames"/>
-                <InputField type="text" id="friend3_usernames"/>
-              </InputDiv>
+          <div>       
+            <InputLabels>Enter up to three other Spotify users to compare your music picks:</InputLabels>
+                <InputDiv>
+                  <InputField type="text" id="friend1_usernames" onChange={this.handleChangeFriend}/>
+                  <InputField type="text" id="friend2_usernames" onChange={this.handleChangeFriend}/>
+                  <InputField type="text" id="friend3_usernames" onChange={this.handleChangeFriend}/>
+                </InputDiv>
           </div>
         )  
       }
@@ -237,14 +251,14 @@ class Home extends React.Component {
 
     async componentDidMount() {
       try {
-        /* await this.getAccessToken();
-        let users = ['skylarhaven', 'ariel.walley'];
+        await this.getAccessToken();
+        let users = ['1229503923', 'ariel.walley'];
         let compareSongs = [];
         for (let user of users) {
           let uniqSongs = await this.getUserData(user); //gets user data and filters our users' duplicate songs (i.e., user added the same song to multiple playlists);
           compareSongs.push(uniqSongs);
         };
-        let duplicateSongs = await this.findDuplicateSongs(compareSongs); */
+        let duplicateSongs = await this.findDuplicateSongs(compareSongs);
       } catch (err) {
         console.log(err);
       }
@@ -259,7 +273,7 @@ class Home extends React.Component {
               <About>Find out which songs you and your friends have in common in your public playlists in Spotify!</About>
               <InputLabels for="your_username">Enter your Spotify username here:</InputLabels>
               <InputDiv>
-                <InputField type="text" id="your_username" onChange={this.handleChange}/>
+                <InputField type="text" id="your_username" onChange={this.handleChangeMain}/>
               </InputDiv>
               {this.displayOtherUsers()}
               <Tutorial>Not sure how to find a Spotify username? Click here for help!</Tutorial>
