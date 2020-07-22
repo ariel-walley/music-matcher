@@ -229,6 +229,11 @@ class Home extends React.Component {
           mainUsername: value
         }
       }));
+      if (this.state.users.mainUsername.length > 1) {
+        this.setState({
+          display: true
+        })
+      }
     }
 
     handleChangeFriend(event) {
@@ -262,7 +267,7 @@ class Home extends React.Component {
     }
 
     displayOtherUsers() {
-      if (this.state.users.mainUsername.length > 1) {
+      if (this.state.display === true) {
         return (
           <div>       
             <InputLabels>Enter up to three other Spotify users to compare your music picks:</InputLabels>
