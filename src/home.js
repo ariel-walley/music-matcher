@@ -183,7 +183,6 @@ class Home extends React.Component {
         let splitDuplicates = duplicates.splice(0,50);
         let apiDuplicates = splitDuplicates.join(",");
         let duplicateInfo = await this.getDuplicatesInfo(apiDuplicates);
-        console.log(duplicateInfo);
         for (let song of duplicateInfo.tracks) {
           let artists = [];
           for (let artist of song.artists) {
@@ -229,10 +228,12 @@ class Home extends React.Component {
       }
     }
 
-    handleChangeFriend(event, id) {
-      console.log(event);
-      console.log(id);
+    handleChangeFriend(event) {
+      this.setState({
+        [event.target.id]: event.target.value
+      })
     }
+
 
     displayOtherUsers() {
       if (this.state.display === true) {
@@ -240,9 +241,9 @@ class Home extends React.Component {
           <div>       
             <InputLabels>Enter up to three other Spotify users to compare your music picks:</InputLabels>
                 <InputDiv>
-                  <InputField type="text" id="friend1_usernames" onChange={this.handleChangeFriend}/>
-                  <InputField type="text" id="friend2_usernames" onChange={this.handleChangeFriend}/>
-                  <InputField type="text" id="friend3_usernames" onChange={this.handleChangeFriend}/>
+                  <InputField type="text" id="username0" onChange={this.handleChangeFriend}/>
+                  <InputField type="text" id="username1" onChange={this.handleChangeFriend}/>
+                  <InputField type="text" id="username2" onChange={this.handleChangeFriend}/>
                 </InputDiv>
           </div>
         )  
