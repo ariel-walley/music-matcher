@@ -225,15 +225,11 @@ class Home extends React.Component {
       let value = event.target.value;
       this.setState(() => ({
         users: {
-          ...this.state.users, 
+          ...this.state.users,
+          display: (value.length > 2 || this.state.users.display) ? true : false, 
           mainUsername: value
         }
       }));
-      if (this.state.users.mainUsername.length > 1) {
-        this.setState({
-          display: true
-        })
-      }
     }
 
     handleChangeFriend(event) {
@@ -265,9 +261,10 @@ class Home extends React.Component {
         console.log(err);
       }
     }
+    
 
     displayOtherUsers() {
-      if (this.state.display === true) {
+      if (this.state.users.display === true) {
         return (
           <div>       
             <InputLabels>Enter up to three other Spotify users to compare your music picks:</InputLabels>
@@ -283,6 +280,7 @@ class Home extends React.Component {
 
     async componentDidMount() {
       await this.getAccessToken();
+
     }
 
     render () {
