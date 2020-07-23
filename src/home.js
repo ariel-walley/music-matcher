@@ -70,12 +70,10 @@ class Home extends React.Component {
         super(props);
         this.state = {
           accessToken: '',
-          fieldInput: '',
           duplicatesFound: false,
           users: {
             mainUsername: ''
           },
-          display: false
         };
         this.getAccessToken = this.getAccessToken.bind(this);
         this.getUserData = this.getUserData.bind(this);
@@ -224,9 +222,10 @@ class Home extends React.Component {
       let id = event.target.id;
       let value = event.target.value;
       this.setState(() => ({
+        ...this.state,
+        userDisplay: (value.length > 2 || this.state.userDisplay) ? true : false, 
         users: {
           ...this.state.users,
-          display: (value.length > 2 || this.state.users.display) ? true : false, 
           mainUsername: value
         }
       }));
@@ -264,7 +263,7 @@ class Home extends React.Component {
     
 
     displayOtherUsers() {
-      if (this.state.users.display === true) {
+      if (this.state.userDisplay === true) {
         return (
           <div>       
             <InputLabels>Enter up to three other Spotify users to compare your music picks:</InputLabels>
