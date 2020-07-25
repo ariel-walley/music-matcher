@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
+import _ from 'lodash';
 
 const MainContainer = styled.div`
   background-image: radial-gradient(circle farthest-corner at 10% 20%,  rgba(243,94,131,1), rgba(236,212,80,1));
@@ -81,14 +82,32 @@ class DisplayData extends React.Component {
     }
 
     formatHeader() {
+      //Determine the display names
+      let mainUserID = this.props.data.usernames.mainUsername;
+      let mainUsername = this.props.data.usernames[mainUserID];
+      let usernames = Object.values(this.props.data.usernames);
+      _.pull(usernames, mainUserID, mainUsername); //remove the main user from the display names
+      if (usernames.length === 1) {
+        usernames = ' and ' + usernames
+      } else if (usernames.length === 2) {
+        usernames = `, ${usernames[0]} and ${usernames[1]}`
+      } else {
+        usernames = `, ${usernames[0]}, ${usernames[1]}, and ${usernames[2]}`
+      }
+    
+      //Determine how many songs in common
+      let songs = '';
       let length = this.props.data.duplicateData.length;
       if (length === 0) {
-        return <Header>You have no songs in common.</Header>
+        songs = 'no songs'
       } else if (length === 1) {
-        return <Header>You have 1 song in common!</Header>
+        songs = '1 song'
       } else {
-        return <Header>You have {length} songs in common!</Header>
+        songs = `${length} songs`
       }
+
+      //Final phrase
+      return <Header>You{usernames} have {songs} in common!</Header>
     }
 
     renderData() {

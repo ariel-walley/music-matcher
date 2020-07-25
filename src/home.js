@@ -77,6 +77,7 @@ class Home extends React.Component {
         };
         this.getAccessToken = this.getAccessToken.bind(this);
         this.getUserData = this.getUserData.bind(this);
+        this.getUserName = this.getUserName.bind(this);
         this.startSongs = this.startSongs.bind(this);
         this.fetchSongs = this.fetchSongs.bind(this);
         this.prepSongs = this.prepSongs.bind(this);
@@ -110,10 +111,10 @@ class Home extends React.Component {
       })
     }
 
-    async getUserData(user) {   
+    async getUserData(user) {
+      this.getUserName(user);
       let playlists = [];
       let next = `https://api.spotify.com/v1/users/${user}/playlists?limit=50`;
-
       while(next != null) {
         try {
           let response = await fetch(next, {
@@ -129,10 +130,30 @@ class Home extends React.Component {
             console.error(err);
         };
       }
-
       let allSongs = await this.startSongs(playlists);
       let allUniqSongs = _.uniq(allSongs);
       return allUniqSongs;
+    }
+
+
+    async getUserName(user) {
+      let url = `https://api.spotify.com/v1/users/${user}`
+      try {
+        let response = await fetch(url, {
+          headers: {
+            'Authorization': 'Bearer ' + this.state.accessToken
+          },
+        });
+        let data = await response.json();
+        this.setState({
+          usernames: {
+            ...this.state.usernames,
+            [user]: data.display_name
+          }
+        })
+      } catch(err) {
+          console.error(err);
+      };             
     }
 
     async startSongs (playlists) {
@@ -244,6 +265,12 @@ class Home extends React.Component {
 
     async submitUsernames() {
       try { 
+        let mainUsername = this.state.users.mainUsername
+        this.setState({
+          usernames: {
+            mainUsername: mainUsername
+          }
+        })
         let users = []; 
         for (let user in this.state.users) {
           if (this.state.users[user] !== "") {
