@@ -81,7 +81,7 @@ class Home extends React.Component {
           userDisplay: false,
           mainUsername: '',
           usernames: {},
-          userInputError: '',
+          invalidUserID: '',
           duplicatesFound: false
         };
         this.getAccessToken = this.getAccessToken.bind(this);
@@ -130,7 +130,6 @@ class Home extends React.Component {
       let id = event.target.id;
       let value = event.target.value;
       this.setState(() => ({
-        ...this.state,
         userDisplay: (value.length > 2 || this.state.userDisplay) ? true : false, 
         users: {
           ...this.state.users,
@@ -140,19 +139,19 @@ class Home extends React.Component {
     }
 
     displayOtherUsers() { //Display block for other users' inputs
-    if (this.state.userDisplay === true) {
-      return (
-        <div>       
-          <InputLabels>Enter up to three other Spotify users to compare your music picks:</InputLabels>
-              <InputDiv>
-                <InputField type="text" id="username0" onChange={this.handleChangeOtherUsername}/>
-                <InputField type="text" id="username1" onChange={this.handleChangeOtherUsername}/>
-                <InputField type="text" id="username2" onChange={this.handleChangeOtherUsername}/>
-              </InputDiv>
-        </div>
-      )  
+      if (this.state.userDisplay === true) {
+        return (
+          <MainContainer>       
+            <InputLabels>Enter up to three other Spotify users to compare your music picks:</InputLabels>
+                <InputDiv>
+                  <InputField type="text" id="username0" onChange={this.handleChangeOtherUsername}/>
+                  <InputField type="text" id="username1" onChange={this.handleChangeOtherUsername}/>
+                  <InputField type="text" id="username2" onChange={this.handleChangeOtherUsername}/>
+                </InputDiv>
+          </MainContainer>
+        )  
+      }
     }
-  }
 
     handleChangeOtherUsername(event) { //Set state with username input for other users
       let id = event.target.id;
@@ -170,12 +169,16 @@ class Home extends React.Component {
       this.setState({
           mainUsername: mainUsername
       })
-      let users = []; //Filter out input fields with null values
-      for (let user in this.state.users) {
-        if (this.state.users[user] !== "") {
-          users.push(this.state.users[user])
+      
+      let userIDs = Object.values(this.state.users); //Trim white space in input fields and eliminate null or empty options
+      let users = [];
+      for (let user of userIDs) { 
+        let trimmedUser = user.trim();
+        if (trimmedUser !== "" && trimmedUser !== null && trimmedUser !== '') {
+          users.push(trimmedUser)
         }
       }
+
       for (let user of users) { //Fetch request for display names/user verification
         let url = `https://api.spotify.com/v1/users/${user}`
         try {
@@ -198,30 +201,30 @@ class Home extends React.Component {
       let displaynames = Object.values(this.state.usernames); //Verify usernames (no undefined display names)
       let undefinedFound = displaynames.indexOf(undefined);
       this.setState({
-        userInputError: (undefinedFound > 0) ? true : false
+        invalidUserID: (undefinedFound > 0) ? true : false,
+        minimumUsers: (users.length > 1 ? false: true),
       })
     }
 
     displayError() { //Display error is username is invalid
-      if (this.state.userInputError === true) {
+      if (this.state.invalidUserID === true) {
         return (
           <div>       
             <Error>Please enter a valid username.</Error>
           </div>
         )  
-      }
+      } 
     }
 
     /*    Request user, playlist, and song data from Spotify API    */
     async submitUsernames() { //MAIN FUNCTION, start API request process
       await this.reset();
       await this.verifyUsernames();
-      if (this.state.userInputError === false) {
+      /* if (this.state.invalidUserID === false) {
         try {
           let compareSongs = [];
           let users = Object.keys(this.state.usernames);
           for (let user of users) {
-            console.log(user);
             let songs = await this.getUserData(user); //gets user data and filters our users' duplicate songs (i.e., user added the same song to multiple playlists);
             compareSongs.push(songs);
           };
@@ -229,7 +232,7 @@ class Home extends React.Component {
         } catch (err) {
           console.log(err);
         }
-      }
+      } */
     }
 
     async getUserData(user) { //Requests user's playlists IDs
@@ -332,14 +335,13 @@ class Home extends React.Component {
 
     /*    Reset functions    */
     async reset() {
-      console.log('reset');
       this.setState({
         accessToken: this.state.accessToken,
         users: this.state.users,
         userDisplay: true,
         mainUsername: '',
         usernames: {},
-        userInputError: '',
+        invalidUserID: '',
         duplicatesFound: false    
       })
     }
