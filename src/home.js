@@ -87,6 +87,7 @@ class Home extends React.Component {
         this.handleChangeFriend = this.handleChangeFriend.bind(this);
         this.submitUsernames = this.submitUsernames.bind(this);
         this.displayOtherUsers = this.displayOtherUsers.bind(this);
+        this.reset = this.reset.bind(this);
     }
 
     async getAccessToken() {
@@ -264,6 +265,7 @@ class Home extends React.Component {
     }
 
     async submitUsernames() {
+      this.reset();
       try { 
         let mainUsername = this.state.users.mainUsername
         this.setState({
@@ -302,6 +304,20 @@ class Home extends React.Component {
           </div>
         )  
       }
+    }
+
+    reset() {
+      console.log('reset');
+      this.setState({
+        accessToken: this.state.accessToken,
+        duplicateData: [],
+        duplicatesFound: false,
+        mainUsername: '',
+        userDisplay: true,
+        username0: '',
+        usernames: {},
+        users: this.state.users
+      })
     }
 
     async componentDidMount() {
