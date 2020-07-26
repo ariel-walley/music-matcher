@@ -65,36 +65,49 @@ const SubmitButton = styled.button`
   border-radius: 5px;
 `;
 
+const Error = styled.p`
+  text-align: center;
+  color: red;
+`;
+
 class Home extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
           accessToken: '',
-          duplicatesFound: false,
           users: {
             mainUsername: ''
           },
+          userDisplay: false,
+          mainUsername: '',
+          usernames: {},
+          userInputError: '',
+          duplicatesFound: false
         };
         this.getAccessToken = this.getAccessToken.bind(this);
+        this.handleChangeMainUsername = this.handleChangeMainUsername.bind(this);
+        this.displayOtherUsers = this.displayOtherUsers.bind(this);
+        this.handleChangeOtherUsername = this.handleChangeOtherUsername.bind(this);
+        this.verifyUsernames = this.verifyUsernames.bind(this);
+        this.displayError = this.displayError.bind(this);
+        this.submitUsernames = this.submitUsernames.bind(this);
         this.getUserData = this.getUserData.bind(this);
-        this.getUserName = this.getUserName.bind(this);
         this.startSongs = this.startSongs.bind(this);
         this.fetchSongs = this.fetchSongs.bind(this);
-        this.prepSongs = this.prepSongs.bind(this);
         this.findDuplicateSongs = this.findDuplicateSongs.bind(this);
         this.getDuplicatesInfo = this.getDuplicatesInfo.bind(this);
-        this.handleChangeMain = this.handleChangeMain.bind(this);
-        this.handleChangeFriend = this.handleChangeFriend.bind(this);
-        this.submitUsernames = this.submitUsernames.bind(this);
-        this.displayOtherUsers = this.displayOtherUsers.bind(this);
         this.reset = this.reset.bind(this);
+    }
+
+    /*    Requesting access token    */
+    async componentDidMount() {
+      await this.getAccessToken();
     }
 
     async getAccessToken() {
       let body = {
         'grant_type': 'client_credentials'
       }
-
       await fetch('https://accounts.spotify.com/api/token', {
         method: 'POST',
         headers: {
@@ -112,8 +125,114 @@ class Home extends React.Component {
       })
     }
 
-    async getUserData(user) {
-      this.getUserName(user);
+    /*    Handle user ID input, the input display, and verifying usernames    */
+    handleChangeMainUsername(event) { //Set state with main username input and decide whether to other other users' block
+      let id = event.target.id;
+      let value = event.target.value;
+      this.setState(() => ({
+        ...this.state,
+        userDisplay: (value.length > 2 || this.state.userDisplay) ? true : false, 
+        users: {
+          ...this.state.users,
+          mainUsername: value
+        }
+      }));
+    }
+
+    displayOtherUsers() { //Display block for other users' inputs
+    if (this.state.userDisplay === true) {
+      return (
+        <div>       
+          <InputLabels>Enter up to three other Spotify users to compare your music picks:</InputLabels>
+              <InputDiv>
+                <InputField type="text" id="username0" onChange={this.handleChangeOtherUsername}/>
+                <InputField type="text" id="username1" onChange={this.handleChangeOtherUsername}/>
+                <InputField type="text" id="username2" onChange={this.handleChangeOtherUsername}/>
+              </InputDiv>
+        </div>
+      )  
+    }
+  }
+
+    handleChangeOtherUsername(event) { //Set state with username input for other users
+      let id = event.target.id;
+      let value = event.target.value;
+      this.setState(() => ({
+        users: {
+          ...this.state.users, 
+          [id]: value
+        }
+      }));
+    }
+
+    async verifyUsernames() { //Request display names from API and verify username input
+      let mainUsername = this.state.users.mainUsername //Identify the main user
+      this.setState({
+          mainUsername: mainUsername
+      })
+      let users = []; //Filter out input fields with null values
+      for (let user in this.state.users) {
+        if (this.state.users[user] !== "") {
+          users.push(this.state.users[user])
+        }
+      }
+      for (let user of users) { //Fetch request for display names/user verification
+        let url = `https://api.spotify.com/v1/users/${user}`
+        try {
+          let response = await fetch(url, {
+            headers: {
+              'Authorization': 'Bearer ' + this.state.accessToken
+            },
+          });
+          let data = await response.json();
+          this.setState({
+            usernames: {
+              ...this.state.usernames,
+              [user]: data.display_name
+            }
+          })
+        } catch(err) {
+            console.error(err);
+        };             
+      }
+      let displaynames = Object.values(this.state.usernames); //Verify usernames (no undefined display names)
+      let undefinedFound = displaynames.indexOf(undefined);
+      this.setState({
+        userInputError: (undefinedFound > 0) ? true : false
+      })
+    }
+
+    displayError() { //Display error is username is invalid
+      if (this.state.userInputError === true) {
+        return (
+          <div>       
+            <Error>Please enter a valid username.</Error>
+          </div>
+        )  
+      }
+    }
+
+    /*    Request user, playlist, and song data from Spotify API    */
+    async submitUsernames() { //MAIN FUNCTION, start API request process
+      await this.reset();
+      await this.verifyUsernames();
+      if (this.state.userInputError === false) {
+        try {
+          let compareSongs = [];
+          let users = Object.keys(this.state.usernames);
+          for (let user of users) {
+            console.log(user);
+            let songs = await this.getUserData(user); //gets user data and filters our users' duplicate songs (i.e., user added the same song to multiple playlists);
+            compareSongs.push(songs);
+          };
+          let duplicateSongs = await this.findDuplicateSongs(compareSongs);
+        } catch (err) {
+          console.log(err);
+        }
+      }
+    }
+
+    async getUserData(user) { //Requests user's playlists IDs
       let playlists = [];
       let next = `https://api.spotify.com/v1/users/${user}/playlists?limit=50`;
       while(next != null) {
@@ -136,28 +255,7 @@ class Home extends React.Component {
       return allUniqSongs;
     }
 
-
-    async getUserName(user) {
-      let url = `https://api.spotify.com/v1/users/${user}`
-      try {
-        let response = await fetch(url, {
-          headers: {
-            'Authorization': 'Bearer ' + this.state.accessToken
-          },
-        });
-        let data = await response.json();
-        this.setState({
-          usernames: {
-            ...this.state.usernames,
-            [user]: data.display_name
-          }
-        })
-      } catch(err) {
-          console.error(err);
-      };             
-    }
-
-    async startSongs (playlists) {
+    async startSongs (playlists) { //Loops through playlists to send off requests for each playlists' songs
       let allSongs = [];
       for(let playlistID of playlists) {
         let playlistData = await this.fetchSongs(playlistID);
@@ -166,7 +264,7 @@ class Home extends React.Component {
       return allSongs.flat();
     }
 
-    async fetchSongs(playlistID) {
+    async fetchSongs(playlistID) { //Requests playlists' songs
       let playlistSongs = [];
       let next = `https://api.spotify.com/v1/playlists/${playlistID}/tracks?fields=items(track(id,name,album(images,name),artists(name))),limit,next,offset,previous,total`
       
@@ -189,19 +287,11 @@ class Home extends React.Component {
       return playlistSongs;
     }
 
-    prepSongs(data) {
-      let songs = []; 
-      for (let song in data) {
-        songs.push(data[song].track.id);
-      }
-      return songs;
-    }
-
-    async findDuplicateSongs(arrays) {
+    /*    Find duplicates from data    */ 
+    async findDuplicateSongs(arrays) { //Find duplicates data and set in state
       let duplicates = _.intersection(...arrays);
       _.pull(duplicates, null);
       let allDuplicateInfo = [];
-
       while(duplicates.length) {
         let splitDuplicates = duplicates.splice(0,50);
         let apiDuplicates = splitDuplicates.join(",");
@@ -218,16 +308,16 @@ class Home extends React.Component {
               "image": song.album.images[1].url,
               "albumName": `The cover art of the song's all: ${song.album.name}`
             }
-          );
+          ); 
         };
         this.setState({
           duplicateData: allDuplicateInfo,
           duplicatesFound: true
-        }); 
+        });  
       }
     }
 
-    async getDuplicatesInfo(duplicates) {     
+    async getDuplicatesInfo(duplicates) { //Request song data (title, artist, album data, etc.)   
       try {
         let response = await fetch('https://api.spotify.com/v1/tracks/?ids=' + duplicates, {
           headers: {
@@ -240,91 +330,21 @@ class Home extends React.Component {
         }
     }
 
-    handleChangeMain(event) {
-      let id = event.target.id;
-      let value = event.target.value;
-      this.setState(() => ({
-        ...this.state,
-        userDisplay: (value.length > 2 || this.state.userDisplay) ? true : false, 
-        users: {
-          ...this.state.users,
-          mainUsername: value
-        }
-      }));
-    }
-
-    handleChangeFriend(event) {
-      let id = event.target.id;
-      let value = event.target.value;
-      this.setState(() => ({
-        users: {
-          ...this.state.users, 
-          [id]: value
-        }
-      }));
-    }
-
-    async submitUsernames() {
-      this.reset();
-      try { 
-        let mainUsername = this.state.users.mainUsername
-        this.setState({
-          usernames: {
-            mainUsername: mainUsername
-          }
-        })
-        let users = []; 
-        for (let user in this.state.users) {
-          if (this.state.users[user] !== "") {
-            users.push(this.state.users[user])
-          }
-        }
-        let compareSongs = [];
-        for (let user of users) {
-          let uniqSongs = await this.getUserData(user); //gets user data and filters our users' duplicate songs (i.e., user added the same song to multiple playlists);
-          compareSongs.push(uniqSongs);
-        };
-        let duplicateSongs = await this.findDuplicateSongs(compareSongs);
-      } catch (err) {
-        console.log(err);
-      }
-    }
-    
-
-    displayOtherUsers() {
-      if (this.state.userDisplay === true) {
-        return (
-          <div>       
-            <InputLabels>Enter up to three other Spotify users to compare your music picks:</InputLabels>
-                <InputDiv>
-                  <InputField type="text" id="username0" onChange={this.handleChangeFriend}/>
-                  <InputField type="text" id="username1" onChange={this.handleChangeFriend}/>
-                  <InputField type="text" id="username2" onChange={this.handleChangeFriend}/>
-                </InputDiv>
-          </div>
-        )  
-      }
-    }
-
-    reset() {
+    /*    Reset functions    */
+    async reset() {
       console.log('reset');
       this.setState({
         accessToken: this.state.accessToken,
-        duplicateData: [],
-        duplicatesFound: false,
-        mainUsername: '',
+        users: this.state.users,
         userDisplay: true,
-        username0: '',
+        mainUsername: '',
         usernames: {},
-        users: this.state.users
+        userInputError: '',
+        duplicatesFound: false    
       })
     }
 
-    async componentDidMount() {
-      await this.getAccessToken();
-
-    }
-
+    /*    Render    */
     render () {
       return (
           <div>
@@ -334,9 +354,10 @@ class Home extends React.Component {
               <About>Find out which songs you and your friends have in common in your public playlists in Spotify!</About>
               <InputLabels for="your_username">Enter your Spotify username here:</InputLabels>
               <InputDiv>
-                <InputField type="text" id="your_username" onChange={this.handleChangeMain}/>
+                <InputField type="text" id="your_username" onChange={this.handleChangeMainUsername}/>
               </InputDiv>
               {this.displayOtherUsers()}
+              {this.displayError()}
               <Tutorial>Not sure how to find a Spotify username? Click here for help!</Tutorial>
               <SubmitButton type="submit" onClick={this.submitUsernames}>Submit</SubmitButton>
             </MainContainer>

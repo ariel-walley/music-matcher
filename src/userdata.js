@@ -83,7 +83,7 @@ class DisplayData extends React.Component {
 
     formatHeader() {
       //Determine the display names
-      let mainUserID = this.props.data.usernames.mainUsername;
+      let mainUserID = this.props.data.mainUsername;
       let mainUsername = this.props.data.usernames[mainUserID];
       let usernames = Object.values(this.props.data.usernames);
       _.pull(usernames, mainUserID, mainUsername); //remove the main user from the display names
