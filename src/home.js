@@ -81,7 +81,7 @@ class Home extends React.Component {
           userDisplay: false,
           mainUsername: '',
           usernames: {},
-          invalidUserID: '',
+          errors: {},
           duplicatesFound: false
         };
         this.getAccessToken = this.getAccessToken.bind(this);
@@ -200,20 +200,34 @@ class Home extends React.Component {
       }
       let displaynames = Object.values(this.state.usernames); //Verify usernames (no undefined display names)
       let undefinedFound = displaynames.indexOf(undefined);
+      console.log('Number of users is: ' + users.length);
+      console.log(users);
+      console.log(Object.values(this.state.usernames));
+      console.log(undefinedFound);
+      console.log((users.length > 1) ? true : false);
+
       this.setState({
-        invalidUserID: (undefinedFound > 0) ? true : false,
-        minimumUsers: (users.length > 1 ? false: true),
+        errors: {
+          invalidUserID: (undefinedFound > -1) ? true : false,
+          minimumUsersError: (users.length > 1) ? false : true
+        }
       })
     }
 
     displayError() { //Display error is username is invalid
-      if (this.state.invalidUserID === true) {
+      if (this.state.errors.invalidUserID === true) {
         return (
           <div>       
             <Error>Please enter a valid username.</Error>
           </div>
         )  
-      } 
+      } else if (this.state.errors.minimumUsersError === true) {
+        return (
+          <div>       
+            <Error>Please enter at least two usernames.</Error>
+          </div>
+        )
+      }
     }
 
     /*    Request user, playlist, and song data from Spotify API    */
@@ -341,7 +355,7 @@ class Home extends React.Component {
         userDisplay: true,
         mainUsername: '',
         usernames: {},
-        invalidUserID: '',
+        errors: {},
         duplicatesFound: false    
       })
     }
