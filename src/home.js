@@ -237,7 +237,7 @@ class Home extends React.Component {
     async submitUsernames() { //MAIN FUNCTION, start API request process
       await this.reset();
       await this.verifyUsernames();
-      if (this.state.errors.invalidUserID === false) {
+      if (this.state.errors.invalidUserID === false && this.state.errors.minimumUsersError === false) {
         try {
           let compareSongs = [];
           let users = Object.keys(this.state.usernames);
