@@ -1,6 +1,13 @@
 import React from 'react';
 import styled from 'styled-components';
 import _ from 'lodash';
+import './loading.css';
+
+const Container = styled.div`
+  margin: 30px auto;
+  width: 100%;
+  display: flex;
+`;
 
 const MainContainer = styled.div`
   font-family: 'Open Sans', sans-serif;
@@ -9,12 +16,6 @@ const MainContainer = styled.div`
 const Header = styled.h1`
   text-align: center;
   margin: 20px;
-`;
-
-const Loading = styled.p`
-  color: white;
-  font-size: 20px;
-  font-weight: 550px;
 `;
 
 const CardContainer = styled.div`
@@ -114,9 +115,15 @@ class DisplayData extends React.Component {
         return <div/>
       } else if (this.props.data.duplicatesFound === 'loading') {
         return (
-          <div>
-            <Loading>Loading...</Loading>
-          </div>
+          <Container>
+            <div class="la-line-scale-pulse-out la-2x">
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+            </div>
+          </Container>
         )    
       } else {
         return (

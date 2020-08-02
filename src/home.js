@@ -1,5 +1,4 @@
 import React from 'react';
-import './App.css';
 import DisplayData from './userdata';
 import QueryString from 'querystring';
 import _ from 'lodash';

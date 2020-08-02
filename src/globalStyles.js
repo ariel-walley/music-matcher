@@ -7,6 +7,7 @@ html {
 
 body {
     height: auto;
+    width: 100%;
     margin: 0 auto;
     padding: 0;
     background-image: linear-gradient(to bottom right, rgba(125,0,170,1) 0%, rgba(1,147,167,1) 50%, rgba(0,255,51,1) 100%);
