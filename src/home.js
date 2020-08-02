@@ -82,7 +82,7 @@ class Home extends React.Component {
           mainUsername: '',
           usernames: {},
           errors: {},
-          duplicatesFound: false
+          duplicatesFound: 'start'
         };
         this.getAccessToken = this.getAccessToken.bind(this);
         this.handleChangeMainUsername = this.handleChangeMainUsername.bind(this);
@@ -238,6 +238,9 @@ class Home extends React.Component {
       await this.reset();
       await this.verifyUsernames();
       if (this.state.errors.invalidUserID === false && this.state.errors.minimumUsersError === false) {
+        this.setState({
+          duplicatesFound: 'loading'
+        })
         try {
           let compareSongs = [];
           let users = Object.keys(this.state.usernames);
@@ -332,7 +335,7 @@ class Home extends React.Component {
         };
         this.setState({
           duplicateData: allDuplicateInfo,
-          duplicatesFound: true
+          duplicatesFound: 'done'
         });  
       }
     }
@@ -359,7 +362,7 @@ class Home extends React.Component {
         mainUsername: '',
         usernames: {},
         errors: {},
-        duplicatesFound: false    
+        duplicatesFound: 'start'    
       })
     }
 

@@ -110,12 +110,14 @@ class DisplayData extends React.Component {
     }
 
     renderData() {
-      if (this.props.data.duplicatesFound === false) {
+      if (this.props.data.duplicatesFound === 'start') {
+        return <div/>
+      } else if (this.props.data.duplicatesFound === 'loading') {
         return (
           <div>
             <Loading>Loading...</Loading>
           </div>
-        )
+        )    
       } else {
         return (
           <div>
