@@ -126,7 +126,6 @@ class Home extends React.Component {
 
     /*    Handle user ID input, the input display, and verifying usernames    */
     handleChangeMainUsername(event) { //Set state with main username input and decide whether to other other users' block
-      let id = event.target.id;
       let value = event.target.value;
       this.setState(() => ({
         userDisplay: (value.length > 2 || this.state.userDisplay) ? true : false, 
@@ -142,11 +141,12 @@ class Home extends React.Component {
         return (
           <MainContainer>       
             <InputLabels>Enter up to three other Spotify users to compare your music picks:</InputLabels>
-                <InputDiv>
-                  <InputField type="text" id="username0" onChange={this.handleChangeOtherUsername}/>
-                  <InputField type="text" id="username1" onChange={this.handleChangeOtherUsername}/>
-                  <InputField type="text" id="username2" onChange={this.handleChangeOtherUsername}/>
-                </InputDiv>
+              <InputDiv>
+                <InputField type="text" id="username0" onChange={this.handleChangeOtherUsername}/>
+                <InputField type="text" id="username1" onChange={this.handleChangeOtherUsername}/>
+                <InputField type="text" id="username2" onChange={this.handleChangeOtherUsername}/>
+              </InputDiv>
+            <SubmitButton type="submit" onClick={this.submitUsernames}>Submit</SubmitButton>
           </MainContainer>
         )  
       }
@@ -247,7 +247,7 @@ class Home extends React.Component {
             let songs = await this.getUserData(user); //gets user data and filters our users' duplicate songs (i.e., user added the same song to multiple playlists);
             compareSongs.push(songs);
           };
-          let duplicateSongs = await this.findDuplicateSongs(compareSongs); 
+          await this.findDuplicateSongs(compareSongs); 
         } catch (err) {
           console.log(err);
         }
@@ -380,7 +380,6 @@ class Home extends React.Component {
               {this.displayOtherUsers()}
               {this.displayError()}
               <Tutorial>Not sure how to find a Spotify username? Click here for help!</Tutorial>
-              <SubmitButton type="submit" onClick={this.submitUsernames}>Submit</SubmitButton>
             </MainContainer>
             <DisplayData data={this.state}/>
           </div>
