@@ -85,9 +85,12 @@ const SubmitButton = styled.button`
 
 const Error = styled.p`
   margin: 0 auto;
-  width: 350px;
+  max-width: 350px;
   text-align: center;
-  color: red;
+  background-color: red;
+  border-radius: 5px;
+  padding: 5px;
+  color: white;
 `;
 
 class Home extends React.Component {
@@ -199,6 +202,16 @@ class Home extends React.Component {
       }
 
       let mainUsername = this.state.users.mainUsername //Identify the main user
+        if (mainUsername == "" || mainUsername == null || mainUsername == '') {
+          this.setState({
+            errors: {
+              ...this.state.errors,
+              noMainUsername: true
+            }
+          })
+          return
+        } 
+
         if (mainUsername.search("spotify:user:") > -1 ) {
           mainUsername = mainUsername.slice(13);
         }
@@ -254,7 +267,13 @@ class Home extends React.Component {
         let noPublicUser = this.state.errors.noPublicPlaylists.true;
         return (
           <div>
-            <Error>Uh oh! Unfortunately {this.state.usernames[noPublicUser]} (username: {this.state.errors.noPublicPlaylists.true}) does not have any public playlists available so we are not able to compare your playlists.</Error>
+            <Error>Uh oh! Unfortunately {this.state.usernames[noPublicUser]} (username: {this.state.errors.noPublicPlaylists.true}) does not have any public playlists available so we are not able to compare your playlists. Please remove their username and try again.</Error>
+          </div>
+        )
+      } else if (this.state.errors.noMainUsername) {
+        return (
+          <div>
+            <Error>Please make sure to list your username or a main username.</Error>
           </div>
         )
       }
