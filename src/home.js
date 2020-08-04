@@ -372,8 +372,19 @@ class Home extends React.Component {
 
     /*    Find duplicates from data    */ 
     async findDuplicateSongs(arrays) { //Find duplicates data and set in state
+      console.log(arrays);
       let duplicates = _.intersection(...arrays);
       _.pull(duplicates, null);
+
+      if (duplicates.length === 0) {
+        this.setState({
+          ...this.state,
+          duplicateData: "none",
+          duplicatesFound: "start"
+        })
+        return
+      }
+
       let allDuplicateInfo = [];
       while(duplicates.length) {
         let splitDuplicates = duplicates.splice(0,50);
