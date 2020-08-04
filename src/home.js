@@ -18,7 +18,7 @@ const Gradient = styled.div`
   width: 100%;
   background: ${props => props.color};
   background-attachment: fixed;
-  transition: opacity 1.5s ease-in-out;
+  transition: opacity 2.5s linear;
   opacity: ${props => props.status ? 1 : 0};
   position: fixed;
   z-index: -1;
@@ -27,7 +27,7 @@ const Gradient = styled.div`
 const ContentContainer = styled.div`
   display: flex;
   flex-direction: column;
-  justify-content; center;
+  justify-content: center;
 `;
 
 const Header = styled.h1`
@@ -84,6 +84,8 @@ const SubmitButton = styled.button`
 `;
 
 const Error = styled.p`
+  margin: 0 auto;
+  width: 350px;
   text-align: center;
   color: red;
 `;
@@ -236,16 +238,23 @@ class Home extends React.Component {
     }
 
     displayError() { //Display error is username is invalid
-      if (this.state.errors.invalidUserID === true) {
+      if (this.state.errors.invalidUserID) {
         return (
           <div>       
             <Error>Please enter a valid username.</Error>
           </div>
         )  
-      } else if (this.state.errors.minimumUsersError === true) {
+      } else if (this.state.errors.minimumUsersError) {
         return (
           <div>       
             <Error>Please enter at least two usernames.</Error>
+          </div>
+        )
+      } else if (this.state.errors.noPublicPlaylists) {
+        let noPublicUser = this.state.errors.noPublicPlaylists.true;
+        return (
+          <div>
+            <Error>Uh oh! Unfortunately {this.state.usernames[noPublicUser]} (username: {this.state.errors.noPublicPlaylists.true}) does not have any public playlists available so we are not able to compare your playlists.</Error>
           </div>
         )
       }
@@ -284,6 +293,20 @@ class Home extends React.Component {
             },
           });
           let data = await response.json();
+          console.log(data);
+          if (data.items.length === 0) {
+            this.setState({
+              ...this.state,
+              duplicatesFound: "start",
+              errors: {
+                ...this.state.errors,
+                noPublicPlaylists: {
+                  true: user
+                }
+              }
+            })
+            return
+          }
           let playlistsChunk = data.items.map(playlist => { return playlist.id });
           playlists.push(...playlistsChunk);
           next = data.next;
@@ -380,7 +403,7 @@ class Home extends React.Component {
         mainUsername: '',
         usernames: {},
         errors: {},
-        duplicatesFound: 'start'    
+        duplicatesFound: 'start',  
       })
     }
 
@@ -390,7 +413,7 @@ class Home extends React.Component {
           <Wrapper>
             <GlobalStyle/>
             <Gradient color="linear-gradient(to bottom right, #6101a1, #f31f69)" status={this.state.duplicatesFound === "start"}/>
-            <Gradient color="linear-gradient(to bottom right, #f31f69, #fe7634)" status={this.state.duplicatesFound === "loading"}/>
+            <Gradient color="linear-gradient(to bottom right, #fe7634, #f31f69)" status={this.state.duplicatesFound === "loading"}/>
             <Gradient color="linear-gradient(to bottom right, #fe7634, #f9e92f)" status={this.state.duplicatesFound === "done"}/>
               <ContentContainer> 
                 <Header>Welcome to Music Matcher!</Header>
