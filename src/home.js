@@ -5,7 +5,26 @@ import _ from 'lodash';
 import styled from 'styled-components';
 import GlobalStyle from './globalStyles';
 
-const MainContainer = styled.div`
+const Wrapper = styled.div`
+  height: 100%;
+  width: 100%;
+  position: relative;
+  background-color: rgba(0, 0, 0, 0);
+  background-attachment: fixed;
+`;
+
+const Gradient = styled.div`
+  height: 100%;
+  width: 100%;
+  background: ${props => props.color};
+  background-attachment: fixed;
+  transition: opacity 1.5s ease-in-out;
+  opacity: ${props => props.status ? 1 : 0};
+  position: fixed;
+  z-index: -1;
+`;
+
+const ContentContainer = styled.div`
   display: flex;
   flex-direction: column;
   justify-content; center;
@@ -139,7 +158,7 @@ class Home extends React.Component {
     displayOtherUsers() { //Display block for other users' inputs
       if (this.state.userDisplay === true) {
         return (
-          <MainContainer>       
+          <ContentContainer>       
             <InputLabels>Enter up to three other Spotify users to compare your music picks:</InputLabels>
               <InputDiv>
                 <InputField type="text" id="username0" onChange={this.handleChangeOtherUsername}/>
@@ -147,7 +166,7 @@ class Home extends React.Component {
                 <InputField type="text" id="username2" onChange={this.handleChangeOtherUsername}/>
               </InputDiv>
             <SubmitButton type="submit" onClick={this.submitUsernames}>Submit</SubmitButton>
-          </MainContainer>
+          </ContentContainer>
         )  
       }
     }
@@ -368,21 +387,24 @@ class Home extends React.Component {
     /*    Render    */
     render () {
       return (
-          <div>
+          <Wrapper>
             <GlobalStyle/>
-            <MainContainer> 
-              <Header>Welcome to Music Matcher!</Header>
-              <About>Find out which songs you and your friends have in common in your public playlists in Spotify!</About>
-              <InputLabels for="your_username">Enter your Spotify username here:</InputLabels>
-              <InputDiv>
-                <InputField type="text" id="your_username" onChange={this.handleChangeMainUsername}/>
-              </InputDiv>
-              {this.displayOtherUsers()}
-              {this.displayError()}
-              <Tutorial>Not sure how to find a Spotify username? Click here for help!</Tutorial>
-            </MainContainer>
-            <DisplayData data={this.state}/>
-          </div>
+            <Gradient color="linear-gradient(to bottom right, #6101a1, #f31f69)" status={this.state.duplicatesFound === "start"}/>
+            <Gradient color="linear-gradient(to bottom right, #f31f69, #fe7634)" status={this.state.duplicatesFound === "loading"}/>
+            <Gradient color="linear-gradient(to bottom right, #fe7634, #f9e92f)" status={this.state.duplicatesFound === "done"}/>
+              <ContentContainer> 
+                <Header>Welcome to Music Matcher!</Header>
+                <About>Find out which songs you and your friends have in common in your public playlists in Spotify!</About>
+                <InputLabels for="your_username">Enter your Spotify username here:</InputLabels>
+                <InputDiv>
+                  <InputField type="text" id="your_username" onChange={this.handleChangeMainUsername}/>
+                </InputDiv>
+                {this.displayOtherUsers()}
+                {this.displayError()}
+                <Tutorial>Not sure how to find a Spotify username? Click here for help!</Tutorial>
+              </ContentContainer>
+              <DisplayData data={this.state}/>
+          </Wrapper>
       );
     }
 };
