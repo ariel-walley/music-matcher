@@ -13,5 +13,5 @@ body {
   padding: 0;
 }
 `;
- 
+
 export default GlobalStyle;

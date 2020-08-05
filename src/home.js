@@ -2,7 +2,7 @@ import React from 'react';
 import DisplayData from './userdata';
 import QueryString from 'querystring';
 import _ from 'lodash';
-import styled from 'styled-components';
+import styled, { keyframes } from 'styled-components';
 import GlobalStyle from './globalStyles';
 
 const Wrapper = styled.div`
@@ -18,44 +18,57 @@ const Gradient = styled.div`
   width: 100%;
   background: ${props => props.color};
   background-attachment: fixed;
-  transition: opacity 2.5s linear;
+  transition: opacity 2.5s;
   opacity: ${props => props.status ? 1 : 0};
   position: fixed;
   z-index: -1;
+`;
+
+const fadeIn = keyframes`
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1
+  }
 `;
 
 const ContentContainer = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: center;
+  color: ${props => props.status === "done" ? "black" : "white"};
+  text-align: center;
+  transition: color 1s;
 `;
 
 const Header = styled.h1`
-  text-align: center;
   margin: 20px auto 0 auto;
   font-size: 70px;
-  color: white;
 `;
 
 const About = styled.p`
-  text-align: center;
   margin: 0 auto 30px auto;
   font-weight: 5500px;
   font-size: 18px;
-  color: white;
 `;
 
 const InputLabels = styled.label`
-  text-align: center;
   margin: 10px;
   font-weight: 700px;
   font-size: 20px;
-  color: white;
+  color: ${props => props.status ? "black" : "white"};
+  transition: color 1s;
+
+`;
+
+const InputLabels2 = styled(InputLabels)`
+  animation: 0.6s ${fadeIn} ease-out;
 `;
 
 const InputDiv = styled.div`
   margin: 0 auto;
-  text-align: center;
 `;
 
 const InputField = styled.input`
@@ -66,31 +79,34 @@ const InputField = styled.input`
   border-radius: 5px;
 `;
 
+const InputField2 = styled(InputField)`
+  animation: 0.8s ${fadeIn} ease-out;
+`;
+
 const Tutorial = styled.p`
-  text-align: center;
   margin: 10px;
   font-weight: 5500px;
   font-size: 18px;
-  color: white;
 `;
 
 const SubmitButton = styled.button`
   margin: 10px auto;
+  width: 70px;
   padding: 7px;
-  background-color: white;
-  font-size: 16px;
   border: 0;
   border-radius: 5px;
+  background-color: white;
+  text-align: center;
+  font-size: 16px;
+  animation: 0.5s ${fadeIn} ease-out;
 `;
 
 const Error = styled.p`
   margin: 0 auto;
   max-width: 350px;
-  text-align: center;
   background-color: red;
   border-radius: 5px;
   padding: 5px;
-  color: white;
 `;
 
 class Home extends React.Component {
@@ -113,6 +129,7 @@ class Home extends React.Component {
         this.handleChangeOtherUsername = this.handleChangeOtherUsername.bind(this);
         this.verifyUsernames = this.verifyUsernames.bind(this);
         this.displayError = this.displayError.bind(this);
+        this.displayButton = this.displayButton.bind(this);
         this.submitUsernames = this.submitUsernames.bind(this);
         this.getUserData = this.getUserData.bind(this);
         this.startSongs = this.startSongs.bind(this);
@@ -164,17 +181,25 @@ class Home extends React.Component {
       if (this.state.userDisplay === true) {
         return (
           <ContentContainer>       
-            <InputLabels>Enter up to three other Spotify users to compare your music picks:</InputLabels>
+            <InputLabels2 status={this.state.duplicatesFound === "done"}>Enter up to three other Spotify users to compare your music picks:</InputLabels2>
               <InputDiv>
-                <InputField type="text" id="username0" onChange={this.handleChangeOtherUsername}/>
-                <InputField type="text" id="username1" onChange={this.handleChangeOtherUsername}/>
-                <InputField type="text" id="username2" onChange={this.handleChangeOtherUsername}/>
+                <InputField2 type="text" id="username0" onChange={this.handleChangeOtherUsername}/>
+                <InputField2 type="text" id="username1" onChange={this.handleChangeOtherUsername}/>
+                <InputField2 type="text" id="username2" onChange={this.handleChangeOtherUsername}/>
               </InputDiv>
-            <SubmitButton type="submit" onClick={this.submitUsernames}>Submit</SubmitButton>
           </ContentContainer>
         )  
       }
     }
+
+    displayButton() { //Display submit button
+    let users = Object.keys(this.state.users);
+    if (users.length > 1) {
+      return (
+        <SubmitButton type="submit" status={this.state.userDisplay2} onClick={this.submitUsernames}>Submit</SubmitButton>
+      )  
+    }
+  }
 
     handleChangeOtherUsername(event) { //Set state with username input for other users
       let id = event.target.id;
@@ -202,7 +227,7 @@ class Home extends React.Component {
       }
 
       let mainUsername = this.state.users.mainUsername //Identify the main user
-        if (mainUsername == "" || mainUsername == null || mainUsername == '') {
+        if (mainUsername === "" || mainUsername === null || mainUsername === '') {
           this.setState({
             errors: {
               ...this.state.errors,
@@ -445,15 +470,16 @@ class Home extends React.Component {
             <Gradient color="linear-gradient(to bottom right, #6101a1, #f31f69)" status={this.state.duplicatesFound === "start"}/>
             <Gradient color="linear-gradient(to bottom right, #fe7634, #f31f69)" status={this.state.duplicatesFound === "loading"}/>
             <Gradient color="linear-gradient(to bottom right, #fe7634, #f9e92f)" status={this.state.duplicatesFound === "done"}/>
-              <ContentContainer> 
+              <ContentContainer status={this.state.duplicatesFound}> 
                 <Header>Welcome to Music Matcher!</Header>
                 <About>Find out which songs you and your friends have in common in your public playlists in Spotify!</About>
-                <InputLabels for="your_username">Enter your Spotify username here:</InputLabels>
+                <InputLabels for="your_username" status={this.state.duplicatesFound === "done"}>Enter your Spotify username here:</InputLabels>
                 <InputDiv>
                   <InputField type="text" id="your_username" onChange={this.handleChangeMainUsername}/>
                 </InputDiv>
                 {this.displayOtherUsers()}
                 {this.displayError()}
+                {this.displayButton()}
                 <Tutorial>Not sure how to find a Spotify username? Click here for help!</Tutorial>
               </ContentContainer>
               <DisplayData data={this.state}/>

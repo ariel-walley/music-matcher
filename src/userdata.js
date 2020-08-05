@@ -1,5 +1,5 @@
 import React from 'react';
-import styled from 'styled-components';
+import styled, { keyframes } from 'styled-components';
 import _ from 'lodash';
 import './loading.css';
 
@@ -9,8 +9,19 @@ const Container = styled.div`
   display: flex;
 `;
 
+const fadeIn = keyframes`
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1
+  }
+`;
+
 const MainContainer = styled.div`
   font-family: 'Open Sans', sans-serif;
+  animation: 1s ${fadeIn} ease-out;
 `;
 
 const Header = styled.h1`
