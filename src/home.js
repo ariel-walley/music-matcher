@@ -139,7 +139,6 @@ class Home extends React.Component {
         this.handleChangeOtherUsername = this.handleChangeOtherUsername.bind(this);
         this.verifyUsernames = this.verifyUsernames.bind(this);
         this.displayError = this.displayError.bind(this);
-        this.displayButton = this.displayButton.bind(this);
         this.submitUsernames = this.submitUsernames.bind(this);
         this.getUserData = this.getUserData.bind(this);
         this.startSongs = this.startSongs.bind(this);
@@ -206,24 +205,16 @@ class Home extends React.Component {
         return (
           <ContentContainer>       
             <InputLabels2 status={this.state.duplicatesFound === "done"}>Enter up to three other Spotify users to compare your music picks. Enter their URIs below:</InputLabels2>
-              <InputDiv>
-                <InputField2 type="text" id="username0" onChange={this.handleChangeOtherUsername}/>
-                <InputField2 type="text" id="username1" onChange={this.handleChangeOtherUsername}/>
-                <InputField2 type="text" id="username2" onChange={this.handleChangeOtherUsername}/>
-              </InputDiv>
+            <InputDiv>
+              <InputField2 type="text" id="username0" onChange={this.handleChangeOtherUsername}/>
+              <InputField2 type="text" id="username1" onChange={this.handleChangeOtherUsername}/>
+              <InputField2 type="text" id="username2" onChange={this.handleChangeOtherUsername}/>
+            </InputDiv>
+            <SubmitButton type="submit" status={this.state.userDisplay2} onClick={this.submitUsernames}>Submit</SubmitButton>
           </ContentContainer>
         )  
       }
     }
-
-    displayButton() { //Display submit button
-    let users = Object.keys(this.state.users);
-    if (users.length > 1) {
-      return (
-        <SubmitButton type="submit" status={this.state.userDisplay2} onClick={this.submitUsernames}>Submit</SubmitButton>
-      )  
-    }
-  }
 
     handleChangeOtherUsername(event) { //Set state with username input for other users
       let id = event.target.id;
