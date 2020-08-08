@@ -3,6 +3,7 @@ import DisplayData from './userdata';
 import QueryString from 'querystring';
 import _ from 'lodash';
 import styled, { keyframes } from 'styled-components';
+import Popup from './instructions';
 import GlobalStyle from './globalStyles';
 
 const Wrapper = styled.div`
@@ -18,7 +19,7 @@ const Gradient = styled.div`
   width: 100%;
   background: ${props => props.color};
   background-attachment: fixed;
-  transition: opacity 2.5s;
+  transition: opacity 8s;
   opacity: ${props => props.status ? 1 : 0};
   position: fixed;
   z-index: -1;
@@ -40,7 +41,7 @@ const ContentContainer = styled.div`
   justify-content: center;
   color: ${props => props.status === "done" ? "black" : "white"};
   text-align: center;
-  transition: color 1s;
+  transition: color 5s;
 `;
 
 const Header = styled.h1`
@@ -59,12 +60,12 @@ const InputLabels = styled.label`
   font-weight: 700px;
   font-size: 20px;
   color: ${props => props.status ? "black" : "white"};
-  transition: color 1s;
+  transition: color 5s;
 
 `;
 
 const InputLabels2 = styled(InputLabels)`
-  animation: 0.6s ${fadeIn} ease-out;
+  animation: 0.4s ${fadeIn} ease-out;
 `;
 
 const InputDiv = styled.div`
@@ -80,13 +81,21 @@ const InputField = styled.input`
 `;
 
 const InputField2 = styled(InputField)`
-  animation: 0.8s ${fadeIn} ease-out;
+  animation: 0.6s ${fadeIn} ease-out;
 `;
 
-const Tutorial = styled.p`
-  margin: 10px;
-  font-weight: 5500px;
-  font-size: 18px;
+const Tutorial = styled.button`
+  margin: 10px auto;
+  padding: 3px;
+  width: 550px;
+  cursor: pointer;
+  background-color: rgba(0,0,0,0);
+  border-style: none;
+  outline-style: none;
+  font-weight: 700px;
+  font-size: 20px;
+  color: ${props => props.status ? "black" : "white"};
+  transition: color 5s;
 `;
 
 const SubmitButton = styled.button`
@@ -121,7 +130,8 @@ class Home extends React.Component {
           mainUsername: '',
           usernames: {},
           errors: {},
-          duplicatesFound: 'start'
+          duplicatesFound: 'start',
+          showPopup: false
         };
         this.getAccessToken = this.getAccessToken.bind(this);
         this.handleChangeMainUsername = this.handleChangeMainUsername.bind(this);
@@ -136,6 +146,8 @@ class Home extends React.Component {
         this.fetchSongs = this.fetchSongs.bind(this);
         this.findDuplicateSongs = this.findDuplicateSongs.bind(this);
         this.getDuplicatesInfo = this.getDuplicatesInfo.bind(this);
+        this.displayPopup = this.displayPopup.bind(this);
+        this.togglePopup = this.togglePopup.bind(this);
         this.reset = this.reset.bind(this);
     }
 
@@ -177,11 +189,23 @@ class Home extends React.Component {
       }));
     }
 
+    displayPopup() {
+      if (this.state.showPopup) {
+        return <Popup closePopup={this.togglePopup}/>
+      }
+    }
+
+    togglePopup() {
+      this.setState({
+        showPopup: !this.state.showPopup
+      })
+    }
+
     displayOtherUsers() { //Display block for other users' inputs
       if (this.state.userDisplay === true) {
         return (
           <ContentContainer>       
-            <InputLabels2 status={this.state.duplicatesFound === "done"}>Enter up to three other Spotify users to compare your music picks:</InputLabels2>
+            <InputLabels2 status={this.state.duplicatesFound === "done"}>Enter up to three other Spotify users to compare your music picks. Enter their URIs below:</InputLabels2>
               <InputDiv>
                 <InputField2 type="text" id="username0" onChange={this.handleChangeOtherUsername}/>
                 <InputField2 type="text" id="username1" onChange={this.handleChangeOtherUsername}/>
@@ -459,6 +483,7 @@ class Home extends React.Component {
         usernames: {},
         errors: {},
         duplicatesFound: 'start',  
+        showPopup: false
       })
     }
 
@@ -467,20 +492,21 @@ class Home extends React.Component {
       return (
           <Wrapper>
             <GlobalStyle/>
-            <Gradient color="linear-gradient(to bottom right, #6101a1, #f31f69)" status={this.state.duplicatesFound === "start"}/>
-            <Gradient color="linear-gradient(to bottom right, #fe7634, #f31f69)" status={this.state.duplicatesFound === "loading"}/>
-            <Gradient color="linear-gradient(to bottom right, #fe7634, #f9e92f)" status={this.state.duplicatesFound === "done"}/>
+            <Gradient color="linear-gradient(to bottom right, #00ff33 0%, #13a9bb 50%, #7d00aa 100%)" status={this.state.duplicatesFound === "start"}/>
+            <Gradient color="linear-gradient(to bottom right, #13a9bb 0%, #7d00aa 50%, #f31f69 100%)" status={this.state.duplicatesFound === "loading"}/>
+            <Gradient color="linear-gradient(to bottom right, #f31f69 0%, #fe7634 50%, #f9df2f 100%)" status={this.state.duplicatesFound === "done"}/>
               <ContentContainer status={this.state.duplicatesFound}> 
                 <Header>Welcome to Music Matcher!</Header>
                 <About>Find out which songs you and your friends have in common in your public playlists in Spotify!</About>
-                <InputLabels for="your_username" status={this.state.duplicatesFound === "done"}>Enter your Spotify username here:</InputLabels>
+                <InputLabels htmlFor="your_username" status={this.state.duplicatesFound === "done"}>Enter your Spotify username/Spotify URI here:</InputLabels>
                 <InputDiv>
                   <InputField type="text" id="your_username" onChange={this.handleChangeMainUsername}/>
                 </InputDiv>
                 {this.displayOtherUsers()}
                 {this.displayError()}
-                {this.displayButton()}
-                <Tutorial>Not sure how to find a Spotify username? Click here for help!</Tutorial>
+                {this.displayPopup()}
+                <Tutorial onClick={this.togglePopup}>Not sure how to find a Spotify username? Click here for help!</Tutorial>
+                {this.displayPopup}
               </ContentContainer>
               <DisplayData data={this.state}/>
           </Wrapper>
