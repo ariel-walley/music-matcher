@@ -1,5 +1,6 @@
 import React from 'react';
 import DisplayData from './userdata';
+import TopArtists from './topartists';
 import QueryString from 'querystring';
 import _ from 'lodash';
 import styled, { keyframes } from 'styled-components';
@@ -419,10 +420,12 @@ class Home extends React.Component {
       }
 
       let allDuplicateInfo = [];
+
       while(duplicates.length) {
         let splitDuplicates = duplicates.splice(0,50);
         let apiDuplicates = splitDuplicates.join(",");
         let duplicateInfo = await this.getDuplicatesInfo(apiDuplicates);
+
         for (let song of duplicateInfo.tracks) {
           let artists = [];
           for (let artist of song.artists) {
@@ -437,11 +440,16 @@ class Home extends React.Component {
             }
           ); 
         };
-        this.setState({
-          duplicateData: allDuplicateInfo,
-          duplicatesFound: 'done'
-        });  
       }
+
+      this.setState({
+        duplicateData: allDuplicateInfo,
+      }, () => {
+        this.setState({
+        duplicatesLength: this.state.duplicateData.length,
+        duplicatesFound: 'done'
+        })
+      });
     }
 
     async getDuplicatesInfo(duplicates) { //Request song data (title, artist, album data, etc.)   
@@ -492,6 +500,7 @@ class Home extends React.Component {
                 {this.displayPopup()}
               </ContentContainer>
               <DisplayData data={this.state}/>
+              <TopArtists data={this.state}/>
           </Wrapper>
       );
     }

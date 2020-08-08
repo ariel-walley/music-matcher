@@ -109,13 +109,12 @@ class DisplayData extends React.Component {
     
       //Determine how many songs in common
       let songs = '';
-      let length = this.props.data.duplicateData.length;
       if (this.props.data.duplicateData === "none") {
         songs = 'no songs'
-      } else if (length === 1) {
+      } else if (this.props.data.duplicatesLength === 1) {
         songs = '1 song'
       } else {
-        songs = `${length} songs`
+        songs = `${this.props.data.duplicatesLength} songs`
       }
 
       //Final phrase
