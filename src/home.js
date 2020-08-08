@@ -10,7 +10,7 @@ const Wrapper = styled.div`
   height: 100%;
   width: 100%;
   position: relative;
-  background-color: rgba(0, 0, 0, 0);
+  background-color: rgba(256, 256, 256, 0.02);
   background-attachment: fixed;
 `;
 
@@ -39,10 +39,10 @@ const ContentContainer = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: center;
-  color: ${props => props.status === "done" ? "black" : "white"};
   text-align: center;
   transition: color 5s;
 `;
+// old color - color: ${props => props.status === "done" ? "black" : "white"};
 
 const Header = styled.h1`
   margin: 20px auto 0 auto;
@@ -59,10 +59,10 @@ const InputLabels = styled.label`
   margin: 10px;
   font-weight: 700px;
   font-size: 20px;
-  color: ${props => props.status ? "black" : "white"};
   transition: color 5s;
-
 `;
+
+// old color - color: ${props => props.status ? "black" : "white"};
 
 const InputLabels2 = styled(InputLabels)`
   animation: 0.4s ${fadeIn} ease-out;
@@ -94,9 +94,10 @@ const Tutorial = styled.button`
   outline-style: none;
   font-weight: 700px;
   font-size: 20px;
-  color: ${props => props.status ? "black" : "white"};
   transition: color 5s;
 `;
+
+//old color - color: ${props => props.status ? "black" : "white"};
 
 const SubmitButton = styled.button`
   margin: 10px auto;
@@ -483,9 +484,9 @@ class Home extends React.Component {
       return (
           <Wrapper>
             <GlobalStyle/>
-            <Gradient color="linear-gradient(to bottom right, #00ff33 0%, #13a9bb 50%, #7d00aa 100%)" status={this.state.duplicatesFound === "start"}/>
-            <Gradient color="linear-gradient(to bottom right, #13a9bb 0%, #7d00aa 50%, #f31f69 100%)" status={this.state.duplicatesFound === "loading"}/>
-            <Gradient color="linear-gradient(to bottom right, #f31f69 0%, #fe7634 50%, #f9df2f 100%)" status={this.state.duplicatesFound === "done"}/>
+            <Gradient color="linear-gradient(to bottom right, #00ff33, #13a9bb)" status={this.state.duplicatesFound === "start"}/>
+            <Gradient color="linear-gradient(to bottom right, #13a9bb, #7d00aa)" status={this.state.duplicatesFound === "loading"}/>
+            <Gradient color="linear-gradient(to bottom right, #7d00aa, #f31f69)" status={this.state.duplicatesFound === "done"}/>
               <ContentContainer status={this.state.duplicatesFound}> 
                 <Header>Welcome to Music Matcher!</Header>
                 <About>Find out which songs you and your friends have in common in your public playlists in Spotify!</About>

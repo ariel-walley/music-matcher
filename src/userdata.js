@@ -39,13 +39,14 @@ const CardContainer = styled.div`
 
 const Card = styled.div`
   width: 40%;
-  margin: 0 auto;
+  padding: 15px;
+  margin: 5px auto;
   display: flex;
   align-items: center;
   align-content: center;
   justify-content: flex-start;
   border-radius: 15px;
-  padding: 18px;
+  background-color: rgba(256,256,256,0.3);
 `;
 
 const SongTitle = styled.h1`
