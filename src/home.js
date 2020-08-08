@@ -45,19 +45,19 @@ const ContentContainer = styled.div`
 // old color - color: ${props => props.status === "done" ? "black" : "white"};
 
 const Header = styled.h1`
-  margin: 20px auto 0 auto;
+  margin: 20px auto;
   font-size: 70px;
 `;
 
 const About = styled.p`
   margin: 0 auto 30px auto;
-  font-weight: 5500px;
+  font-weight: 500;
   font-size: 18px;
 `;
 
 const InputLabels = styled.label`
   margin: 10px;
-  font-weight: 700px;
+  font-weight: 600;
   font-size: 20px;
   transition: color 5s;
 `;
@@ -81,20 +81,24 @@ const InputField = styled.input`
 `;
 
 const InputField2 = styled(InputField)`
-  animation: 0.6s ${fadeIn} ease-out;
+  animation: 0.4s ${fadeIn} ease-out;
 `;
 
 const Tutorial = styled.button`
-  margin: 10px auto;
+  margin: -2px auto 7px auto;
   padding: 3px;
   width: 550px;
   cursor: pointer;
   background-color: rgba(0,0,0,0);
   border-style: none;
   outline-style: none;
-  font-weight: 700px;
-  font-size: 20px;
+  font-weight: 500;
+  font-size: 15px;
   transition: color 5s;
+`;
+
+const Underline = styled(Tutorial)`
+  text-decoration: underline;
 `;
 
 //old color - color: ${props => props.status ? "black" : "white"};
@@ -108,7 +112,7 @@ const SubmitButton = styled.button`
   background-color: white;
   text-align: center;
   font-size: 16px;
-  animation: 0.5s ${fadeIn} ease-out;
+  animation: 0.4s ${fadeIn} ease-out;
 `;
 
 const Error = styled.p`
@@ -205,7 +209,7 @@ class Home extends React.Component {
       if (this.state.userDisplay === true) {
         return (
           <ContentContainer>       
-            <InputLabels2 status={this.state.duplicatesFound === "done"}>Enter up to three other Spotify users to compare your music picks. Enter their URIs below:</InputLabels2>
+            <InputLabels2 status={this.state.duplicatesFound === "done"}>Enter up to three other Spotify usernames to compare your music picks:</InputLabels2>
             <InputDiv>
               <InputField2 type="text" id="username0" onChange={this.handleChangeOtherUsername}/>
               <InputField2 type="text" id="username1" onChange={this.handleChangeOtherUsername}/>
@@ -486,19 +490,18 @@ class Home extends React.Component {
             <GlobalStyle/>
             <Gradient color="linear-gradient(to bottom right, #00ff33, #13a9bb)" status={this.state.duplicatesFound === "start"}/>
             <Gradient color="linear-gradient(to bottom right, #13a9bb, #7d00aa)" status={this.state.duplicatesFound === "loading"}/>
-            <Gradient color="linear-gradient(to bottom right, #7d00aa, #f31f69)" status={this.state.duplicatesFound === "done"}/>
+            <Gradient color="linear-gradient(to bottom right, #7d00aa, #fa3378)" status={this.state.duplicatesFound === "done"}/>
               <ContentContainer status={this.state.duplicatesFound}> 
                 <Header>Welcome to Music Matcher!</Header>
-                <About>Find out which songs you and your friends have in common in your public playlists in Spotify!</About>
-                <InputLabels htmlFor="your_username" status={this.state.duplicatesFound === "done"}>Enter your Spotify username/Spotify URI here:</InputLabels>
+                <About>Find the songs you and your friends have in common in your public playlists in Spotify!</About>
+                <InputLabels htmlFor="your_username" status={this.state.duplicatesFound === "done"}>Enter your Spotify username here:</InputLabels>
+                <Tutorial onClick={this.togglePopup}>Not sure how to find a Spotify username? <span>Click here for help!</span></Tutorial>
                 <InputDiv>
                   <InputField type="text" id="your_username" onChange={this.handleChangeMainUsername}/>
                 </InputDiv>
                 {this.displayOtherUsers()}
                 {this.displayError()}
                 {this.displayPopup()}
-                <Tutorial onClick={this.togglePopup}>Not sure how to find a Spotify username? Click here for help!</Tutorial>
-                {this.displayPopup}
               </ContentContainer>
               <DisplayData data={this.state}/>
           </Wrapper>

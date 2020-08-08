@@ -11,6 +11,11 @@ body {
   width: 100%;
   margin: 0 auto;
   padding: 0;
+  color: #080808;
+}
+
+span {
+  text-decoration: underline;
 }
 `;
 

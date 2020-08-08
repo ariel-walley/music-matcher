@@ -135,7 +135,7 @@ class DisplayData extends React.Component {
       } else if (this.props.data.duplicatesFound === 'loading') {
         return (
           <Container>
-            <div className="la-line-scale-pulse-out la-2x">
+            <div className="la-line-scale-pulse-out la-dark la-2x">
                 <div></div>
                 <div></div>
                 <div></div>
