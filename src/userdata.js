@@ -82,7 +82,7 @@ class DisplayData extends React.Component {
       let display = [];
       this.props.data.duplicateData.map((duplicate) => {
         display.push(
-        <Card key={duplicate.id}>
+        <Card key={duplicate.songID}>
           <Img src={duplicate.image} alt={duplicate.albumName} />
           <div>
             <SongTitle>{duplicate.name}</SongTitle>
@@ -122,7 +122,6 @@ class DisplayData extends React.Component {
     }
 
     renderData() {
-
       if (this.props.data.duplicateData === "none") {
         return (
           <div>

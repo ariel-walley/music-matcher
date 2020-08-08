@@ -420,6 +420,7 @@ class Home extends React.Component {
       }
 
       let allDuplicateInfo = [];
+      let artistsIDs = [];
 
       while(duplicates.length) {
         let splitDuplicates = duplicates.splice(0,50);
@@ -427,14 +428,15 @@ class Home extends React.Component {
         let duplicateInfo = await this.getDuplicatesInfo(apiDuplicates);
 
         for (let song of duplicateInfo.tracks) {
-          let artists = [];
+          let artistsName = [];
           for (let artist of song.artists) {
-            artists.push(artist.name);
+            artistsName.push(artist.name);
+            artistsIDs.push(artist.name);
           };
           allDuplicateInfo.push(
-            { "id": song.id,
+            { "songID": song.id,
               "name": song.name,
-              "artist": artists.join(", "),
+              "artist": artistsName.join(", "),
               "image": song.album.images[1].url,
               "albumName": `The cover art of the song's all: ${song.album.name}`
             }
@@ -443,6 +445,7 @@ class Home extends React.Component {
       }
 
       this.setState({
+        duplicateArtists: artistsIDs,
         duplicateData: allDuplicateInfo,
       }, () => {
         this.setState({
