@@ -40,27 +40,6 @@ const Wrapper1 = styled.div`
 
 `;
 
-const Wrapper2 = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-items: center;
-  align-content: center;
-  margin: 0 auto;
-  padding-left: 10px;
-  padding-right: 30px;
-`;
-
-const Wrapper3 = styled.div`
-  display: flex;
-  flex-direction: column;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-items: center;
-  align-content: center;  
-  padding: 0 20px;
-`;
-
 const Text = styled.p`
   font-size: 20px;
   font-weight: 500;
@@ -89,11 +68,6 @@ const Instructions = styled.ol`
 
 const List = styled.li`
   margin: 25px 0;
-`;
-
-const Span = styled.span`
-  margin-top: -13px;
-  display: block;
 `;
 
 class Popup extends React.Component {  

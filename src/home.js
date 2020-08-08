@@ -42,7 +42,6 @@ const ContentContainer = styled.div`
   text-align: center;
   transition: color 5s;
 `;
-// old color - color: ${props => props.status === "done" ? "black" : "white"};
 
 const Header = styled.h1`
   margin: 20px auto;
@@ -61,8 +60,6 @@ const InputLabels = styled.label`
   font-size: 20px;
   transition: color 5s;
 `;
-
-// old color - color: ${props => props.status ? "black" : "white"};
 
 const InputLabels2 = styled(InputLabels)`
   animation: 0.4s ${fadeIn} ease-out;
@@ -96,12 +93,6 @@ const Tutorial = styled.button`
   font-size: 15px;
   transition: color 5s;
 `;
-
-const Underline = styled(Tutorial)`
-  text-decoration: underline;
-`;
-
-//old color - color: ${props => props.status ? "black" : "white"};
 
 const SubmitButton = styled.button`
   margin: 10px auto;
@@ -174,7 +165,6 @@ class Home extends React.Component {
       }).then((data) => {
         return data.json();
       }).then((data) => {
-        console.log(data.access_token);
         this.setState({accessToken: data.access_token});
       }).catch((err) => {
         console.log(err);
@@ -357,7 +347,6 @@ class Home extends React.Component {
             },
           });
           let data = await response.json();
-          console.log(data);
           if (data.items.length === 0) {
             this.setState({
               ...this.state,
@@ -417,7 +406,6 @@ class Home extends React.Component {
 
     /*    Find duplicates from data    */ 
     async findDuplicateSongs(arrays) { //Find duplicates data and set in state
-      console.log(arrays);
       let duplicates = _.intersection(...arrays);
       _.pull(duplicates, null);
 
