@@ -8,6 +8,7 @@ class TopArtists extends React.Component {
     this.renderData = this.renderData.bind(this);
     this.findTopArtists = this.findTopArtists.bind(this);
     this.assembleChart = this.assembleChart.bind(this);
+    this.formatCard = this.formatCard.bind(this);
   }
 
   findTopArtists() {
@@ -24,6 +25,18 @@ class TopArtists extends React.Component {
     let entries = Object.entries(newResult);
     let sorted = entries.sort((a, b) => b[1] - a[1]);
     return sorted;
+  }
+
+  formatCard(sorted) {
+    if (sorted[0][1] !== sorted[1][1]) {
+      return <p>there is just one top artist</p>
+    } else if (sorted[1][1] !== sorted[2][1]) {
+      return <p>there are two top artists</p>
+    } else if (sorted[2][1] !== sorted[3][1]) {
+      return <p>there are three top artists</p>
+    } else {
+      return <p>there really isn't a top artist</p>
+    }
   }
 
   assembleChart(artists) {
@@ -56,13 +69,14 @@ class TopArtists extends React.Component {
       let sorted = this.findTopArtists();
       return(
         <div>
+          {this.formatCard(sorted)}
           {this.assembleChart(sorted)};
         </div>
       )
     } else {
       return (
         <div>
-          <p>Here are your artists in common:</p>
+         <p>Here are your artists in common:</p>
         </div>
       )
     }
