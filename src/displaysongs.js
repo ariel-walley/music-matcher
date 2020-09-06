@@ -71,26 +71,11 @@ const Img = styled.img`
 
 `;
 
-class DisplayData extends React.Component {
+class DisplaySongs extends React.Component {
   constructor(props) {
     super(props);        
     this.formatCard = this.formatCard.bind(this);
     this.renderData = this.renderData.bind(this);
-    }
-
-    formatCard() {
-      let display = [];
-      this.props.data.duplicateData.map((duplicate) => {
-        display.push(
-        <Card key={duplicate.songID}>
-          <Img src={duplicate.image} alt={duplicate.albumName} />
-          <div>
-            <SongTitle>{duplicate.name}</SongTitle>
-            <Artist> by {duplicate.artist}</Artist>
-          </div>
-        </Card>); 
-      })
-      return display;
     }
 
     formatHeader() {
@@ -119,6 +104,21 @@ class DisplayData extends React.Component {
 
       //Final phrase
       return <Header>You{usernames} have {songs} in common!</Header>
+    }
+
+    formatCard() {
+      let display = [];
+      this.props.data.duplicateData.map((duplicate) => {
+        display.push(
+        <Card key={duplicate.songID}>
+          <Img src={duplicate.image} alt={duplicate.albumName} />
+          <div>
+            <SongTitle>{duplicate.name}</SongTitle>
+            <Artist> by {duplicate.artist}</Artist>
+          </div>
+        </Card>); 
+      })
+      return display;
     }
 
     renderData() {
@@ -165,4 +165,4 @@ class DisplayData extends React.Component {
   }
 }
 
-export default DisplayData;
+export default DisplaySongs;

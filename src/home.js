@@ -1,5 +1,5 @@
 import React from 'react';
-import DisplayData from './userdata';
+import DisplaySongs from './displaysongs';
 import TopArtists from './topartists';
 import QueryString from 'querystring';
 import _ from 'lodash';
@@ -502,7 +502,7 @@ class Home extends React.Component {
                 {this.displayError()}
                 {this.displayPopup()}
               </ContentContainer>
-              <DisplayData data={this.state}/>
+              <DisplaySongs data={this.state}/>
               <TopArtists data={this.state}/>
           </Wrapper>
       );
