@@ -2,6 +2,49 @@ import React from 'react';
 import styled from 'styled-components';
 import MUIDataTable from "mui-datatables";
 
+const MainContainer = styled.div`
+  font-family: 'Open Sans', sans-serif;
+`;
+
+const Header = styled.h1`
+  text-align: center;
+  margin: 20px;
+`;
+
+const CardContainer = styled.div`
+  display: flex;
+  align-items: center;
+  align-content: center;
+  flex-wrap: wrap;
+  justify-content: left;
+`;
+
+const Card = styled.div`
+  width: 40%;
+  padding: 15px;
+  margin: 5px auto;
+  display: flex;
+  align-items: center;
+  align-content: center;
+  justify-content: flex-start;
+  border-radius: 15px;
+  background-color: rgba(256,256,256,0.3);
+`;
+
+const ArtistName = styled.h1`
+  font-size: 24px;
+  font-weight: 700px;
+  margin: 0 0 10px 25px;
+  padding: 0;
+`;
+
+const Artist = styled.h2`
+  font-size: 20px;
+  font-weight: 550px;
+  margin: 0 0 0 25px;
+  padding: 0;
+`;
+
 class TopArtists extends React.Component {
   constructor(props) {
     super(props);        
@@ -28,27 +71,36 @@ class TopArtists extends React.Component {
   }
 
   formatCard(sorted) {
+    let display = [];
+    let topArtists = [];
+    
     if (sorted[0][1] !== sorted[1][1]) {
-      return <p>there is just one top artist</p>
+      topArtists.push(sorted[0]);
     } else if (sorted[1][1] !== sorted[2][1]) {
-      return <p>there are two top artists</p>
+      topArtists.push(sorted[0], sorted[1]);
     } else if (sorted[2][1] !== sorted[3][1]) {
-      return <p>there are three top artists</p>
+      topArtists.push(sorted[0], sorted[1], sorted[2])
     } else {
-      return <p>there really isn't a top artist</p>
+      return 'there really isn\'t a top artist'
     }
+
+    topArtists.map((artist) => {
+      display.push(
+      <Card key={artist[0]}>
+          <ArtistName>{artist[0]}</ArtistName>
+      </Card>); 
+    });
+
+    return display;
   }
 
   assembleChart(artists) {
     const columns = ["Artist", "Songs in Common", "Percentage"];
-
     const data = [];
 
     for (let artist of artists) {
       data.push([artist[0], artist[1], ((artist[1]/this.props.data.duplicatesLength)*100) + "%"])
     }
-
-    console.log(data);
 
     const options = {
       filterType: 'checkbox',
@@ -68,10 +120,13 @@ class TopArtists extends React.Component {
     if (this.props.data.duplicatesFound === "done") {  
       let sorted = this.findTopArtists();
       return(
-        <div>
-          {this.formatCard(sorted)}
-          {this.assembleChart(sorted)};
-        </div>
+        <MainContainer>
+          <Header>Here are your top artists in common:</Header>
+          <CardContainer>
+            {this.formatCard(sorted)}
+          </CardContainer>
+          {this.assembleChart(sorted)}
+        </MainContainer>
       )
     } else {
       return (
