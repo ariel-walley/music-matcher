@@ -438,7 +438,7 @@ class Home extends React.Component {
               "name": song.name,
               "artist": artistsName.join(", "),
               "image": song.album.images[1].url,
-              "albumName": `The cover art of the song's all: ${song.album.name}`
+              "albumName": song.album.name
             }
           ); 
         };

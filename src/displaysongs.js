@@ -111,7 +111,7 @@ class DisplaySongs extends React.Component {
       this.props.data.duplicateData.map((duplicate) => {
         display.push(
         <Card key={duplicate.songID}>
-          <Img src={duplicate.image} alt={duplicate.albumName} />
+          <Img src={duplicate.image} alt={`The cover art of the song's album, "${duplicate.albumName}"`}/>
           <div>
             <SongTitle>{duplicate.name}</SongTitle>
             <Artist> by {duplicate.artist}</Artist>
