@@ -55,18 +55,7 @@ class TopArtists extends React.Component {
   }
 
   findTopArtists() {
-    let result = {};
-    this.props.data.duplicateArtists.forEach(function (v, i) {
-      result[v] = result[v] ? [...result[v], i] : [i];
-    });
-
-    let newResult = {};
-    Object.keys(result).forEach((artist) => {
-      newResult[artist] = result[artist].length
-    })
-
-    let entries = Object.entries(newResult);
-    let sorted = entries.sort((a, b) => b[1] - a[1]);
+    let sorted = Object.values(this.props.data.duplicateArtists).sort((a, b) => b[1] - a[1]);
     return sorted;
   }
 

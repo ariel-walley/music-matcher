@@ -420,7 +420,7 @@ class Home extends React.Component {
       }
 
       let allDuplicateInfo = [];
-      let artistsIDs = [];
+      let topArtists = {};
 
       while(duplicates.length) {
         let splitDuplicates = duplicates.splice(0,50);
@@ -431,8 +431,10 @@ class Home extends React.Component {
           let artistsName = [];
           for (let artist of song.artists) {
             artistsName.push(artist.name);
-            artistsIDs.push(artist.name);
+            topArtists[artist.id] = topArtists[artist.id] ? [artist.name, (topArtists[artist.id][1] + 1)] : [artist.name, 1];
+
           };
+
           allDuplicateInfo.push(
             { "songID": song.id,
               "name": song.name,
@@ -445,7 +447,7 @@ class Home extends React.Component {
       }
 
       this.setState({
-        duplicateArtists: artistsIDs,
+        duplicateArtists: topArtists,
         duplicateData: allDuplicateInfo,
       }, () => {
         this.setState({
