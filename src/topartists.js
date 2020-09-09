@@ -52,10 +52,18 @@ class TopArtists extends React.Component {
     this.findTopArtists = this.findTopArtists.bind(this);
     this.assembleChart = this.assembleChart.bind(this);
     this.formatCard = this.formatCard.bind(this);
+    //this.getArtistArt = this.getArtistArt.bind(this);
   }
 
   findTopArtists() {
-    let sorted = Object.values(this.props.data.duplicateArtists).sort((a, b) => b[1] - a[1]);
+    let topArtists = [];
+
+    for (const key in this.props.data.duplicateArtists) {
+      topArtists.push([key, this.props.data.duplicateArtists[key][0], this.props.data.duplicateArtists[key][1]]);
+    }
+    
+    let sorted = topArtists.sort((a, b) => b[2] - a[2]);
+
     return sorted;
   }
 
@@ -63,32 +71,42 @@ class TopArtists extends React.Component {
     let display = [];
     let topArtists = [];
     
-    if (sorted[0][1] !== sorted[1][1]) {
+    if (sorted[0][2] !== sorted[1][2]) {
       topArtists.push(sorted[0]);
-    } else if (sorted[1][1] !== sorted[2][1]) {
+    } else if (sorted[1][2] !== sorted[2][2]) {
       topArtists.push(sorted[0], sorted[1]);
-    } else if (sorted[2][1] !== sorted[3][1]) {
+    } else if (sorted[2][2] !== sorted[3][2]) {
       topArtists.push(sorted[0], sorted[1], sorted[2])
     } else {
       return 'there really isn\'t a top artist'
     }
 
-    topArtists.map((artist) => {
+    topArtists.forEach((artist) => {
       display.push(
       <Card key={artist[0]}>
-          <ArtistName>{artist[0]}</ArtistName>
+          <ArtistName>{artist[1]}</ArtistName>
       </Card>); 
     });
 
     return display;
   }
 
+  /* getArtistArt(artist) {
+    let artists = [];
+
+    for (key in this.props.data.duplicateArtists) {
+      console.log(this.props.data.duplicateArtists[key]);
+    }
+    Object.values(this.props.data.duplicateArtists).
+    console.log(artistID);
+  } */
+
   assembleChart(artists) {
     const columns = ["Artist", "Songs in Common", "Percentage"];
     const data = [];
 
     for (let artist of artists) {
-      data.push([artist[0], artist[1], ((artist[1]/this.props.data.duplicatesLength)*100) + "%"])
+      data.push([artist[1], artist[2], ((artist[2]/this.props.data.duplicatesLength)*100).toFixed(2) + "%"])
     }
 
     const options = {

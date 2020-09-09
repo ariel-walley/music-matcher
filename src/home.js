@@ -432,7 +432,6 @@ class Home extends React.Component {
           for (let artist of song.artists) {
             artistsName.push(artist.name);
             topArtists[artist.id] = topArtists[artist.id] ? [artist.name, (topArtists[artist.id][1] + 1)] : [artist.name, 1];
-
           };
 
           allDuplicateInfo.push(
