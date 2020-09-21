@@ -1,12 +1,11 @@
 import React from 'react';
 import styled from 'styled-components';
-import MUIDataTable from "mui-datatables";
 
 const MainContainer = styled.div`
   font-family: 'Open Sans', sans-serif;
 `;
 
-const Header = styled.h1`
+const Heading = styled.h1`
   text-align: center;
   margin: 20px;
 `;
@@ -45,14 +44,55 @@ const Artist = styled.h2`
   padding: 0;
 `;
 
+const Img = styled.img`
+  width: 100px;
+  height: 100px;
+  border-radius: 10px;
+  margin: 10 18px 10 10;
+`;
+
+const Row = styled.div`
+  background-color: green;
+  border-radius: 5px;
+  width: 70%;
+  padding: 15px;
+  margin: 5px auto;
+  display: flex;
+  align-items: center;
+  align-content: center;
+  justify-content: center;
+  border-radius: 15px;
+  background-color: rgba(256,256,256,0.3);
+`;
+
+const Header = styled(Row)`
+  font-weight: 700;
+  text-decoration: underline;
+  font-size: 22px;
+`;
+
+const TableData = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 18px;
+  margin: auto 20px;
+  width: 25%;
+  text-align: center;
+`;
+
+const TableArtist = styled(TableData)`
+  width: 50%;
+`;
+
 class TopArtists extends React.Component {
   constructor(props) {
     super(props);        
-    this.renderData = this.renderData.bind(this);
     this.findTopArtists = this.findTopArtists.bind(this);
-    this.assembleChart = this.assembleChart.bind(this);
     this.formatCard = this.formatCard.bind(this);
-    //this.getArtistArt = this.getArtistArt.bind(this);
+    this.getArtistArt = this.getArtistArt.bind(this);
+    this.assembleTable = this.assembleTable.bind(this);
+    this.renderData = this.renderData.bind(this);
   }
 
   findTopArtists() {
@@ -68,7 +108,6 @@ class TopArtists extends React.Component {
   }
 
   formatCard(sorted) {
-    let display = [];
     let topArtists = [];
     
     if (sorted[0][2] !== sorted[1][2]) {
@@ -81,65 +120,84 @@ class TopArtists extends React.Component {
       return 'there really isn\'t a top artist'
     }
 
-    topArtists.forEach((artist) => {
+    let display = [];
+    console.log(topArtists)
+
+    topArtists.map(async (artist) => {
+      let image = await this.getArtistArt(artist[0]);
+      console.log(image);
+
       display.push(
       <Card key={artist[0]}>
+          <Img src={image} />
           <ArtistName>{artist[1]}</ArtistName>
       </Card>); 
-    });
 
+      console.log(display);
+    });
     return display;
   }
 
-  /* getArtistArt(artist) {
-    let artists = [];
+  getArtistArt = async (artist) => {
+    let url = `https://api.spotify.com/v1/artists/${artist}`
+    try {
+      let response = await fetch(url, {
+        headers: {
+          'Authorization': 'Bearer ' + this.props.data.accessToken
+        },
+      });
+      let data = await response.json();
+      
+      return data.images[2].url;
 
-    for (key in this.props.data.duplicateArtists) {
-      console.log(this.props.data.duplicateArtists[key]);
-    }
-    Object.values(this.props.data.duplicateArtists).
-    console.log(artistID);
-  } */
+    } catch(err) {
+        console.error(err);
+    };   
 
-  assembleChart(artists) {
-    const columns = ["Artist", "Songs in Common", "Percentage"];
-    const data = [];
+  }
+
+
+  assembleTable(artists) {
+    let display = [];
+
+    display.push(
+      <Header key="header">
+        <TableArtist>Artist</TableArtist>
+        <TableData>No. of Songs</TableData>
+        <TableData>Percent of Songs</TableData>
+      </Header>
+    )
 
     for (let artist of artists) {
-      data.push([artist[1], artist[2], ((artist[2]/this.props.data.duplicatesLength)*100).toFixed(2) + "%"])
+      display.push(
+        <Row key={artist[0]}>
+          <TableArtist>{artist[1]}</TableArtist>
+          <TableData>{artist[2]}</TableData>
+          <TableData>{((artist[2]/this.props.data.duplicatesLength)*100).toFixed(2) + "%"}</TableData>
+        </Row>      
+      )
     }
 
-    const options = {
-      filterType: 'checkbox',
-    };
+    return display;
 
-    return (
-    <MUIDataTable 
-      title={"Your Top Artists in Common"} 
-      data={data} 
-      columns={columns} 
-      options={options} 
-    />
-    )
-  };
+  }
 
   renderData() {
     if (this.props.data.duplicatesFound === "done") {  
       let sorted = this.findTopArtists();
       return(
         <MainContainer>
-          <Header>Here are your top artists in common:</Header>
+          <Heading>Here are your top artists in common:</Heading>
           <CardContainer>
             {this.formatCard(sorted)}
           </CardContainer>
-          {this.assembleChart(sorted)}
+          <Heading>See all of your artist(s) in common:</Heading>
+          {this.assembleTable(sorted)}
         </MainContainer>
       )
     } else {
       return (
-        <div>
-         <p>Here are your artists in common:</p>
-        </div>
+        <div></div>
       )
     }
   }

@@ -68,7 +68,6 @@ const Img = styled.img`
   height: 100px;
   border-radius: 10px;
   margin: 10 18px 10 10;
-
 `;
 
 class DisplaySongs extends React.Component {
@@ -118,6 +117,7 @@ class DisplaySongs extends React.Component {
           </div>
         </Card>); 
       })
+
       return display;
     }
 
