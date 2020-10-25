@@ -121,12 +121,10 @@ class TopArtists extends React.Component {
     }
 
     let display = [];
-    console.log(topArtists)
 
     topArtists.map(async (artist) => {
       let image = await this.getArtistArt(artist[0]);
-      console.log(image);
-
+      
       display.push(
       <Card key={artist[0]}>
           <Img src={image} />

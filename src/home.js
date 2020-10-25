@@ -1,4 +1,5 @@
 import React from 'react';
+import Header from './header';
 import DisplaySongs from './displaysongs';
 import TopArtists from './topartists';
 import QueryString from 'querystring';
@@ -42,17 +43,6 @@ const ContentContainer = styled.div`
   justify-content: center;
   text-align: center;
   transition: color 5s;
-`;
-
-const Header = styled.h1`
-  margin: 20px auto;
-  font-size: 70px;
-`;
-
-const About = styled.p`
-  margin: 0 auto 30px auto;
-  font-weight: 500;
-  font-size: 18px;
 `;
 
 const InputLabels = styled.label`
@@ -491,9 +481,8 @@ class Home extends React.Component {
             <Gradient color="linear-gradient(to bottom right, #00ff33, #13a9bb)" status={this.state.duplicatesFound === "start"}/>
             <Gradient color="linear-gradient(to bottom right, #13a9bb, #7d00aa)" status={this.state.duplicatesFound === "loading"}/>
             <Gradient color="linear-gradient(to bottom right, #7d00aa, #fa3378)" status={this.state.duplicatesFound === "done"}/>
+              <Header/>
               <ContentContainer status={this.state.duplicatesFound}> 
-                <Header>Welcome to Music Matcher!</Header>
-                <About>Find the songs you and your friends have in common in your public playlists in Spotify!</About>
                 <InputLabels htmlFor="your_username" status={this.state.duplicatesFound === "done"}>Enter your Spotify username here:</InputLabels>
                 <Tutorial onClick={this.togglePopup}>Not sure how to find a Spotify username? <span>Click here for help!</span></Tutorial>
                 <InputDiv>
