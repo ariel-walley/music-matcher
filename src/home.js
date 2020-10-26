@@ -1,5 +1,6 @@
 import React from 'react';
 import Header from './header';
+import Menu from './menu';
 import DisplaySongs from './displaysongs';
 import TopArtists from './topartists';
 import QueryString from 'querystring';
@@ -37,7 +38,7 @@ const fadeIn = keyframes`
   }
 `;
 
-const ContentContainer = styled.div`
+const UserInputContainer = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -135,6 +136,7 @@ class Home extends React.Component {
         this.displayPopup = this.displayPopup.bind(this);
         this.togglePopup = this.togglePopup.bind(this);
         this.reset = this.reset.bind(this);
+        this.renderContent = this.renderContent.bind(this);
     }
 
     /*    Requesting access token    */
@@ -189,7 +191,7 @@ class Home extends React.Component {
     displayOtherUsers() { //Display block for other users' inputs
       if (this.state.userDisplay === true) {
         return (
-          <ContentContainer>       
+          <UserInputContainer>       
             <InputLabels2 status={this.state.duplicatesFound === "done"}>Enter up to three other Spotify usernames to compare your music picks:</InputLabels2>
             <InputDiv>
               <InputField2 type="text" id="username0" onChange={this.handleChangeOtherUsername}/>
@@ -197,7 +199,7 @@ class Home extends React.Component {
               <InputField2 type="text" id="username2" onChange={this.handleChangeOtherUsername}/>
             </InputDiv>
             <SubmitButton type="submit" status={this.state.userDisplay2} onClick={this.submitUsernames}>Submit</SubmitButton>
-          </ContentContainer>
+          </UserInputContainer>
         )  
       }
     }
@@ -474,6 +476,37 @@ class Home extends React.Component {
     }
 
     /*    Render    */
+    renderContent(status) {
+      if (status === "start") {
+        return (
+          <div>
+            <UserInputContainer status={this.state.duplicatesFound}> 
+              <InputLabels htmlFor="your_username" status={this.state.duplicatesFound === "done"}>Enter your Spotify username here:</InputLabels>
+              <Tutorial onClick={this.togglePopup}>Not sure how to find a Spotify username? <span>Click here for help!</span></Tutorial>
+              <InputDiv>
+                <InputField type="text" id="your_username" onChange={this.handleChangeMainUsername}/>
+              </InputDiv>
+
+
+              {this.displayOtherUsers()}
+              {this.displayError()}
+              {this.displayPopup()}
+            </UserInputContainer>
+        </div>
+        )
+      } else if (status === "loading") {
+        return (
+          <div></div>
+        )
+      } else if (status === "done") {
+        return (
+          <TopArtists data={this.state}/>
+        )
+      } else {
+        return <div></div>
+      }
+    }
+    
     render () {
       return (
           <Wrapper>
@@ -482,18 +515,8 @@ class Home extends React.Component {
             <Gradient color="linear-gradient(to bottom right, #13a9bb, #7d00aa)" status={this.state.duplicatesFound === "loading"}/>
             <Gradient color="linear-gradient(to bottom right, #7d00aa, #fa3378)" status={this.state.duplicatesFound === "done"}/>
               <Header/>
-              <ContentContainer status={this.state.duplicatesFound}> 
-                <InputLabels htmlFor="your_username" status={this.state.duplicatesFound === "done"}>Enter your Spotify username here:</InputLabels>
-                <Tutorial onClick={this.togglePopup}>Not sure how to find a Spotify username? <span>Click here for help!</span></Tutorial>
-                <InputDiv>
-                  <InputField type="text" id="your_username" onChange={this.handleChangeMainUsername}/>
-                </InputDiv>
-                {this.displayOtherUsers()}
-                {this.displayError()}
-                {this.displayPopup()}
-              </ContentContainer>
+              {this.renderContent(this.state.duplicatesFound)}
               <DisplaySongs data={this.state}/>
-              <TopArtists data={this.state}/>
           </Wrapper>
       );
     }

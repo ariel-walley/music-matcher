@@ -92,7 +92,6 @@ class TopArtists extends React.Component {
     this.formatCard = this.formatCard.bind(this);
     this.getArtistArt = this.getArtistArt.bind(this);
     this.assembleTable = this.assembleTable.bind(this);
-    this.renderData = this.renderData.bind(this);
   }
 
   findTopArtists() {
@@ -154,7 +153,6 @@ class TopArtists extends React.Component {
 
   }
 
-
   assembleTable(artists) {
     let display = [];
 
@@ -179,32 +177,17 @@ class TopArtists extends React.Component {
     return display;
 
   }
-
-  renderData() {
-    if (this.props.data.duplicatesFound === "done") {  
-      let sorted = this.findTopArtists();
-      return(
-        <MainContainer>
-          <Heading>Here are your top artists in common:</Heading>
-          <CardContainer>
-            {this.formatCard(sorted)}
-          </CardContainer>
-          <Heading>See all of your artist(s) in common:</Heading>
-          {this.assembleTable(sorted)}
-        </MainContainer>
-      )
-    } else {
-      return (
-        <div></div>
-      )
-    }
-  }
       
   render() {
     return(
-      <div>
-        {this.renderData()}
-      </div>
+      <MainContainer>
+        <Heading>Here are your top artists in common:</Heading>
+        <CardContainer>
+          {this.formatCard(this.findTopArtists())}
+        </CardContainer>
+        <Heading>See all of your artist(s) in common:</Heading>
+        {this.assembleTable(this.findTopArtists())}
+      </MainContainer>
     )
   }
 }
