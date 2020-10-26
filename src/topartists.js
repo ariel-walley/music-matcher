@@ -1,8 +1,19 @@
 import React from 'react';
-import styled from 'styled-components';
+import styled, { keyframes } from 'styled-components';
+
+const fadeIn = keyframes`
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1
+  }
+`;
 
 const MainContainer = styled.div`
   font-family: 'Open Sans', sans-serif;
+  animation: 1s ${fadeIn} ease-out;
 `;
 
 const Heading = styled.h1`

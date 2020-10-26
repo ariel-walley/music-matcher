@@ -3,12 +3,6 @@ import styled, { keyframes } from 'styled-components';
 import _ from 'lodash';
 import './loading.css';
 
-const Container = styled.div`
-  margin: 30px auto;
-  width: 100%;
-  display: flex;
-`;
-
 const fadeIn = keyframes`
   0% {
     opacity: 0;
@@ -74,7 +68,6 @@ class DisplaySongs extends React.Component {
   constructor(props) {
     super(props);        
     this.formatCard = this.formatCard.bind(this);
-    this.renderData = this.renderData.bind(this);
     }
 
     formatHeader() {
@@ -115,52 +108,22 @@ class DisplaySongs extends React.Component {
             <SongTitle>{duplicate.name}</SongTitle>
             <Artist> by {duplicate.artist}</Artist>
           </div>
-        </Card>); 
+        </Card>);
       })
 
       return display;
     }
-
-    renderData() {
-      if (this.props.data.duplicateData === "none") {
-        return (
-          <div>
-            {this.formatHeader()}
-          </div>
-        )
-      } else if (this.props.data.duplicatesFound === 'start') {
-        return <div/>
-      } else if (this.props.data.duplicatesFound === 'loading') {
-        return (
-          <Container>
-            <div className="la-line-scale-pulse-out la-dark la-2x">
-                <div></div>
-                <div></div>
-                <div></div>
-                <div></div>
-                <div></div>
-            </div>
-          </Container>
-        )           
-      } else {
-        return (
-          <div>
-            <MainContainer>
-              {this.formatHeader()}
-              <CardContainer>
-                {this.formatCard()}
-              </CardContainer>
-            </MainContainer>
-          </div>  
-        )
-      }
-    }
-      
+     
   render() {
-    return(
+    return (
       <div>
-        {this.renderData()}
-      </div>
+        <MainContainer>
+          {this.formatHeader()}
+          <CardContainer>
+            {this.formatCard()}
+          </CardContainer>
+        </MainContainer>
+      </div>  
     )
   }
 }

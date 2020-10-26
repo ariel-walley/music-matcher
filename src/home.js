@@ -106,6 +106,13 @@ const Error = styled.p`
   padding: 5px;
 `;
 
+const Loader = styled.div`
+  margin: 30px auto;
+  width: 100%;
+  display: flex;
+  animation: 1s ${fadeIn} ease-out;
+`;
+
 class Home extends React.Component {
     constructor(props) {
         super(props);
@@ -486,8 +493,6 @@ class Home extends React.Component {
               <InputDiv>
                 <InputField type="text" id="your_username" onChange={this.handleChangeMainUsername}/>
               </InputDiv>
-
-
               {this.displayOtherUsers()}
               {this.displayError()}
               {this.displayPopup()}
@@ -496,11 +501,22 @@ class Home extends React.Component {
         )
       } else if (status === "loading") {
         return (
-          <div></div>
+          <Loader>
+            <div className="la-line-scale-pulse-out la-dark la-2x">
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+            </div>
+          </Loader>
         )
       } else if (status === "done") {
         return (
-          <TopArtists data={this.state}/>
+          <div>
+            <TopArtists data={this.state}/>
+            <DisplaySongs data={this.state}/>
+          </div>
         )
       } else {
         return <div></div>
@@ -514,9 +530,8 @@ class Home extends React.Component {
             <Gradient color="linear-gradient(to bottom right, #00ff33, #13a9bb)" status={this.state.duplicatesFound === "start"}/>
             <Gradient color="linear-gradient(to bottom right, #13a9bb, #7d00aa)" status={this.state.duplicatesFound === "loading"}/>
             <Gradient color="linear-gradient(to bottom right, #7d00aa, #fa3378)" status={this.state.duplicatesFound === "done"}/>
-              <Header/>
-              {this.renderContent(this.state.duplicatesFound)}
-              <DisplaySongs data={this.state}/>
+            <Header/>
+            {this.renderContent(this.state.duplicatesFound)}
           </Wrapper>
       );
     }
