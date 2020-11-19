@@ -2,8 +2,10 @@ import React from 'react';
 import styled from 'styled-components';
 
 const HeaderBlock = styled.h1`
-  margin: 0 auto 100px;
+  width: 100%;
+  margin: 0 auto;
   padding: 5px;
+  position: fixed;
   background-color: black;
   color: white;
   font-size: 35px;

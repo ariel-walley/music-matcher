@@ -134,13 +134,12 @@ class TopArtists extends React.Component {
 
     topArtists.map(async (artist) => {
       let image = await this.getArtistArt(artist[0]);
-      
+
       display.push(
       <Card key={artist[0]}>
           <Img src={image} />
           <ArtistName>{artist[1]}</ArtistName>
       </Card>); 
-
       console.log(display);
     });
     return display;
@@ -164,6 +163,7 @@ class TopArtists extends React.Component {
 
   }
 
+
   assembleTable(artists) {
     let display = [];
 
@@ -184,11 +184,9 @@ class TopArtists extends React.Component {
         </Row>      
       )
     }
-
     return display;
-
   }
-      
+
   render() {
     return(
       <MainContainer>
@@ -200,6 +198,7 @@ class TopArtists extends React.Component {
         {this.assembleTable(this.findTopArtists())}
       </MainContainer>
     )
+
   }
 }
 

@@ -9,7 +9,8 @@ import styled, { keyframes } from 'styled-components';
 import Popup from './instructions';
 import GlobalStyle from './globalStyles';
 
-const Wrapper = styled.div`
+//Styles for gradient background
+const GradientWrapper = styled.div`
   height: 100%;
   width: 100%;
   position: relative;
@@ -38,11 +39,29 @@ const fadeIn = keyframes`
   }
 `;
 
+//Styles for body
+const Body = styled.div`
+  height: calc(100% - 57px);
+  width: 100%;
+  padding-top: 57px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+`;
+
+const Body2 = styled(Body)`
+  padding-top: 75px;
+  flex-wrap: wrap;
+  justify-content: center;
+`;
+
+//Styles for username input on start page
 const UserInputContainer = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: center;
-  text-align: center;
+  align-items: center;
   transition: color 5s;
 `;
 
@@ -98,6 +117,7 @@ const SubmitButton = styled.button`
   animation: 0.4s ${fadeIn} ease-out;
 `;
 
+//Styles for error
 const Error = styled.p`
   margin: 0 auto;
   max-width: 350px;
@@ -106,10 +126,10 @@ const Error = styled.p`
   padding: 5px;
 `;
 
+//Styles for loader
 const Loader = styled.div`
   margin: 30px auto;
   width: 100%;
-  display: flex;
   animation: 1s ${fadeIn} ease-out;
 `;
 
@@ -513,10 +533,10 @@ class Home extends React.Component {
         )
       } else if (status === "done") {
         return (
-          <div>
-            <TopArtists data={this.state}/>
+          <Body2>
             <DisplaySongs data={this.state}/>
-          </div>
+            <TopArtists data={this.state}/>
+          </Body2>
         )
       } else {
         return <div></div>
@@ -525,14 +545,16 @@ class Home extends React.Component {
     
     render () {
       return (
-          <Wrapper>
-            <GlobalStyle/>
-            <Gradient color="linear-gradient(to bottom right, #00ff33, #13a9bb)" status={this.state.duplicatesFound === "start"}/>
-            <Gradient color="linear-gradient(to bottom right, #13a9bb, #7d00aa)" status={this.state.duplicatesFound === "loading"}/>
-            <Gradient color="linear-gradient(to bottom right, #7d00aa, #fa3378)" status={this.state.duplicatesFound === "done"}/>
-            <Header/>
+        <GradientWrapper>
+          <GlobalStyle/>
+          <Header/>
+          <Gradient color="linear-gradient(to bottom right, #00ff33, #13a9bb)" status={this.state.duplicatesFound === "start"}/>
+          <Gradient color="linear-gradient(to bottom right, #13a9bb, #7d00aa)" status={this.state.duplicatesFound === "loading"}/>
+          <Gradient color="linear-gradient(to bottom right, #7d00aa, #fa3378)" status={this.state.duplicatesFound === "done"}/>
+          <Body>
             {this.renderContent(this.state.duplicatesFound)}
-          </Wrapper>
+          </Body>
+        </GradientWrapper>
       );
     }
 };
