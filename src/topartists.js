@@ -139,7 +139,8 @@ class TopArtists extends React.Component {
       <Card key={artist[0]}>
           <Img src={image} />
           <ArtistName>{artist[1]}</ArtistName>
-      </Card>); 
+      </Card>);
+
       console.log(display);
     });
     return display;
@@ -150,7 +151,7 @@ class TopArtists extends React.Component {
     try {
       let response = await fetch(url, {
         headers: {
-          'Authorization': 'Bearer ' + this.props.data.accessToken
+          'Authorization': 'Bearer ' + localStorage.getItem('accessToken')
         },
       });
       let data = await response.json();
@@ -192,7 +193,11 @@ class TopArtists extends React.Component {
       <MainContainer>
         <Heading>Here are your top artists in common:</Heading>
         <CardContainer>
-          {this.formatCard(this.findTopArtists())}
+          {this.findTopArtists()}
+          <Card key="123">
+            <Img src="https://c1.zzounds.com/media/productmedia/fit,2018by3200/quality,85/8_Full_Left_Front_NA-dca5510f9ee3e781f3d053fb8eb2721d.jpg" />
+            <ArtistName>I'm an artist</ArtistName>
+          </Card>
         </CardContainer>
         <Heading>See all of your artist(s) in common:</Heading>
         {this.assembleTable(this.findTopArtists())}

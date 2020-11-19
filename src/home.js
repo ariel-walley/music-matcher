@@ -47,7 +47,6 @@ const Body = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  text-align: center;
 `;
 
 const Body2 = styled(Body)`
@@ -137,7 +136,6 @@ class Home extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-          accessToken: '',
           users: {
             mainUsername: ''
           },
@@ -167,6 +165,7 @@ class Home extends React.Component {
     }
 
     /*    Requesting access token    */
+
     async componentDidMount() {
       await this.getAccessToken();
     }
@@ -185,7 +184,7 @@ class Home extends React.Component {
       }).then((data) => {
         return data.json();
       }).then((data) => {
-        this.setState({accessToken: data.access_token});
+        localStorage.setItem('accessToken', data.access_token);
       }).catch((err) => {
         console.log(err);
       })
@@ -280,7 +279,7 @@ class Home extends React.Component {
         try {
           let response = await fetch(url, {
             headers: {
-              'Authorization': 'Bearer ' + this.state.accessToken
+              'Authorization': 'Bearer ' + localStorage.getItem('accessToken')
             },
           });
           let data = await response.json();
@@ -363,7 +362,7 @@ class Home extends React.Component {
         try {
           let response = await fetch(next, {
             headers: {
-              'Authorization': 'Bearer ' + this.state.accessToken
+              'Authorization': 'Bearer ' + localStorage.getItem('accessToken')
             },
           });
           let data = await response.json();
@@ -409,7 +408,7 @@ class Home extends React.Component {
         try {
           let response = await fetch(next, {
             headers: {
-              'Authorization': 'Bearer ' + this.state.accessToken
+              'Authorization': 'Bearer ' + localStorage.getItem('accessToken')
               }
           });
           
@@ -479,7 +478,7 @@ class Home extends React.Component {
       try {
         let response = await fetch('https://api.spotify.com/v1/tracks/?ids=' + duplicates, {
           headers: {
-            'Authorization': 'Bearer ' + this.state.accessToken
+            'Authorization': 'Bearer ' + localStorage.getItem('accessToken')
             }
         });
         return await response.json();
@@ -491,7 +490,6 @@ class Home extends React.Component {
     /*    Reset functions    */
     async reset() {
       this.setState({
-        accessToken: this.state.accessToken,
         users: this.state.users,
         userDisplay: true,
         mainUsername: '',
