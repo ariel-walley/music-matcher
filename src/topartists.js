@@ -99,73 +99,33 @@ const TableArtist = styled(TableData)`
 class TopArtists extends React.Component {
   constructor(props) {
     super(props);        
-    this.findTopArtists = this.findTopArtists.bind(this);
     this.formatCard = this.formatCard.bind(this);
-    this.getArtistArt = this.getArtistArt.bind(this);
     this.assembleTable = this.assembleTable.bind(this);
   }
 
-  findTopArtists() {
-    let topArtists = [];
+  formatCard() {
 
-    for (const key in this.props.data.duplicateArtists) {
-      topArtists.push([key, this.props.data.duplicateArtists[key][0], this.props.data.duplicateArtists[key][1]]);
-    }
-    
-    let sorted = topArtists.sort((a, b) => b[2] - a[2]);
+    let display = [(
+      <Card key='123'>
+          <Img src='https://c1.zzounds.com/media/productmedia/fit,2018by3200/quality,85/8_Full_Left_Front_NA-dca5510f9ee3e781f3d053fb8eb2721d.jpg' />
+          <ArtistName>Test Artist</ArtistName>
+        </Card>
+    )];
 
-    return sorted;
-  }
-
-  formatCard(sorted) {
-    let topArtists = [];
-    
-    if (sorted[0][2] !== sorted[1][2]) {
-      topArtists.push(sorted[0]);
-    } else if (sorted[1][2] !== sorted[2][2]) {
-      topArtists.push(sorted[0], sorted[1]);
-    } else if (sorted[2][2] !== sorted[3][2]) {
-      topArtists.push(sorted[0], sorted[1], sorted[2])
-    } else {
-      return 'there really isn\'t a top artist'
-    }
-
-    let display = [];
-
-    topArtists.map(async (artist) => {
-      let image = await this.getArtistArt(artist[0]);
-
+    this.props.data.topArtists.forEach((artist) => {
       display.push(
-      <Card key={artist[0]}>
-          <Img src={image} />
+        <Card key={artist[0]}>
+          <Img src={artist[2]} />
           <ArtistName>{artist[1]}</ArtistName>
-      </Card>);
-
-      console.log(display);
+        </Card>);
     });
+
     return display;
   }
 
-  getArtistArt = async (artist) => {
-    let url = `https://api.spotify.com/v1/artists/${artist}`
-    try {
-      let response = await fetch(url, {
-        headers: {
-          'Authorization': 'Bearer ' + localStorage.getItem('accessToken')
-        },
-      });
-      let data = await response.json();
-      
-      return data.images[2].url;
+  //remove this, including bind, and draw info from the state somehow -- put in duplicateArtists as third thing in array
 
-    } catch(err) {
-        console.error(err);
-    };   
-
-  }
-
-
-  assembleTable(artists) {
+  assembleTable() {
     let display = [];
 
     display.push(
@@ -176,7 +136,7 @@ class TopArtists extends React.Component {
       </Header>
     )
 
-    for (let artist of artists) {
+    for (let artist of this.props.data.duplicateArtists) {
       display.push(
         <Row key={artist[0]}>
           <TableArtist>{artist[1]}</TableArtist>
@@ -185,6 +145,7 @@ class TopArtists extends React.Component {
         </Row>      
       )
     }
+
     return display;
   }
 
@@ -193,14 +154,10 @@ class TopArtists extends React.Component {
       <MainContainer>
         <Heading>Here are your top artists in common:</Heading>
         <CardContainer>
-          {this.findTopArtists()}
-          <Card key="123">
-            <Img src="https://c1.zzounds.com/media/productmedia/fit,2018by3200/quality,85/8_Full_Left_Front_NA-dca5510f9ee3e781f3d053fb8eb2721d.jpg" />
-            <ArtistName>I'm an artist</ArtistName>
-          </Card>
+          {this.formatCard()}
         </CardContainer>
         <Heading>See all of your artist(s) in common:</Heading>
-        {this.assembleTable(this.findTopArtists())}
+        {this.assembleTable()}
       </MainContainer>
     )
 

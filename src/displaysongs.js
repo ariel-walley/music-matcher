@@ -86,7 +86,7 @@ class DisplaySongs extends React.Component {
     
       //Determine how many songs in common
       let songs = '';
-      if (this.props.data.duplicateData === "none") {
+      if (this.props.data.duplicateSongs === "none") {
         songs = 'no songs'
       } else if (this.props.data.duplicatesLength === 1) {
         songs = '1 song'
@@ -100,7 +100,7 @@ class DisplaySongs extends React.Component {
 
     formatCard() {
       let display = [];
-      this.props.data.duplicateData.map((duplicate) => {
+      this.props.data.duplicateSongs.map((duplicate) => {
         display.push(
         <Card key={duplicate.songID}>
           <Img src={duplicate.image} alt={`The cover art of the song's album, "${duplicate.albumName}"`}/>

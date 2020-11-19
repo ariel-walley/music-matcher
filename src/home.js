@@ -136,16 +136,18 @@ class Home extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+          duplicatesFound: 'start',
+          errors: {},
+          mainUsername: '',
+          showPopup: false,
+          topArtists: [],
+          userDisplay: false,
+          usernames: {},
           users: {
             mainUsername: ''
-          },
-          userDisplay: false,
-          mainUsername: '',
-          usernames: {},
-          errors: {},
-          duplicatesFound: 'start',
-          showPopup: false
+          }         
         };
+
         this.getAccessToken = this.getAccessToken.bind(this);
         this.handleChangeMainUsername = this.handleChangeMainUsername.bind(this);
         this.displayOtherUsers = this.displayOtherUsers.bind(this);
@@ -160,6 +162,8 @@ class Home extends React.Component {
         this.getDuplicatesInfo = this.getDuplicatesInfo.bind(this);
         this.displayPopup = this.displayPopup.bind(this);
         this.togglePopup = this.togglePopup.bind(this);
+        this.findTopArtists = this.findTopArtists.bind(this);
+        this.getArtistArt = this.getArtistArt.bind(this);
         this.reset = this.reset.bind(this);
         this.renderContent = this.renderContent.bind(this);
     }
@@ -431,7 +435,7 @@ class Home extends React.Component {
       if (duplicates.length === 0) {
         this.setState({
           ...this.state,
-          duplicateData: "none",
+          duplicateSongs: "none",
           duplicatesFound: "start"
         })
         return
@@ -463,18 +467,21 @@ class Home extends React.Component {
         };
       }
 
+      this.findTopArtists(topArtists);
+
       this.setState({
-        duplicateArtists: topArtists,
-        duplicateData: allDuplicateInfo,
+        duplicateSongs: allDuplicateInfo,
       }, () => {
         this.setState({
-        duplicatesLength: this.state.duplicateData.length,
+        duplicatesLength: this.state.duplicateSongs.length,
         duplicatesFound: 'done'
         })
       });
+
+
     }
 
-    async getDuplicatesInfo(duplicates) { //Request song data (title, artist, album data, etc.)   
+    async getDuplicatesInfo(duplicates) { //API request for song data (title, artist, album data, etc.)   
       try {
         let response = await fetch('https://api.spotify.com/v1/tracks/?ids=' + duplicates, {
           headers: {
@@ -485,6 +492,64 @@ class Home extends React.Component {
         } catch (err) {
           console.log(err);
         }
+    }
+
+    /*    Find artists data and top artists    */
+
+    async findTopArtists(artists) {
+      let duplicateArtists = [];
+  
+      for (const key in artists) {
+        duplicateArtists.push([key, artists[key][0], artists[key][1]]);
+      }
+              
+      let sorted = duplicateArtists.sort((a, b) => b[2] - a[2]);
+
+      this.setState({
+        duplicateArtists: sorted  
+      });
+
+      let topArtists = [];
+
+      if (sorted[0][2] !== sorted[1][2]) {
+        topArtists.push(sorted[0]);
+      } else if (sorted[1][2] !== sorted[2][2]) {
+        topArtists.push(sorted[0], sorted[1]);
+      } else if (sorted[2][2] !== sorted[3][2]) {
+        topArtists.push(sorted[0], sorted[1], sorted[2])
+      } else {
+        return 'there really isn\'t a top artist'
+      }
+
+      let newTopArtists = []; 
+
+      topArtists.map(async (artist) => {
+        let image = await this.getArtistArt(artist[0]);
+        newTopArtists.push([artist[0], artist[1], image]);
+        //copy state local and then push all at once
+      });
+
+      this.setState({
+        topArtists: newTopArtists
+      });
+
+    }
+
+    getArtistArt = async (artist) => {
+      let url = `https://api.spotify.com/v1/artists/${artist}`
+      try {
+        let response = await fetch(url, {
+          headers: {
+            'Authorization': 'Bearer ' + localStorage.getItem('accessToken')
+          },
+        });
+        let data = await response.json();
+        
+        return data.images[2].url;
+  
+      } catch(err) {
+          console.error(err);
+      };   
     }
 
     /*    Reset functions    */
@@ -539,7 +604,7 @@ class Home extends React.Component {
       } else {
         return <div></div>
       }
-    }
+    };
     
     render () {
       return (
