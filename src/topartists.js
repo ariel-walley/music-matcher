@@ -105,25 +105,22 @@ class TopArtists extends React.Component {
 
   formatCard() {
 
-    let display = [(
-      <Card key='123'>
-          <Img src='https://c1.zzounds.com/media/productmedia/fit,2018by3200/quality,85/8_Full_Left_Front_NA-dca5510f9ee3e781f3d053fb8eb2721d.jpg' />
-          <ArtistName>Test Artist</ArtistName>
-        </Card>
-    )];
+    let display = [];
 
-    this.props.data.topArtists.forEach((artist) => {
-      display.push(
-        <Card key={artist[0]}>
-          <Img src={artist[2]} />
-          <ArtistName>{artist[1]}</ArtistName>
-        </Card>);
-    });
+    if (this.props.data.duplicatesFound === 'data set') { 
 
-    return display;
+      this.props.data.topArtists.forEach((artist) => {
+        display.push(
+          <Card key={artist[0]}>
+            <Img src={artist[2]} alt={`The artist art for ${artist[1]}`} />
+            <ArtistName>{artist[1]}</ArtistName>
+          </Card>);
+      });
+      return display;
+    } else {
+      return <div></div>
+    }
   }
-
-  //remove this, including bind, and draw info from the state somehow -- put in duplicateArtists as third thing in array
 
   assembleTable() {
     let display = [];
@@ -136,17 +133,20 @@ class TopArtists extends React.Component {
       </Header>
     )
 
-    for (let artist of this.props.data.duplicateArtists) {
-      display.push(
-        <Row key={artist[0]}>
-          <TableArtist>{artist[1]}</TableArtist>
-          <TableData>{artist[2]}</TableData>
-          <TableData>{((artist[2]/this.props.data.duplicatesLength)*100).toFixed(2) + "%"}</TableData>
-        </Row>      
-      )
+    if (this.props.data.duplicatesFound === 'data set') {
+      for (let artist of this.props.data.duplicateArtists) {
+        display.push(
+          <Row key={artist[0]}>
+            <TableArtist>{artist[1]}</TableArtist>
+            <TableData>{artist[2]}</TableData>
+            <TableData>{((artist[2]/this.props.data.duplicatesLength)*100).toFixed(2) + "%"}</TableData>
+          </Row>      
+        )
+      }
+      return display;
+    } else {
+      return <div></div>
     }
-
-    return display;
   }
 
   render() {
@@ -160,8 +160,8 @@ class TopArtists extends React.Component {
         {this.assembleTable()}
       </MainContainer>
     )
-
   }
+
 }
 
 export default TopArtists;

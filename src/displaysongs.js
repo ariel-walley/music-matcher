@@ -83,35 +83,43 @@ class DisplaySongs extends React.Component {
       } else {
         usernames = `, ${usernames[0]}, ${usernames[1]}, and ${usernames[2]}`
       }
-    
-      //Determine how many songs in common
-      let songs = '';
-      if (this.props.data.duplicateSongs === "none") {
-        songs = 'no songs'
-      } else if (this.props.data.duplicatesLength === 1) {
-        songs = '1 song'
-      } else {
-        songs = `${this.props.data.duplicatesLength} songs`
-      }
+      
+      if (this.props.data.duplicatesFound === 'data set') {
+        //Determine how many songs in common
+        let songs = '';
+        if (this.props.data.duplicateSongs === "none") {
+          songs = 'no songs'
+        } else if (this.props.data.duplicatesLength === 1) {
+          songs = '1 song'
+        } else {
+          songs = `${this.props.data.duplicatesLength} songs`
+        }
 
-      //Final phrase
-      return <Header>You{usernames} have {songs} in common!</Header>
+        //Final phrase
+        return <Header>You{usernames} have {songs} in common!</Header>
+      } else {
+        return <div></div>
+      }
     }
 
     formatCard() {
       let display = [];
-      this.props.data.duplicateSongs.map((duplicate) => {
-        display.push(
-        <Card key={duplicate.songID}>
-          <Img src={duplicate.image} alt={`The cover art of the song's album, "${duplicate.albumName}"`}/>
-          <div>
-            <SongTitle>{duplicate.name}</SongTitle>
-            <Artist> by {duplicate.artist}</Artist>
-          </div>
-        </Card>);
-      })
 
-      return display;
+      if (this.props.data.duplicatesFound === 'data set') {
+        this.props.data.duplicateSongs.forEach((duplicate) => {
+          display.push(
+          <Card key={duplicate.songID}>
+            <Img src={duplicate.image} alt={`The cover art of the song's album, "${duplicate.albumName}"`}/>
+            <div>
+              <SongTitle>{duplicate.name}</SongTitle>
+              <Artist> by {duplicate.artist}</Artist>
+            </div>
+          </Card>);
+        })
+        return display;
+      } else {
+        return <div></div>
+      }
     }
      
   render() {

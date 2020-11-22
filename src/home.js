@@ -136,6 +136,7 @@ class Home extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+          duplicateSongs: [],
           duplicatesFound: 'start',
           errors: {},
           mainUsername: '',
@@ -222,7 +223,7 @@ class Home extends React.Component {
       if (this.state.userDisplay === true) {
         return (
           <UserInputContainer>       
-            <InputLabels2 status={this.state.duplicatesFound === "done"}>Enter up to three other Spotify usernames to compare your music picks:</InputLabels2>
+            <InputLabels2>Enter up to three other Spotify usernames to compare your music picks:</InputLabels2>
             <InputDiv>
               <InputField2 type="text" id="username0" onChange={this.handleChangeOtherUsername}/>
               <InputField2 type="text" id="username1" onChange={this.handleChangeOtherUsername}/>
@@ -467,18 +468,12 @@ class Home extends React.Component {
         };
       }
 
-      this.findTopArtists(topArtists);
-
       this.setState({
         duplicateSongs: allDuplicateInfo,
-      }, () => {
-        this.setState({
-        duplicatesLength: this.state.duplicateSongs.length,
-        duplicatesFound: 'done'
-        })
-      });
+        duplicatesLength: allDuplicateInfo.length
+      }); 
 
-
+      this.findTopArtists(topArtists);
     }
 
     async getDuplicatesInfo(duplicates) { //API request for song data (title, artist, album data, etc.)   
@@ -495,7 +490,6 @@ class Home extends React.Component {
     }
 
     /*    Find artists data and top artists    */
-
     async findTopArtists(artists) {
       let duplicateArtists = [];
   
@@ -523,16 +517,18 @@ class Home extends React.Component {
 
       let newTopArtists = []; 
 
-      topArtists.map(async (artist) => {
+      for (const artist of topArtists) {
         let image = await this.getArtistArt(artist[0]);
         newTopArtists.push([artist[0], artist[1], image]);
-        //copy state local and then push all at once
-      });
+      }
 
       this.setState({
         topArtists: newTopArtists
+      }, () => {
+        this.setState({
+          duplicatesFound: "data set"
+        })
       });
-
     }
 
     getArtistArt = async (artist) => {
@@ -566,12 +562,12 @@ class Home extends React.Component {
     }
 
     /*    Render    */
-    renderContent(status) {
-      if (status === "start") {
+    renderContent() {
+      if (this.state.duplicatesFound === "start") {
         return (
           <div>
             <UserInputContainer status={this.state.duplicatesFound}> 
-              <InputLabels htmlFor="your_username" status={this.state.duplicatesFound === "done"}>Enter your Spotify username here:</InputLabels>
+              <InputLabels htmlFor="your_username" >Enter your Spotify username here:</InputLabels>
               <Tutorial onClick={this.togglePopup}>Not sure how to find a Spotify username? <span>Click here for help!</span></Tutorial>
               <InputDiv>
                 <InputField type="text" id="your_username" onChange={this.handleChangeMainUsername}/>
@@ -582,7 +578,7 @@ class Home extends React.Component {
             </UserInputContainer>
         </div>
         )
-      } else if (status === "loading") {
+      } else if (this.state.duplicatesFound === "loading") {
         return (
           <Loader>
             <div className="la-line-scale-pulse-out la-dark la-2x">
@@ -594,7 +590,7 @@ class Home extends React.Component {
             </div>
           </Loader>
         )
-      } else if (status === "done") {
+      } else if (this.state.duplicatesFound === "data set") {
         return (
           <Body2>
             <DisplaySongs data={this.state}/>
@@ -613,9 +609,9 @@ class Home extends React.Component {
           <Header/>
           <Gradient color="linear-gradient(to bottom right, #00ff33, #13a9bb)" status={this.state.duplicatesFound === "start"}/>
           <Gradient color="linear-gradient(to bottom right, #13a9bb, #7d00aa)" status={this.state.duplicatesFound === "loading"}/>
-          <Gradient color="linear-gradient(to bottom right, #7d00aa, #fa3378)" status={this.state.duplicatesFound === "done"}/>
+          <Gradient color="linear-gradient(to bottom right, #7d00aa, #fa3378)" status={this.state.duplicatesFound === "data set"}/>
           <Body>
-            {this.renderContent(this.state.duplicatesFound)}
+            {this.renderContent()}
           </Body>
         </GradientWrapper>
       );
