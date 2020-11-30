@@ -15,12 +15,12 @@ const reducer = (state = INITIAL_STATE, action) => {
     case 'SET_MAIN_USER':
       return {
         ...state, 
-        mainUsername: 'updated'
+        mainUsername: action.payload
       };
     case 'SET_USERS':
       return {
         ...state, 
-        usernames: {'user1': 123, 'user2': 1324}
+        usernames: action.payload
       };
     default: {
       return state

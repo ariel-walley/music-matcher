@@ -347,8 +347,8 @@ class Home extends React.Component {
       await this.reset();
       await this.verifyUsernames();
       if (this.state.errors.invalidUserID === false && this.state.errors.minimumUsersError === false) {
-        this.props.setMainUser();
-        this.props.setUsers();
+        this.props.setMainUser(this.state.mainUsername);
+        this.props.setUsers(this.state.usernames);
         this.setState({
           duplicatesFound: 'loading'
         })
@@ -636,8 +636,8 @@ function mapStateToProps(state) {
 
 const mapDispatchToProps = dispatch => {
   return {
-    setMainUser: () => dispatch(setMainUser()),
-    setUsers: () => dispatch(setUsers())
+    setMainUser: (i) => dispatch(setMainUser(i)),
+    setUsers: (i) => dispatch(setUsers(i))
   }
 }
 
