@@ -8,6 +8,11 @@ import _ from 'lodash';
 import styled, { keyframes } from 'styled-components';
 import Popup from './instructions';
 import GlobalStyle from './globalStyles';
+import { connect } from 'react-redux';
+import { 
+  setMainUser,
+  setUsers
+} from './redux/actions';
 
 //Styles for gradient background
 const GradientWrapper = styled.div`
@@ -196,16 +201,15 @@ class Home extends React.Component {
     }
 
     /*    Handle user ID input, the input display, and verifying usernames    */
-    handleChangeMainUsername(event) { //Set state with main username input and decide whether to other other users' block
-      let value = event.target.value;
+    handleChangeMainUsername(input) { //Set state with main username input and decide whether to other other users' block
       this.setState(() => ({
-        userDisplay: (value.length > 2 || this.state.userDisplay) ? true : false, 
+        userDisplay: (input.length > 2 || this.state.userDisplay) ? true : false, 
         users: {
           ...this.state.users,
-          mainUsername: value
+          mainUsername: input
         }
       }));
-    }
+    } 
 
     displayPopup() {
       if (this.state.showPopup) {
@@ -343,6 +347,8 @@ class Home extends React.Component {
       await this.reset();
       await this.verifyUsernames();
       if (this.state.errors.invalidUserID === false && this.state.errors.minimumUsersError === false) {
+        this.props.setMainUser();
+        this.props.setUsers();
         this.setState({
           duplicatesFound: 'loading'
         })
@@ -356,7 +362,7 @@ class Home extends React.Component {
           await this.findDuplicateSongs(compareSongs); 
         } catch (err) {
           console.log(err);
-        }
+        } 
       }
     }
 
@@ -570,7 +576,11 @@ class Home extends React.Component {
               <InputLabels htmlFor="your_username" >Enter your Spotify username here:</InputLabels>
               <Tutorial onClick={this.togglePopup}>Not sure how to find a Spotify username? <span>Click here for help!</span></Tutorial>
               <InputDiv>
-                <InputField type="text" id="your_username" onChange={this.handleChangeMainUsername}/>
+                <InputField 
+                  type="text" 
+                  id="your_username" 
+                  onChange={e => this.handleChangeMainUsername(e.target.value)}
+                />
               </InputDiv>
               {this.displayOtherUsers()}
               {this.displayError()}
@@ -594,7 +604,7 @@ class Home extends React.Component {
         return (
           <Body2>
             <DisplaySongs data={this.state}/>
-            <TopArtists data={this.state}/>
+            {/* <TopArtists data={this.state}/> */}
           </Body2>
         )
       } else {
@@ -618,4 +628,17 @@ class Home extends React.Component {
     }
 };
 
-export default Home;
+function mapStateToProps(state) {
+  return {
+    mainUsername: state.mainUsername
+  };
+}
+
+const mapDispatchToProps = dispatch => {
+  return {
+    setMainUser: () => dispatch(setMainUser()),
+    setUsers: () => dispatch(setUsers())
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Home);
