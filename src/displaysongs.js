@@ -92,10 +92,10 @@ class DisplaySongs extends React.Component {
         let songs = '';
         if (this.props.duplicateSongs === "none") {
           songs = 'no songs'
-        } else if (this.props.duplicatesLength === 1) {
+        } else if (this.props.duplicateSongs.length === 1) {
           songs = '1 song'
         } else {
-          songs = `${this.props.duplicatesLength} songs`
+          songs = `${this.props.duplicateSongs.length} songs`
         }
 
         //Final phrase
@@ -144,8 +144,7 @@ function mapStateToProps(state) {
     mainUsername: state.mainUsername,
     usernames: state.usernames,
     status: state.status,
-    duplicateSongs: state.duplicateSongs,
-    duplicatesLength: state.duplicatesLength
+    duplicateSongs: state.duplicateSongs
   };
 }
 

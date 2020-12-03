@@ -140,7 +140,7 @@ class TopArtists extends React.Component {
           <Row key={artist[0]}>
             <TableArtist>{artist[1]}</TableArtist>
             <TableData>{artist[2]}</TableData>
-            <TableData>{((artist[2]/this.props.duplicatesLength)*100).toFixed(2) + "%"}</TableData>
+            <TableData>{((artist[2]/this.props.duplicateSongs.length)*100).toFixed(2) + "%"}</TableData>
           </Row>      
         )
       }
@@ -168,7 +168,7 @@ class TopArtists extends React.Component {
 function mapStateToProps(state) {
   return {
     status: state.status,
-    duplicatesLength: state.duplicatesLength,
+    duplicateSongs: state.duplicateSongs,
     duplicateArtists: state.duplicateArtists,
     topArtists: state.topArtists
   };

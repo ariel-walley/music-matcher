@@ -619,7 +619,6 @@ function mapStateToProps(state) {
     usernames: state.usernames,
     status: state.status,
     duplicateSongs: state.duplicateSongs,
-    duplicatesLength: state.duplicatesLength,
     duplicateArtists: state.duplicateArtists,
     topArtists: state.topArtists
   };
