@@ -502,7 +502,9 @@ class Home extends React.Component {
 
       let topArtists = [];
 
-      if (sorted[0][2] !== sorted[1][2]) {
+      if (sorted.length === 1) {
+        topArtists.push(sorted[0]);
+      } else if (sorted[0][2] !== sorted[1][2]) {
         topArtists.push(sorted[0]);
       } else if (sorted[1][2] !== sorted[2][2]) {
         topArtists.push(sorted[0], sorted[1]);
