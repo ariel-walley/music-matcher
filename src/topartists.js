@@ -1,5 +1,6 @@
 import React from 'react';
 import styled, { keyframes } from 'styled-components';
+import { connect } from 'react-redux';
 
 const fadeIn = keyframes`
   0% {
@@ -107,9 +108,9 @@ class TopArtists extends React.Component {
 
     let display = [];
 
-    if (this.props.data.duplicatesFound === 'data set') { 
+    if (this.props.status === 'data set') { 
 
-      this.props.data.topArtists.forEach((artist) => {
+      this.props.topArtists.forEach((artist) => {
         display.push(
           <Card key={artist[0]}>
             <Img src={artist[2]} alt={`The artist art for ${artist[1]}`} />
@@ -133,13 +134,13 @@ class TopArtists extends React.Component {
       </Header>
     )
 
-    if (this.props.data.duplicatesFound === 'data set') {
-      for (let artist of this.props.data.duplicateArtists) {
+    if (this.props.status === 'data set') {
+      for (let artist of this.props.duplicateArtists) {
         display.push(
           <Row key={artist[0]}>
             <TableArtist>{artist[1]}</TableArtist>
             <TableData>{artist[2]}</TableData>
-            <TableData>{((artist[2]/this.props.data.duplicatesLength)*100).toFixed(2) + "%"}</TableData>
+            <TableData>{((artist[2]/this.props.duplicatesLength)*100).toFixed(2) + "%"}</TableData>
           </Row>      
         )
       }
@@ -164,4 +165,13 @@ class TopArtists extends React.Component {
 
 }
 
-export default TopArtists;
+function mapStateToProps(state) {
+  return {
+    status: state.status,
+    duplicatesLength: state.duplicatesLength,
+    duplicateArtists: state.duplicateArtists,
+    topArtists: state.topArtists
+  };
+}
+
+export default connect(mapStateToProps)(TopArtists);

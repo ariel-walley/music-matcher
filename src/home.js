@@ -11,7 +11,12 @@ import GlobalStyle from './globalStyles';
 import { connect } from 'react-redux';
 import { 
   setMainUser,
-  setUsers
+  setUsers,
+  setStatus,
+  setSongs,
+  setLength,
+  setArtists,
+  setTopArtists
 } from './redux/actions';
 
 //Styles for gradient background
@@ -142,13 +147,10 @@ class Home extends React.Component {
         super(props);
         this.state = {
           duplicateSongs: [],
-          duplicatesFound: 'start',
           errors: {},
-          mainUsername: '',
           showPopup: false,
           topArtists: [],
           userDisplay: false,
-          usernames: {},
           users: {
             mainUsername: ''
           }         
@@ -292,6 +294,7 @@ class Home extends React.Component {
             },
           });
           let data = await response.json();
+          
           this.setState({
             usernames: {
               ...this.state.usernames,
@@ -302,7 +305,7 @@ class Home extends React.Component {
             console.error(err);
         };             
       }
-      let displaynames = Object.values(this.state.usernames); //Verify usernames (no undefined display names)
+      let displaynames = Object.values(this.props.usernames); //Verify usernames (no undefined display names)
       let undefinedFound = displaynames.indexOf(undefined);
 
       this.setState({
@@ -349,12 +352,10 @@ class Home extends React.Component {
       if (this.state.errors.invalidUserID === false && this.state.errors.minimumUsersError === false) {
         this.props.setMainUser(this.state.mainUsername);
         this.props.setUsers(this.state.usernames);
-        this.setState({
-          duplicatesFound: 'loading'
-        })
+        this.props.setStatus('loading');
         try {
           let compareSongs = [];
-          let users = Object.keys(this.state.usernames);
+          let users = Object.keys(this.props.usernames);
           for (let user of users) {
             let songs = await this.getUserData(user); //gets user data and filters our users' duplicate songs (i.e., user added the same song to multiple playlists);
             compareSongs.push(songs);
@@ -380,7 +381,6 @@ class Home extends React.Component {
           if (data.items.length === 0) {
             this.setState({
               ...this.state,
-              duplicatesFound: "start",
               errors: {
                 ...this.state.errors,
                 noPublicPlaylists: {
@@ -440,11 +440,7 @@ class Home extends React.Component {
       _.pull(duplicates, null);
 
       if (duplicates.length === 0) {
-        this.setState({
-          ...this.state,
-          duplicateSongs: "none",
-          duplicatesFound: "start"
-        })
+        this.props.setSongs('none');
         return
       }
 
@@ -473,11 +469,8 @@ class Home extends React.Component {
           ); 
         };
       }
-
-      this.setState({
-        duplicateSongs: allDuplicateInfo,
-        duplicatesLength: allDuplicateInfo.length
-      }); 
+      this.props.setSongs(allDuplicateInfo);
+      this.props.setLength(allDuplicateInfo.length);
 
       this.findTopArtists(topArtists);
     }
@@ -505,9 +498,7 @@ class Home extends React.Component {
               
       let sorted = duplicateArtists.sort((a, b) => b[2] - a[2]);
 
-      this.setState({
-        duplicateArtists: sorted  
-      });
+      this.props.setArtists(sorted);
 
       let topArtists = [];
 
@@ -528,13 +519,8 @@ class Home extends React.Component {
         newTopArtists.push([artist[0], artist[1], image]);
       }
 
-      this.setState({
-        topArtists: newTopArtists
-      }, () => {
-        this.setState({
-          duplicatesFound: "data set"
-        })
-      });
+      this.props.setTopArtists(newTopArtists);
+      this.props.setStatus('data set');
     }
 
     getArtistArt = async (artist) => {
@@ -561,18 +547,17 @@ class Home extends React.Component {
         userDisplay: true,
         mainUsername: '',
         usernames: {},
-        errors: {},
-        duplicatesFound: 'start',  
+        errors: {}, 
         showPopup: false
       })
     }
 
     /*    Render    */
     renderContent() {
-      if (this.state.duplicatesFound === "start") {
+      if (this.props.status === "start") {
         return (
           <div>
-            <UserInputContainer status={this.state.duplicatesFound}> 
+            <UserInputContainer> 
               <InputLabels htmlFor="your_username" >Enter your Spotify username here:</InputLabels>
               <Tutorial onClick={this.togglePopup}>Not sure how to find a Spotify username? <span>Click here for help!</span></Tutorial>
               <InputDiv>
@@ -588,7 +573,7 @@ class Home extends React.Component {
             </UserInputContainer>
         </div>
         )
-      } else if (this.state.duplicatesFound === "loading") {
+      } else if (this.props.status === "loading") {
         return (
           <Loader>
             <div className="la-line-scale-pulse-out la-dark la-2x">
@@ -600,11 +585,11 @@ class Home extends React.Component {
             </div>
           </Loader>
         )
-      } else if (this.state.duplicatesFound === "data set") {
+      } else if (this.props.status === "data set") {
         return (
           <Body2>
-            <DisplaySongs data={this.state}/>
-            {/* <TopArtists data={this.state}/> */}
+            <DisplaySongs/>
+            <TopArtists data={this.state}/>
           </Body2>
         )
       } else {
@@ -617,9 +602,9 @@ class Home extends React.Component {
         <GradientWrapper>
           <GlobalStyle/>
           <Header/>
-          <Gradient color="linear-gradient(to bottom right, #00ff33, #13a9bb)" status={this.state.duplicatesFound === "start"}/>
-          <Gradient color="linear-gradient(to bottom right, #13a9bb, #7d00aa)" status={this.state.duplicatesFound === "loading"}/>
-          <Gradient color="linear-gradient(to bottom right, #7d00aa, #fa3378)" status={this.state.duplicatesFound === "data set"}/>
+          <Gradient color="linear-gradient(to bottom right, #00ff33, #13a9bb)" status={this.props.status === "start"}/>
+          <Gradient color="linear-gradient(to bottom right, #13a9bb, #7d00aa)" status={this.props.status === "loading"}/>
+          <Gradient color="linear-gradient(to bottom right, #7d00aa, #fa3378)" status={this.props.status === "data set"}/>
           <Body>
             {this.renderContent()}
           </Body>
@@ -630,15 +615,24 @@ class Home extends React.Component {
 
 function mapStateToProps(state) {
   return {
-    mainUsername: state.mainUsername
+    mainUsername: state.mainUsername,
+    usernames: state.usernames,
+    status: state.status,
+    duplicateSongs: state.duplicateSongs,
+    duplicatesLength: state.duplicatesLength,
+    duplicateArtists: state.duplicateArtists,
+    topArtists: state.topArtists
   };
 }
 
-const mapDispatchToProps = dispatch => {
-  return {
-    setMainUser: (i) => dispatch(setMainUser(i)),
-    setUsers: (i) => dispatch(setUsers(i))
-  }
-}
+const mapDispatchToProps = {
+  setMainUser,
+  setUsers,
+  setStatus,
+  setSongs,
+  setLength,
+  setArtists,
+  setTopArtists
+};
 
 export default connect(mapStateToProps, mapDispatchToProps)(Home);

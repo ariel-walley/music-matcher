@@ -1,27 +1,31 @@
 import { setMainUser, setUsers } from './actions';
 
-const INITIAL_STATE = {
-  mainUsername: '', //SET_MAIN_USER
-  usernames: {}, //SET_USERS
-  duplicatesFound: 'start', //SET_STATUS
-  duplicateSongs: [], //SET_SONGS
-  duplicatesLength: 0, //SET_SONGS_LENGTH
-  duplicateArtists: [], //SET_ARTISTS
-  topArtists: [] //SET_TOP_ARTISTS
+const initialState = {
+  mainUsername: '',
+  usernames: {},
+  status: 'start',
+  duplicateSongs: [],
+  duplicatesLength: 0,
+  duplicateArtists: [],
+  topArtists: []
 };
 
-const reducer = (state = INITIAL_STATE, action) => {
+function reducer (state = initialState, action) {
   switch (action.type) {
     case 'SET_MAIN_USER':
-      return {
-        ...state, 
-        mainUsername: action.payload
-      };
+      return { ...state, mainUsername: action.payload };
     case 'SET_USERS':
-      return {
-        ...state, 
-        usernames: action.payload
-      };
+      return { ...state, usernames: action.payload };
+    case 'SET_STATUS':
+      return { ...state, status: action.payload };
+    case 'SET_SONGS':
+      return { ...state, duplicateSongs: action.payload };
+    case 'SET_LENGTH':
+      return { ...state, duplicatesLength: action.payload };
+    case 'SET_ARTISTS':
+      return { ...state, duplicateArtists: action.payload };
+    case 'SET_TOP_ARTISTS':
+      return { ...state, topArtists: action.payload };
     default: {
       return state
     };
