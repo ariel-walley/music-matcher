@@ -68,7 +68,7 @@ const Body2 = styled(Body)`
 //Styles for username input on start page
 const UserInputContainer = styled.div`
   display: flex;
-  flex-direction: column;
+  flex-wrap: wrap;
   justify-content: center;
   align-items: center;
   transition: color 5s;
@@ -82,11 +82,16 @@ const InputLabels = styled.label`
 `;
 
 const InputLabels2 = styled(InputLabels)`
+  text-align: center;
   animation: 0.4s ${fadeIn} ease-out;
 `;
 
 const InputDiv = styled.div`
   margin: 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
 `;
 
 const InputField = styled.input`
