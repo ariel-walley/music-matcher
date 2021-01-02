@@ -1,6 +1,5 @@
 import React from 'react';
 import Header from './header';
-import Menu from './menu';
 import DisplaySongs from './displaysongs';
 import TopArtists from './topartists';
 import QueryString from 'querystring';

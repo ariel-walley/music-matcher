@@ -49,13 +49,6 @@ const ArtistName = styled.h1`
   padding: 0;
 `;
 
-const Artist = styled.h2`
-  font-size: 20px;
-  font-weight: 550px;
-  margin: 0 0 0 25px;
-  padding: 0;
-`;
-
 const Img = styled.img`
   width: 100px;
   height: 100px;

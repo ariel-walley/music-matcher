@@ -1,5 +1,3 @@
-import { setMainUser, setUsers } from './actions';
-
 const initialState = {
   mainUsername: '',
   usernames: {},
