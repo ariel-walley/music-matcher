@@ -134,7 +134,7 @@ class TopArtists extends React.Component {
       </Header>
     )
 
-    if (this.props.status === 'data set') {
+    if (this.props.topArtists.length > 0) {
       for (let artist of this.props.duplicateArtists) {
         display.push(
           <Row key={artist[0]}>
@@ -151,18 +151,21 @@ class TopArtists extends React.Component {
   }
 
   render() {
-    return(
-      <MainContainer>
-        <Heading>Here are your top artists in common:</Heading>
-        <CardContainer>
-          {this.formatCard()}
-        </CardContainer>
-        <Heading>See all of your artist(s) in common:</Heading>
-        {this.assembleTable()}
-      </MainContainer>
-    )
+    if (this.props.topArtists.length > 0) {
+      return(
+        <MainContainer>
+          <Heading>Here are your top artists in common:</Heading>
+          <CardContainer>
+            {this.formatCard()}
+          </CardContainer>
+          <Heading>See all of your artist(s) in common:</Heading>
+          {this.assembleTable()}
+        </MainContainer>
+      )
+    } else {
+      return (<div></div>)
+    }    
   }
-
 }
 
 function mapStateToProps(state) {

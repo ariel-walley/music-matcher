@@ -420,7 +420,7 @@ class Home extends React.Component {
     async fetchSongs(playlistID) { //Requests playlists' songs
       let playlistSongs = [];
       let next = `https://api.spotify.com/v1/playlists/${playlistID}/tracks?fields=items(track(id,name,album(images,name),artists(name))),limit,next,offset,previous,total`
-      
+
       while(next !=null) {
         try {
           let response = await fetch(next, {
@@ -430,7 +430,11 @@ class Home extends React.Component {
           });
           
           let data = await response.json();
-          let songsChunk = data.items.map(song => { return song.track.id });
+          let songsChunk = data.items.map(song => { 
+            if (song.track) { 
+              return song.track.id 
+            }
+          });
           playlistSongs.push(...songsChunk);
           next = data.next;
         } catch (err) {
@@ -516,18 +520,18 @@ class Home extends React.Component {
         topArtists.push(sorted[0], sorted[1]);
       } else if (sorted[2][2] !== sorted[3][2]) {
         topArtists.push(sorted[0], sorted[1], sorted[2])
-      } else {
-        return 'there really isn\'t a top artist'
-      }
+      } 
 
       let newTopArtists = []; 
 
-      for (const artist of topArtists) {
-        let image = await this.getArtistArt(artist[0]);
-        newTopArtists.push([artist[0], artist[1], image]);
-      }
-
-      this.props.setTopArtists(newTopArtists);
+      if (topArtists) {
+        for (const artist of topArtists) {
+          let image = await this.getArtistArt(artist[0]);
+          newTopArtists.push([artist[0], artist[1], image]);
+        }
+        this.props.setTopArtists(newTopArtists);
+      } 
+      
       this.props.setStatus('data set');
     }
 
