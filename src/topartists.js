@@ -127,7 +127,7 @@ class TopArtists extends React.Component {
       </Header>
     )
 
-    if (this.props.topArtists.length > 0) {
+    if (this.props.duplicateArtists.length > 5) {
       for (let artist of this.props.duplicateArtists) {
         display.push(
           <Row key={artist[0]}>
@@ -144,14 +144,14 @@ class TopArtists extends React.Component {
   }
 
   render() {
-    if (this.props.topArtists.length > 0) {
+    if (this.props.duplicateArtists.length > 5) {
       return(
         <MainContainer>
-          <Heading>Here are your top artists in common:</Heading>
+          <Heading>{this.props.topArtists.length > 0 ? 'Here are your top artists in common:' : ''}</Heading>
           <CardContainer>
             {this.formatCard()}
           </CardContainer>
-          <Heading>See all of your artist(s) in common:</Heading>
+          <Heading>See all of your artists in common:</Heading>
           {this.assembleTable()}
         </MainContainer>
       )
