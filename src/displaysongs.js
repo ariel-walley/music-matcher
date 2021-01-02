@@ -126,16 +126,27 @@ class DisplaySongs extends React.Component {
     }
      
   render() {
-    return (
-      <div>
-        <MainContainer>
+
+    if (this.props.duplicateSongs === 'none') {
+      return(
+        <div>
           {this.formatHeader()}
-          <CardContainer>
-            {this.formatCard()}
-          </CardContainer>
-        </MainContainer>
-      </div>  
-    )
+        </div>
+      )
+    } else if (this.props.duplicateSongs.length > 0) {
+      return (
+        <div>
+          <MainContainer>
+            {this.formatHeader()}
+            <CardContainer>
+              {this.formatCard()}
+            </CardContainer>
+          </MainContainer>
+        </div>  
+      )
+    } else {
+      return (<div></div>)
+    }
   }
 }
 

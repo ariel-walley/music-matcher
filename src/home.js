@@ -429,12 +429,13 @@ class Home extends React.Component {
           });
           
           let data = await response.json();
-          let songsChunk = data.items.map(song => { 
-            if (song.track) { 
-              return song.track.id 
+
+          for (let i = 0; i < data.items.length; i++) {
+            if (data.items[i].track !== null) { 
+              playlistSongs.push(data.items[i].track.id);
             }
-          });
-          playlistSongs.push(...songsChunk);
+          }
+
           next = data.next;
         } catch (err) {
           console.log(err);
@@ -450,38 +451,39 @@ class Home extends React.Component {
 
       if (duplicates.length === 0) {
         this.props.setSongs('none');
-        return
-      }
+        this.props.setStatus('data set');
+      } else {
 
-      let allDuplicateInfo = [];
-      let topArtists = {};
+        let allDuplicateInfo = [];
+        let topArtists = {};
 
-      while(duplicates.length) {
-        let splitDuplicates = duplicates.splice(0,50);
-        let apiDuplicates = splitDuplicates.join(",");
-        let duplicateInfo = await this.getDuplicatesInfo(apiDuplicates);
+        while(duplicates.length) {
+          let splitDuplicates = duplicates.splice(0,50);
+          let apiDuplicates = splitDuplicates.join(",");
+          let duplicateInfo = await this.getDuplicatesInfo(apiDuplicates);
 
-        for (let song of duplicateInfo.tracks) {
-          let artistsName = [];
-          for (let artist of song.artists) {
-            artistsName.push(artist.name);
-            topArtists[artist.id] = topArtists[artist.id] ? [artist.name, (topArtists[artist.id][1] + 1)] : [artist.name, 1];
+          for (let song of duplicateInfo.tracks) {
+            let artistsName = [];
+            for (let artist of song.artists) {
+              artistsName.push(artist.name);
+              topArtists[artist.id] = topArtists[artist.id] ? [artist.name, (topArtists[artist.id][1] + 1)] : [artist.name, 1];
+            };
+
+            allDuplicateInfo.push(
+              { "songID": song.id,
+                "name": song.name,
+                "artist": artistsName.join(", "),
+                "image": song.album.images[1].url,
+                "albumName": song.album.name
+              }
+            ); 
           };
+        }
+        this.props.setSongs(allDuplicateInfo);
+        this.props.setLength(allDuplicateInfo.length);
 
-          allDuplicateInfo.push(
-            { "songID": song.id,
-              "name": song.name,
-              "artist": artistsName.join(", "),
-              "image": song.album.images[1].url,
-              "albumName": song.album.name
-            }
-          ); 
-        };
+        this.findTopArtists(topArtists);
       }
-      this.props.setSongs(allDuplicateInfo);
-      this.props.setLength(allDuplicateInfo.length);
-
-      this.findTopArtists(topArtists);
     }
 
     async getDuplicatesInfo(duplicates) { //API request for song data (title, artist, album data, etc.)   
@@ -523,7 +525,7 @@ class Home extends React.Component {
 
       let newTopArtists = []; 
 
-      if (topArtists) {
+      if (topArtists[0].length > 0) {
         for (const artist of topArtists) {
           let image = await this.getArtistArt(artist[0]);
           newTopArtists.push([artist[0], artist[1], image]);
@@ -543,7 +545,6 @@ class Home extends React.Component {
           },
         });
         let data = await response.json();
-        
         return data.images[2].url;
   
       } catch(err) {
