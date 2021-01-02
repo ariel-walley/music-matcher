@@ -163,6 +163,8 @@ class Home extends React.Component {
 
         this.getAccessToken = this.getAccessToken.bind(this);
         this.handleChangeMainUsername = this.handleChangeMainUsername.bind(this);
+        this.displayPopup = this.displayPopup.bind(this);
+        this.togglePopup = this.togglePopup.bind(this);
         this.displayOtherUsers = this.displayOtherUsers.bind(this);
         this.handleChangeOtherUsername = this.handleChangeOtherUsername.bind(this);
         this.verifyUsernames = this.verifyUsernames.bind(this);
@@ -173,8 +175,6 @@ class Home extends React.Component {
         this.fetchSongs = this.fetchSongs.bind(this);
         this.findDuplicateSongs = this.findDuplicateSongs.bind(this);
         this.getDuplicatesInfo = this.getDuplicatesInfo.bind(this);
-        this.displayPopup = this.displayPopup.bind(this);
-        this.togglePopup = this.togglePopup.bind(this);
         this.findTopArtists = this.findTopArtists.bind(this);
         this.getArtistArt = this.getArtistArt.bind(this);
         this.reset = this.reset.bind(this);
@@ -513,24 +513,24 @@ class Home extends React.Component {
 
       let topArtists = [];
 
-      if (sorted.length < 4) {
-        topArtists.push(sorted);
-      } else if (sorted[0][2] !== sorted[1][2]) {
-        topArtists.push(sorted[0]);
-      } else if (sorted[1][2] !== sorted[2][2]) {
-        topArtists.push(sorted[0], sorted[1]);
-      } else if (sorted[2][2] !== sorted[3][2]) {
-        topArtists.push(sorted[0], sorted[1], sorted[2])
-      } 
+      if (sorted.length > 5) {
+        if (sorted[0][2] !== sorted[1][2]) {
+          topArtists.push(sorted[0]);
+        } else if (sorted[1][2] !== sorted[2][2]) {
+          topArtists.push(sorted[0], sorted[1]);
+        } else if (sorted[2][2] !== sorted[3][2]) {
+          topArtists.push(sorted[0], sorted[1], sorted[2])
+        } 
+  
+        let newTopArtists = []; 
 
-      let newTopArtists = []; 
-
-      if (topArtists[0].length > 0) {
-        for (const artist of topArtists) {
-          let image = await this.getArtistArt(artist[0]);
-          newTopArtists.push([artist[0], artist[1], image]);
-        }
-        this.props.setTopArtists(newTopArtists);
+        if (topArtists.length > 0) {
+          for (const artist of topArtists) {
+            let image = await this.getArtistArt(artist[0]);
+            newTopArtists.push([artist[0], artist[1], image]);
+          }
+          this.props.setTopArtists(newTopArtists);
+        } 
       } 
       
       this.props.setStatus('data set');

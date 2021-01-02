@@ -72,58 +72,58 @@ class DisplaySongs extends React.Component {
     this.formatCard = this.formatCard.bind(this);
     }
 
-    formatHeader() {
-      //Determine the display names
-      let mainUserID = this.props.mainUsername;
-      let mainUsername = this.props.usernames[mainUserID];
-      let usernames = Object.values(this.props.usernames);
+  formatHeader() {
+    //Determine the display names
+    let mainUserID = this.props.mainUsername;
+    let mainUsername = this.props.usernames[mainUserID];
+    let usernames = Object.values(this.props.usernames);
 
-      _.pull(usernames, mainUserID, mainUsername); //remove the main user from the display names
-      if (usernames.length === 1) {
-        usernames = ' and ' + usernames
-      } else if (usernames.length === 2) {
-        usernames = `, ${usernames[0]} and ${usernames[1]}`
-      } else {
-        usernames = `, ${usernames[0]}, ${usernames[1]}, and ${usernames[2]}`
-      }
-      
-      if (this.props.status === 'data set') {
-        //Determine how many songs in common
-        let songs = '';
-        if (this.props.duplicateSongs === "none") {
-          songs = 'no songs'
-        } else if (this.props.duplicateSongs.length === 1) {
-          songs = '1 song'
-        } else {
-          songs = `${this.props.duplicateSongs.length} songs`
-        }
-
-        //Final phrase
-        return <Header>You{usernames} have {songs} in common!</Header>
-      } else {
-        return <div>Not yet</div>
-      }
+    _.pull(usernames, mainUserID, mainUsername); //remove the main user from the display names
+    if (usernames.length === 1) {
+      usernames = ' and ' + usernames
+    } else if (usernames.length === 2) {
+      usernames = `, ${usernames[0]} and ${usernames[1]}`
+    } else {
+      usernames = `, ${usernames[0]}, ${usernames[1]}, and ${usernames[2]}`
     }
-
-    formatCard() {
-      let display = [];
-
-      if (this.props.status === 'data set') {
-        this.props.duplicateSongs.forEach((duplicate) => {
-          display.push(
-          <Card key={duplicate.songID}>
-            <Img src={duplicate.image} alt={`The cover art of the song's album, "${duplicate.albumName}"`}/>
-            <div>
-              <SongTitle>{duplicate.name}</SongTitle>
-              <Artist> by {duplicate.artist}</Artist>
-            </div>
-          </Card>);
-        })
-        return display;
+    
+    if (this.props.status === 'data set') {
+      //Determine how many songs in common
+      let songs = '';
+      if (this.props.duplicateSongs === "none") {
+        songs = 'no songs'
+      } else if (this.props.duplicateSongs.length === 1) {
+        songs = '1 song'
       } else {
-        return <div></div>
+        songs = `${this.props.duplicateSongs.length} songs`
       }
+
+      //Final phrase
+      return <Header>You{usernames} have {songs} in common!</Header>
+    } else {
+      return <div>Not yet</div>
     }
+  }
+
+  formatCard() {
+    let display = [];
+
+    if (this.props.status === 'data set') {
+      this.props.duplicateSongs.forEach((duplicate) => {
+        display.push(
+        <Card key={duplicate.songID}>
+          <Img src={duplicate.image} alt={`The cover art of the song's album, "${duplicate.albumName}"`}/>
+          <div>
+            <SongTitle>{duplicate.name}</SongTitle>
+            <Artist> by {duplicate.artist}</Artist>
+          </div>
+        </Card>);
+      })
+      return display;
+    } else {
+      return <div></div>
+    }
+  }
      
   render() {
 
