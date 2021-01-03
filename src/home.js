@@ -153,9 +153,11 @@ class Home extends React.Component {
         this.state = {
           duplicateSongs: [],
           errors: {},
+          mainUsername: '',
           showPopup: false,
           topArtists: [],
           userDisplay: false,
+          usernames: {},
           users: {
             mainUsername: ''
           }         
@@ -240,7 +242,7 @@ class Home extends React.Component {
               <InputField2 type="text" id="username1" onChange={this.handleChangeOtherUsername}/>
               <InputField2 type="text" id="username2" onChange={this.handleChangeOtherUsername}/>
             </InputDiv>
-            <SubmitButton type="submit" status={this.state.userDisplay2} onClick={this.submitUsernames}>Submit</SubmitButton>
+            <SubmitButton type="submit" onClick={this.submitUsernames}>Submit</SubmitButton>
           </UserInputContainer>
         )  
       }
@@ -263,7 +265,7 @@ class Home extends React.Component {
       let users = [];
       for (let user of userIDs) { 
         let trimmedUser = user.trim();
-        if (trimmedUser !== "" && trimmedUser !== null && trimmedUser !== '') {
+        if (trimmedUser !== "" && trimmedUser !== null) {
           if (trimmedUser.search("spotify:user:") > -1 ) {
             trimmedUser = trimmedUser.slice(13);
           }
@@ -272,19 +274,21 @@ class Home extends React.Component {
       }
 
       let mainUsername = this.state.users.mainUsername //Identify the main user
-        if (mainUsername === "" || mainUsername === null || mainUsername === '') {
-          this.setState({
-            errors: {
-              ...this.state.errors,
-              noMainUsername: true
-            }
-          })
-          return
-        } 
+       
+      if (mainUsername === "" || mainUsername === null) {
+        this.setState({
+          errors: {
+            ...this.state.errors,
+            noMainUsername: true
+          }
+        })
+        return
+      } 
 
-        if (mainUsername.search("spotify:user:") > -1 ) {
-          mainUsername = mainUsername.slice(13);
-        }
+      if (mainUsername.search("spotify:user:") > -1 ) {
+        mainUsername = mainUsername.slice(13);
+      }
+
       this.setState({
           mainUsername: mainUsername
       })  
@@ -307,7 +311,7 @@ class Home extends React.Component {
             }
           })
         } catch(err) {
-            console.error(err);
+            console.log(err);
         };             
       }
       let displaynames = Object.values(this.props.usernames); //Verify usernames (no undefined display names)
@@ -399,7 +403,7 @@ class Home extends React.Component {
           playlists.push(...playlistsChunk);
           next = data.next;
         } catch(err) {
-            console.error(err);
+            console.log(err);
         };
       }
       let allSongs = await this.startSongs(playlists);
@@ -455,7 +459,7 @@ class Home extends React.Component {
       } else {
 
         let allDuplicateInfo = [];
-        let topArtists = {};
+        let duplicateArtists = {};
 
         while(duplicates.length) {
           let splitDuplicates = duplicates.splice(0,50);
@@ -466,7 +470,7 @@ class Home extends React.Component {
             let artistsName = [];
             for (let artist of song.artists) {
               artistsName.push(artist.name);
-              topArtists[artist.id] = topArtists[artist.id] ? [artist.name, (topArtists[artist.id][1] + 1)] : [artist.name, 1];
+              duplicateArtists[artist.id] = duplicateArtists[artist.id] ? [artist.name, (duplicateArtists[artist.id][1] + 1)] : [artist.name, 1];
             };
 
             allDuplicateInfo.push(
@@ -482,7 +486,11 @@ class Home extends React.Component {
         this.props.setSongs(allDuplicateInfo);
         this.props.setLength(allDuplicateInfo.length);
 
-        this.findTopArtists(topArtists);
+        if (Object.keys(duplicateArtists).length > 5) {
+          this.findTopArtists(duplicateArtists);
+        }  
+
+        this.props.setStatus('data set');
       }
     }
 
@@ -513,24 +521,22 @@ class Home extends React.Component {
 
       let topArtists = [];
 
-      if (sorted.length > 5) {
-        if (sorted[0][2] !== sorted[1][2]) {
-          topArtists.push(sorted[0]);
-        } else if (sorted[1][2] !== sorted[2][2]) {
-          topArtists.push(sorted[0], sorted[1]);
-        } else if (sorted[2][2] !== sorted[3][2]) {
-          topArtists.push(sorted[0], sorted[1], sorted[2])
-        } 
+      if (sorted[0][2] !== sorted[1][2]) {
+        topArtists.push(sorted[0]);
+      } else if (sorted[1][2] !== sorted[2][2]) {
+        topArtists.push(sorted[0], sorted[1]);
+      } else if (sorted[2][2] !== sorted[3][2]) {
+        topArtists.push(sorted[0], sorted[1], sorted[2])
+      } 
   
-        let newTopArtists = []; 
+      let newTopArtists = []; 
 
-        if (topArtists.length > 0) {
-          for (const artist of topArtists) {
-            let image = await this.getArtistArt(artist[0]);
-            newTopArtists.push([artist[0], artist[1], image]);
-          }
-          this.props.setTopArtists(newTopArtists);
-        } 
+      if (topArtists.length > 0) {
+        for (const artist of topArtists) {
+          let image = await this.getArtistArt(artist[0]);
+          newTopArtists.push([artist[0], artist[1], image]);
+        }
+        this.props.setTopArtists(newTopArtists);
       } 
       
       this.props.setStatus('data set');
@@ -548,7 +554,7 @@ class Home extends React.Component {
         return data.images[2].url;
   
       } catch(err) {
-          console.error(err);
+          console.log(err);
       };   
     }
 

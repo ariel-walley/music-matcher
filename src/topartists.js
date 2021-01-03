@@ -117,15 +117,13 @@ class TopArtists extends React.Component {
   }
 
   assembleTable() {
-    let display = [];
-
-    display.push(
+    let display = [(
       <Header key="header">
         <TableArtist>Artist</TableArtist>
         <TableData>No. of Songs</TableData>
         <TableData>Percent of Songs</TableData>
       </Header>
-    )
+    )];
 
     if (this.props.duplicateArtists.length > 5) {
       for (let artist of this.props.duplicateArtists) {
