@@ -15,7 +15,7 @@ const HeaderBlock = styled.h1`
 class Header extends React.Component {
   render() {
     return(
-      <HeaderBlock>Music Matcher</HeaderBlock>
+      <HeaderBlock onClick={this.props.function}>Music Matcher</HeaderBlock>
     )
   }
 }

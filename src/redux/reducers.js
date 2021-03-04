@@ -21,9 +21,7 @@ function reducer (state = initialState, action) {
       return { ...state, duplicateArtists: action.payload };
     case 'SET_TOP_ARTISTS':
       return { ...state, topArtists: action.payload };
-    default: {
-      return state
-    };
+    default: return state;
   }
 };
 

@@ -1,4 +1,4 @@
-import { SET_MAIN_USER, SET_USERS, SET_STATUS, SET_SONGS, SET_LENGTH, SET_ARTISTS, SET_TOP_ARTISTS} from './actionTypes';
+import { SET_MAIN_USER, SET_USERS, SET_STATUS, SET_SONGS, SET_ARTISTS, SET_TOP_ARTISTS} from './actionTypes';
 
 export const setMainUser = (content) => ({
   type: SET_MAIN_USER,
@@ -17,10 +17,6 @@ export const setStatus = (content) => ({
 
 export const setSongs = (content) => ({
   type: SET_SONGS,
-  payload: content
-});
-export const setLength = (content) => ({
-  type: SET_LENGTH,
   payload: content
 });
 

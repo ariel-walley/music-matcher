@@ -13,7 +13,6 @@ import {
   setUsers,
   setStatus,
   setSongs,
-  setLength,
   setArtists,
   setTopArtists
 } from './redux/actions';
@@ -151,11 +150,9 @@ class Home extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-          duplicateSongs: [],
           errors: {},
           mainUsername: '',
           showPopup: false,
-          topArtists: [],
           userDisplay: false,
           usernames: {},
           users: {
@@ -356,7 +353,6 @@ class Home extends React.Component {
 
     /*    Request user, playlist, and song data from Spotify API    */
     async submitUsernames() { //MAIN FUNCTION, start API request process
-      await this.reset();
       await this.verifyUsernames();
       if (this.state.errors.invalidUserID === false && this.state.errors.minimumUsersError === false) {
         this.props.setMainUser(this.state.mainUsername);
@@ -484,7 +480,6 @@ class Home extends React.Component {
           };
         }
         this.props.setSongs(allDuplicateInfo);
-        this.props.setLength(allDuplicateInfo.length);
 
         if (Object.keys(duplicateArtists).length > 5) {
           this.findTopArtists(duplicateArtists);
@@ -561,13 +556,20 @@ class Home extends React.Component {
     /*    Reset functions    */
     async reset() {
       this.setState({
-        users: this.state.users,
-        userDisplay: true,
-        mainUsername: '',
-        usernames: {},
         errors: {}, 
-        showPopup: false
+        mainUsername: "",
+        showPopup: false,
+        userDisplay: true,
+        usernames: {},
+        users: {}
       })
+
+      this.props.setMainUser("");
+      this.props.setUsers({ });
+      this.props.setSongs([]);
+      this.props.setArtists([]); 
+      this.props.setTopArtists([]);
+      this.props.setStatus('start');
     }
 
     /*    Render    */
@@ -619,7 +621,7 @@ class Home extends React.Component {
       return (
         <GradientWrapper>
           <GlobalStyle/>
-          <Header/>
+          <Header function={this.reset}/>
           <Gradient color="linear-gradient(to bottom right, #00ff33, #13a9bb)" status={this.props.status === "start"}/>
           <Gradient color="linear-gradient(to bottom right, #13a9bb, #7d00aa)" status={this.props.status === "loading"}/>
           <Gradient color="linear-gradient(to bottom right, #7d00aa, #fa3378)" status={this.props.status === "data set"}/>
@@ -647,7 +649,6 @@ const mapDispatchToProps = {
   setUsers,
   setStatus,
   setSongs,
-  setLength,
   setArtists,
   setTopArtists
 };
