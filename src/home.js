@@ -150,7 +150,12 @@ class Home extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-          errors: {},
+          errors: {
+            minimumUsersError: false,
+            noMainUsername: false,
+            invalidUserID: false,
+            noPublicPlaylists: false
+          },
           mainUsername: '',
           showPopup: false,
           userDisplay: false,
@@ -257,8 +262,27 @@ class Home extends React.Component {
     }
 
     async verifyUsernames() { //Request display names from API and verify username input
+      this.setState({
+        errors: {
+          minimumUsersError: false,
+          noMainUsername: false,
+          invalidUserID: false,
+          noPublicPlaylists: false
+        }
+      })
 
       let userIDs = Object.values(this.state.users); //Trim white space in input fields and eliminate null or empty options
+      
+      if (userIDs.length < 2) { //Check at least two users were submitted
+        this.setState({ 
+          errors: {
+            ...this.state.errors,
+            minimumUsersError: true
+          }
+        })
+        return
+      }
+      
       let users = [];
       for (let user of userIDs) { 
         let trimmedUser = user.trim();
@@ -271,8 +295,8 @@ class Home extends React.Component {
       }
 
       let mainUsername = this.state.users.mainUsername //Identify the main user
-       
-      if (mainUsername === "" || mainUsername === null) {
+      
+      if (mainUsername === "" || mainUsername === null) { //Check if a main user is listed
         this.setState({
           errors: {
             ...this.state.errors,
@@ -280,7 +304,7 @@ class Home extends React.Component {
           }
         })
         return
-      } 
+      }
 
       if (mainUsername.search("spotify:user:") > -1 ) {
         mainUsername = mainUsername.slice(13);
@@ -299,8 +323,17 @@ class Home extends React.Component {
               'Authorization': 'Bearer ' + localStorage.getItem('accessToken')
             },
           });
-          let data = await response.json();
-          
+          let data = await response.json();        
+          if (Object.keys(data)[0] === "error" && data.error.status === 404) { //Check that users are valid
+            this.setState({
+              errors: {
+                ...this.state.errors,
+                invalidUserID: true
+              }
+            });
+            return
+          }
+
           this.setState({
             usernames: {
               ...this.state.usernames,
@@ -308,18 +341,9 @@ class Home extends React.Component {
             }
           })
         } catch(err) {
-            console.log(err);
+          console.log(err);
         };             
       }
-      let displaynames = Object.values(this.props.usernames); //Verify usernames (no undefined display names)
-      let undefinedFound = displaynames.indexOf(undefined);
-
-      this.setState({
-        errors: {
-          invalidUserID: (undefinedFound > -1) ? true : false,
-          minimumUsersError: (users.length > 1) ? false : true
-        }
-      })
     }
 
     displayError() { //Display error is username is invalid
@@ -354,7 +378,7 @@ class Home extends React.Component {
     /*    Request user, playlist, and song data from Spotify API    */
     async submitUsernames() { //MAIN FUNCTION, start API request process
       await this.verifyUsernames();
-      if (this.state.errors.invalidUserID === false && this.state.errors.minimumUsersError === false) {
+      if (!Object.values(this.state.errors).includes(true)) {
         this.props.setMainUser(this.state.mainUsername);
         this.props.setUsers(this.state.usernames);
         this.props.setStatus('loading');
@@ -556,7 +580,12 @@ class Home extends React.Component {
     /*    Reset functions    */
     async reset() {
       this.setState({
-        errors: {}, 
+        errors: {
+          minimumUsersError: false,
+          noMainUsername: false,
+          invalidUserID: false,
+          noPublicPlaylists: false
+        },
         mainUsername: "",
         showPopup: false,
         userDisplay: true,
