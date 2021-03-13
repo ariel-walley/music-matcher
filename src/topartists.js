@@ -95,6 +95,7 @@ class TopArtists extends React.Component {
     super(props);        
     this.formatCard = this.formatCard.bind(this);
     this.assembleTable = this.assembleTable.bind(this);
+    this.createHeader = this.createHeader.bind(this);
   }
 
   formatCard() {
@@ -141,11 +142,21 @@ class TopArtists extends React.Component {
     }
   }
 
+  createHeader() {
+    if (this.props.topArtists.length > 1) {
+      return <Heading>Here are your top artists in common:</Heading>
+    } else if (this.props.topArtists.length > 0) {
+      return <Heading>Here is your top artist in common:</Heading>
+    } else {
+      return <div></div>
+    }
+  }
+
   render() {
     if (this.props.duplicateArtists.length > 5) {
       return(
         <MainContainer>
-          <Heading>{this.props.topArtists.length > 0 ? 'Here are your top artists in common:' : ''}</Heading>
+          {this.createHeader()}
           <CardContainer>
             {this.formatCard()}
           </CardContainer>
