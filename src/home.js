@@ -137,6 +137,7 @@ const Error = styled.p`
   background-color: red;
   border-radius: 5px;
   padding: 5px;
+  text-align: center;
 `;
 
 //Styles for loader
@@ -262,41 +263,60 @@ class Home extends React.Component {
     }
 
     async verifyUsernames() { //Request display names from API and verify username input
-      this.setState({
-        errors: {
-          minimumUsersError: false,
-          noMainUsername: false,
-          invalidUserID: false,
-          noPublicPlaylists: false
-        }
-      })
-
-      let userIDs = Object.values(this.state.users); //Trim white space in input fields and eliminate null or empty options
+      let userIDs = Object.values(this.state.users); 
       
-      if (userIDs.length < 2) { //Check at least two users were submitted
-        this.setState({ 
-          errors: {
-            ...this.state.errors,
-            minimumUsersError: true
-          }
-        })
-        return
-      }
-      
-      let users = [];
+      let users = []; //Trim white space in input fields and eliminate null or empty options
       for (let user of userIDs) { 
         let trimmedUser = user.trim();
         if (trimmedUser !== "" && trimmedUser !== null) {
           if (trimmedUser.search("spotify:user:") > -1 ) {
             trimmedUser = trimmedUser.slice(13);
           }
-          users.push(trimmedUser)
+          users.push(trimmedUser);
         }
       }
+
+      console.log(users);
+
+      if (users.length < 2) {
+        console.log('oops there\'s not enough users');
+        this.setState({
+          errors: {
+            ...this.state.errors,
+            minimumUsersError: true
+          }
+        })
+        console.log('State is: ' + this.state.errors.minimumUsersError);
+        return
+      } else {
+        console.log('there are enough users!');
+        this.setState({
+          errors: {
+            ...this.state.errors,
+            minimumUsersError: false
+          }
+        })
+        console.log('State is: ' + this.state.errors.minimumUsersError);
+      }
+
+      /* this.setState({ // Check for the minimum number of issues and return if error
+        errors: {
+          ...this.state.errors,
+          minimumUsersError: (users.length < 2) ? true : false
+        }
+      })
+
+      if (users.length < 2) {
+        console.log('oops not enough users');
+        return
+      } else {
+        console.log('there are enough users!');
+      } */
 
       let mainUsername = this.state.users.mainUsername //Identify the main user
       
       if (mainUsername === "" || mainUsername === null) { //Check if a main user is listed
+        console.log('oops no main username');
         this.setState({
           errors: {
             ...this.state.errors,
@@ -304,6 +324,14 @@ class Home extends React.Component {
           }
         })
         return
+      } else {
+        console.log('there is a main username!')
+        this.setState({
+          errors: {
+            ...this.state.errors,
+            noMainUsername: false
+          }
+        })
       }
 
       if (mainUsername.search("spotify:user:") > -1 ) {
@@ -323,8 +351,9 @@ class Home extends React.Component {
               'Authorization': 'Bearer ' + localStorage.getItem('accessToken')
             },
           });
-          let data = await response.json();        
+          let data = await response.json();      
           if (Object.keys(data)[0] === "error" && data.error.status === 404) { //Check that users are valid
+            console.log('oops invalid username');
             this.setState({
               errors: {
                 ...this.state.errors,
@@ -332,6 +361,13 @@ class Home extends React.Component {
               }
             });
             return
+          } else {
+            this.setState({
+              errors: {
+                ...this.state.errors,
+                invalidUserID: false
+              }
+            })
           }
 
           this.setState({
