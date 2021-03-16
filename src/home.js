@@ -307,7 +307,7 @@ class Home extends React.Component {
             'Authorization': 'Bearer ' + localStorage.getItem('accessToken')
           },
         });
-        let data = await response.json();  
+        let data = await response.json();
         if (Object.keys(data)[0] === "error" && data.error.status === 404) { //Check that users are valid
           this.setState({
             ErrorInvalidID: true
@@ -340,7 +340,6 @@ class Home extends React.Component {
       } else if (this.state.ErrorNoPublicPlaylists) {
         return (
           <div>
-            <Error>Uh oh! Unfortunately one of the users you inputted (username: {this.state.ErrorNoPublicInfo} does not have any public playlists available so we are not able to compare your playlists. Please remove their username and try again.</Error>
           </div>
         )
       } else if (this.state.ErrorNoMain) {
@@ -366,12 +365,15 @@ class Home extends React.Component {
       if (!this.state.ErrorMinUsers && !this.state.ErrorNoMain && !this.state.ErrorInvalidID && !this.state.ErrorNoPublicPlaylists) {
         this.props.setMainUser(this.state.mainUsername);
         this.props.setUsers(this.state.usernames);
-        this.props.setStatus('loading');
         let compareSongs = [];
         let users = Object.keys(this.props.usernames);
         for (let user of users) {
           let songs = await this.getUserData(user); //gets user data and filters our users' duplicate songs (i.e., user added the same song to multiple playlists);
-          compareSongs.push(songs);
+          if (this.state.ErrorNoPublicPlaylists) {
+            return
+          } else {
+            compareSongs.push(songs);
+          }
         };
         await this.findDuplicateSongs(compareSongs); 
       }
@@ -386,9 +388,8 @@ class Home extends React.Component {
             'Authorization': 'Bearer ' + localStorage.getItem('accessToken')
           },
         });
-
         let data = await response.json();
-          if (data.items.length === 0) {
+          if (data.total === 0) {
             this.setState({
               ...this.state,
               ErrorNoPublicPlaylists: true,
@@ -400,6 +401,12 @@ class Home extends React.Component {
           let playlistsChunk = data.items.map(playlist => { return playlist.id });
           playlists.push(...playlistsChunk);
           next = data.next;
+      }
+      
+      if (this.state.ErrorNoPublicPlaylists) {
+        return
+      } else {
+        this.props.setStatus('loading');
       }
       
       let allSongs = await this.startSongs(playlists);
