@@ -325,27 +325,28 @@ class Home extends React.Component {
     }
 
     displayError() { //Display error is username is invalid
-      if (this.state.ErrorInvalidID) {
+      if (this.state.ErrorNoMain) {
         return (
-          <div>       
-            <Error>Please enter a valid username.</Error>
+          <div>
+            <Error>Please make sure to list your username or a main username.</Error>
           </div>
-        )  
+        )
       } else if (this.state.ErrorMinUsers) {
         return (
           <div>       
             <Error>Please enter at least two usernames.</Error>
           </div>
         )
+      } else if (this.state.ErrorInvalidID) {
+        return (
+          <div>       
+            <Error>Please enter a valid username.</Error>
+          </div>
+        )  
       } else if (this.state.ErrorNoPublicPlaylists) {
         return (
           <div>
-          </div>
-        )
-      } else if (this.state.ErrorNoMain) {
-        return (
-          <div>
-            <Error>Please make sure to list your username or a main username.</Error>
+            <Error>Uh oh! One of the users (username: {this.state.ErrorNoPublicInfo}) doesn't have any public playlists so we can't compare your playlists. Please remove their username and try again.</Error>
           </div>
         )
       }
@@ -359,7 +360,8 @@ class Home extends React.Component {
         ErrorNoMain: false,
         ErrorInvalidID: false,
         ErrorNoPublicPlaylists: false,
-        ErrorNoPublicInfo: ''
+        ErrorNoPublicInfo: '',
+        usernames: {}
       }))
       await this.verifyUsernames();
       if (!this.state.ErrorMinUsers && !this.state.ErrorNoMain && !this.state.ErrorInvalidID && !this.state.ErrorNoPublicPlaylists) {
