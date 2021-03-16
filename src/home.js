@@ -151,12 +151,11 @@ class Home extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-          errors: {
-            minimumUsersError: false,
-            noMainUsername: false,
-            invalidUserID: false,
-            noPublicPlaylists: false
-          },
+          ErrorMinUsers: false,
+          ErrorNoMain: false,
+          ErrorInvalidID: false,
+          ErrorNoPublicPlaylists: false,
+          ErrorNoPublicInfo: '',
           mainUsername: '',
           showPopup: false,
           userDisplay: false,
@@ -276,62 +275,20 @@ class Home extends React.Component {
         }
       }
 
-      console.log(users);
-
       if (users.length < 2) {
-        console.log('oops there\'s not enough users');
         this.setState({
-          errors: {
-            ...this.state.errors,
-            minimumUsersError: true
-          }
-        })
-        console.log('State is: ' + this.state.errors.minimumUsersError);
+          ErrorMinUsers: true
+        })      
         return
-      } else {
-        console.log('there are enough users!');
-        this.setState({
-          errors: {
-            ...this.state.errors,
-            minimumUsersError: false
-          }
-        })
-        console.log('State is: ' + this.state.errors.minimumUsersError);
       }
-
-      /* this.setState({ // Check for the minimum number of issues and return if error
-        errors: {
-          ...this.state.errors,
-          minimumUsersError: (users.length < 2) ? true : false
-        }
-      })
-
-      if (users.length < 2) {
-        console.log('oops not enough users');
-        return
-      } else {
-        console.log('there are enough users!');
-      } */
 
       let mainUsername = this.state.users.mainUsername //Identify the main user
       
       if (mainUsername === "" || mainUsername === null) { //Check if a main user is listed
-        console.log('oops no main username');
         this.setState({
-          errors: {
-            ...this.state.errors,
-            noMainUsername: true
-          }
+          ErrorNoMain: true
         })
         return
-      } else {
-        console.log('there is a main username!')
-        this.setState({
-          errors: {
-            ...this.state.errors,
-            noMainUsername: false
-          }
-        })
       }
 
       if (mainUsername.search("spotify:user:") > -1 ) {
@@ -353,21 +310,10 @@ class Home extends React.Component {
           });
           let data = await response.json();      
           if (Object.keys(data)[0] === "error" && data.error.status === 404) { //Check that users are valid
-            console.log('oops invalid username');
             this.setState({
-              errors: {
-                ...this.state.errors,
-                invalidUserID: true
-              }
-            });
-            return
-          } else {
-            this.setState({
-              errors: {
-                ...this.state.errors,
-                invalidUserID: false
-              }
+              ErrorInvalidID: true
             })
+            return
           }
 
           this.setState({
@@ -383,26 +329,25 @@ class Home extends React.Component {
     }
 
     displayError() { //Display error is username is invalid
-      if (this.state.errors.invalidUserID) {
+      if (this.state.ErrorInvalidID) {
         return (
           <div>       
             <Error>Please enter a valid username.</Error>
           </div>
         )  
-      } else if (this.state.errors.minimumUsersError) {
+      } else if (this.state.ErrorMinUsers) {
         return (
           <div>       
             <Error>Please enter at least two usernames.</Error>
           </div>
         )
-      } else if (this.state.errors.noPublicPlaylists) {
-        let noPublicUser = this.state.errors.noPublicPlaylists.true;
+      } else if (this.state.ErrorNoPublicPlaylists) {
         return (
           <div>
-            <Error>Uh oh! Unfortunately {this.state.usernames[noPublicUser]} (username: {this.state.errors.noPublicPlaylists.true}) does not have any public playlists available so we are not able to compare your playlists. Please remove their username and try again.</Error>
+            <Error>Uh oh! Unfortunately one of the users you inputted (username: {this.state.ErrorNoPublicInfo} does not have any public playlists available so we are not able to compare your playlists. Please remove their username and try again.</Error>
           </div>
         )
-      } else if (this.state.errors.noMainUsername) {
+      } else if (this.state.ErrorNoMain) {
         return (
           <div>
             <Error>Please make sure to list your username or a main username.</Error>
@@ -413,8 +358,16 @@ class Home extends React.Component {
 
     /*    Request user, playlist, and song data from Spotify API    */
     async submitUsernames() { //MAIN FUNCTION, start API request process
+      this.setState((state, props) => ({
+        ...this.state,
+        ErrorMinUsers: false,
+        ErrorNoMain: false,
+        ErrorInvalidID: false,
+        ErrorNoPublicPlaylists: false,
+        ErrorNoPublicInfo: ''
+      }))
       await this.verifyUsernames();
-      if (!Object.values(this.state.errors).includes(true)) {
+      if (!this.state.ErrorMinUsers && !this.state.ErrorNoMain && !this.state.ErrorInvalidID && !this.state.ErrorNoPublicPlaylists) {
         this.props.setMainUser(this.state.mainUsername);
         this.props.setUsers(this.state.usernames);
         this.props.setStatus('loading');
@@ -446,12 +399,8 @@ class Home extends React.Component {
           if (data.items.length === 0) {
             this.setState({
               ...this.state,
-              errors: {
-                ...this.state.errors,
-                noPublicPlaylists: {
-                  true: user
-                }
-              }
+              ErrorNoPublicPlaylists: true,
+              ErrorNoPublicInfo: user
             })
             return
           }
@@ -616,12 +565,11 @@ class Home extends React.Component {
     /*    Reset functions    */
     async reset() {
       this.setState({
-        errors: {
-          minimumUsersError: false,
-          noMainUsername: false,
-          invalidUserID: false,
-          noPublicPlaylists: false
-        },
+        ErrorMinUsers: false,
+        ErrorNoMain: false,
+        ErrorInvalidID: false,
+        ErrorNoPublicPlaylists: false,
+        ErrorNoPublicInfo: '',
         mainUsername: "",
         showPopup: false,
         userDisplay: true,
