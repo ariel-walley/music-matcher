@@ -317,32 +317,28 @@ class Home extends React.Component {
 
       for (let user of users) { //Fetch request for display names/user verification
         let url = `https://api.spotify.com/v1/users/${user}`
-        try {
-          let response = await fetch(url, {
-            headers: {
-              'Authorization': 'Bearer ' + localStorage.getItem('accessToken')
-            },
-          });
-          let data = await response.json();        
-          if (Object.keys(data)[0] === "error" && data.error.status === 404) { //Check that users are valid
-            this.setState({
-              errors: {
-                ...this.state.errors,
-                invalidUserID: true
-              }
-            });
-            return
-          }
-
+        let response = await fetch(url, {
+          headers: {
+            'Authorization': 'Bearer ' + localStorage.getItem('accessToken')
+          },
+        });
+        let data = await response.json();  
+        if (Object.keys(data)[0] === "error" && data.error.status === 404) { //Check that users are valid
           this.setState({
-            usernames: {
-              ...this.state.usernames,
-              [user]: data.display_name
+            errors: {
+              ...this.state.errors,
+              invalidUserID: true
             }
-          })
-        } catch(err) {
-          console.log(err);
-        };             
+          });
+          return
+        }
+
+        this.setState({
+          usernames: {
+            ...this.state.usernames,
+            [user]: data.display_name
+          }
+        })          
       }
     }
 
@@ -382,17 +378,13 @@ class Home extends React.Component {
         this.props.setMainUser(this.state.mainUsername);
         this.props.setUsers(this.state.usernames);
         this.props.setStatus('loading');
-        try {
-          let compareSongs = [];
-          let users = Object.keys(this.props.usernames);
-          for (let user of users) {
-            let songs = await this.getUserData(user); //gets user data and filters our users' duplicate songs (i.e., user added the same song to multiple playlists);
-            compareSongs.push(songs);
-          };
-          await this.findDuplicateSongs(compareSongs); 
-        } catch (err) {
-          console.log(err);
-        } 
+        let compareSongs = [];
+        let users = Object.keys(this.props.usernames);
+        for (let user of users) {
+          let songs = await this.getUserData(user); //gets user data and filters our users' duplicate songs (i.e., user added the same song to multiple playlists);
+          compareSongs.push(songs);
+        };
+        await this.findDuplicateSongs(compareSongs); 
       }
     }
 
@@ -400,31 +392,28 @@ class Home extends React.Component {
       let playlists = [];
       let next = `https://api.spotify.com/v1/users/${user}/playlists?limit=50`;
       while(next != null) {
-        try {
-          let response = await fetch(next, {
-            headers: {
-              'Authorization': 'Bearer ' + localStorage.getItem('accessToken')
-            },
-          });
-          let data = await response.json();
-          if (data.items.length === 0) {
-            this.setState({
-              ...this.state,
-              errors: {
-                ...this.state.errors,
-                noPublicPlaylists: {
-                  true: user
-                }
+        let response = await fetch(next, {
+          headers: {
+            'Authorization': 'Bearer ' + localStorage.getItem('accessToken')
+          },
+        });
+        let data = await response.json();
+        
+        if (data.items.length === 0) {
+          this.setState({
+            ...this.state,
+            errors: {
+              ...this.state.errors,
+              noPublicPlaylists: {
+                true: user
               }
-            })
-            return
-          }
-          let playlistsChunk = data.items.map(playlist => { return playlist.id });
-          playlists.push(...playlistsChunk);
-          next = data.next;
-        } catch(err) {
-            console.log(err);
-        };
+            }
+          })
+          return
+        } 
+        let playlistsChunk = data.items.map(playlist => { return playlist.id });
+        playlists.push(...playlistsChunk);
+        next = data.next;
       }
       let allSongs = await this.startSongs(playlists);
       let allUniqSongs = _.uniq(allSongs);
@@ -445,25 +434,21 @@ class Home extends React.Component {
       let next = `https://api.spotify.com/v1/playlists/${playlistID}/tracks?fields=items(track(id,name,album(images,name),artists(name))),limit,next,offset,previous,total`
 
       while(next !=null) {
-        try {
-          let response = await fetch(next, {
-            headers: {
-              'Authorization': 'Bearer ' + localStorage.getItem('accessToken')
-              }
-          });
-          
-          let data = await response.json();
-
-          for (let i = 0; i < data.items.length; i++) {
-            if (data.items[i].track !== null) { 
-              playlistSongs.push(data.items[i].track.id);
+        let response = await fetch(next, {
+          headers: {
+            'Authorization': 'Bearer ' + localStorage.getItem('accessToken')
             }
-          }
+        });
+        
+        let data = await response.json();
 
-          next = data.next;
-        } catch (err) {
-          console.log(err);
+        for (let i = 0; i < data.items.length; i++) {
+          if (data.items[i].track !== null) { 
+            playlistSongs.push(data.items[i].track.id);
+          }
         }
+
+        next = data.next;
       }
       return playlistSongs;
     }
@@ -513,17 +498,13 @@ class Home extends React.Component {
       }
     }
 
-    async getDuplicatesInfo(duplicates) { //API request for song data (title, artist, album data, etc.)   
-      try {
-        let response = await fetch('https://api.spotify.com/v1/tracks/?ids=' + duplicates, {
-          headers: {
-            'Authorization': 'Bearer ' + localStorage.getItem('accessToken')
-            }
-        });
-        return await response.json();
-        } catch (err) {
-          console.log(err);
+    async getDuplicatesInfo(duplicates) { //API request for song data (title, artist, album data, etc.) 
+      let response = await fetch('https://api.spotify.com/v1/tracks/?ids=' + duplicates, {
+        headers: {
+          'Authorization': 'Bearer ' + localStorage.getItem('accessToken')
         }
+      });
+      return await response.json();
     }
 
     /*    Find artists data and top artists    */
@@ -563,18 +544,13 @@ class Home extends React.Component {
 
     getArtistArt = async (artist) => {
       let url = `https://api.spotify.com/v1/artists/${artist}`
-      try {
-        let response = await fetch(url, {
-          headers: {
-            'Authorization': 'Bearer ' + localStorage.getItem('accessToken')
-          },
-        });
-        let data = await response.json();
-        return data.images[2].url;
-  
-      } catch(err) {
-          console.log(err);
-      };   
+      let response = await fetch(url, {
+        headers: {
+          'Authorization': 'Bearer ' + localStorage.getItem('accessToken')
+        },
+      });
+      let data = await response.json();
+      return data.images[2].url;  
     }
 
     /*    Reset functions    */
