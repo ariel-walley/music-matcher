@@ -13,6 +13,7 @@ const fadeIn = keyframes`
 `;
 
 const MainContainer = styled.div`
+  width: 100%;
   font-family: 'Open Sans', sans-serif;
   animation: 1s ${fadeIn} ease-out;
 `;
@@ -27,13 +28,13 @@ const CardContainer = styled.div`
   align-items: center;
   align-content: center;
   flex-wrap: wrap;
-  justify-content: left;
+  justify-content: center;
 `;
 
 const Card = styled.div`
-  min-width: 40%;
+  width: 25%;
   padding: 15px;
-  margin: 5px auto;
+  margin: 15px;
   display: flex;
   align-items: center;
   align-content: center;
@@ -59,7 +60,7 @@ const Img = styled.img`
 const Row = styled.div`
   background-color: green;
   border-radius: 5px;
-  width: 70%;
+  width: 45%;
   padding: 15px;
   margin: 10px auto;
   display: flex;
@@ -71,6 +72,7 @@ const Row = styled.div`
 `;
 
 const Header = styled(Row)`
+  width: 45%
   font-weight: 700;
   text-decoration: underline;
   font-size: 22px;
@@ -124,7 +126,7 @@ class TopArtists extends React.Component {
         <TableData>No. of Songs</TableData>
         <TableData>Percent of Songs</TableData>
       </Header>
-    )];
+  )];
 
     if (this.props.duplicateArtists.length > 5) {
       for (let artist of this.props.duplicateArtists) {

@@ -29,13 +29,13 @@ const CardContainer = styled.div`
   align-items: center;
   align-content: center;
   flex-wrap: wrap;
-  justify-content: left;
+  justify-content: center;
 `;
 
 const Card = styled.div`
-  width: 40%;
+  width: 30%;
   padding: 15px;
-  margin: 15px auto;
+  margin: 15px 40px;
   display: flex;
   align-items: center;
   align-content: center;

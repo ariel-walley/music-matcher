@@ -180,6 +180,7 @@ class Home extends React.Component {
         this.handleChangeOtherUsername = this.handleChangeOtherUsername.bind(this);
         this.verifyUsernames = this.verifyUsernames.bind(this);
         this.displayError = this.displayError.bind(this);
+        this.handleEnter = this.handleEnter.bind(this);  
         this.submitUsernames = this.submitUsernames.bind(this);
         this.getUserData = this.getUserData.bind(this);
         this.startSongs = this.startSongs.bind(this);
@@ -247,9 +248,9 @@ class Home extends React.Component {
           <UserInputContainer>       
             <InputLabels2>Enter up to three other Spotify usernames to compare your music picks:</InputLabels2>
             <InputDiv>
-              <InputField2 type="text" id="username0" onChange={this.handleChangeOtherUsername}/>
-              <InputField2 type="text" id="username1" onChange={this.handleChangeOtherUsername}/>
-              <InputField2 type="text" id="username2" onChange={this.handleChangeOtherUsername}/>
+              <InputField2 type="text" id="username0" onChange={this.handleChangeOtherUsername} onKeyDown={this.handleEnter}/>
+              <InputField2 type="text" id="username1" onChange={this.handleChangeOtherUsername} onKeyDown={this.handleEnter}/>
+              <InputField2 type="text" id="username2" onChange={this.handleChangeOtherUsername} onKeyDown={this.handleEnter}/>
             </InputDiv>
             <SubmitButton type="submit" onClick={this.submitUsernames}>Submit</SubmitButton>
           </UserInputContainer>
@@ -356,6 +357,14 @@ class Home extends React.Component {
             <Error>Uh oh! One of the users (username: {this.state.ErrorNoPublicInfo}) doesn't have any public playlists so we can't compare your playlists. Please remove their username and try again.</Error>
           </div>
         )
+      }
+    }
+
+    handleEnter(event) {  //Submit user input if 'Enter' key is pressed   
+      if (event.key !== undefined) {
+        if (event.key === 'Enter') {this.submitUsernames()}
+      } else if (event.keyCode !== undefined) {
+        if (event.keyCode === 13) {this.submitUsernames()};
       }
     }
 
