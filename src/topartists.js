@@ -19,7 +19,7 @@ const MainContainer = styled.div`
 
 const Heading = styled.h1`
   text-align: center;
-  margin: 20px;
+  margin: 23px;
 `;
 
 const CardContainer = styled.div`
@@ -31,7 +31,7 @@ const CardContainer = styled.div`
 `;
 
 const Card = styled.div`
-  width: 40%;
+  min-width: 40%;
   padding: 15px;
   margin: 5px auto;
   display: flex;
@@ -61,7 +61,7 @@ const Row = styled.div`
   border-radius: 5px;
   width: 70%;
   padding: 15px;
-  margin: 5px auto;
+  margin: 10px auto;
   display: flex;
   align-items: center;
   align-content: center;

@@ -35,7 +35,7 @@ const CardContainer = styled.div`
 const Card = styled.div`
   width: 40%;
   padding: 15px;
-  margin: 5px auto;
+  margin: 15px auto;
   display: flex;
   align-items: center;
   align-content: center;

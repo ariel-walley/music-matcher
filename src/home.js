@@ -58,7 +58,7 @@ const Body = styled.div`
 `;
 
 const Body2 = styled(Body)`
-  padding-top: 75px;
+  padding-top: 25px;
   flex-wrap: wrap;
   justify-content: center;
 `;
@@ -140,7 +140,13 @@ const Error = styled.p`
   text-align: center;
 `;
 
-//Styles for loader
+//Styles for loading screen
+const UpdateText = styled.h1`
+  font-size: 35px;
+  margin-bottom: 100px;
+`;
+
+
 const Loader = styled.div`
   margin: 30px auto;
   width: 100%;
@@ -158,6 +164,7 @@ class Home extends React.Component {
           ErrorNoPublicInfo: '',
           mainUsername: '',
           showPopup: false,
+          status2: '',
           userDisplay: false,
           usernames: {},
           users: {
@@ -373,9 +380,8 @@ class Home extends React.Component {
           let songs = await this.getUserData(user); //gets user data and filters our users' duplicate songs (i.e., user added the same song to multiple playlists);
           if (this.state.ErrorNoPublicPlaylists) {
             return
-          } else {
-            compareSongs.push(songs);
           }
+          compareSongs.push(songs);
         };
         await this.findDuplicateSongs(compareSongs); 
       }
@@ -411,6 +417,10 @@ class Home extends React.Component {
         this.props.setStatus('loading');
       }
       
+      this.setState({
+        status2: 'Requesting songs for ' + this.state.usernames[user] + '...'
+      })
+
       let allSongs = await this.startSongs(playlists);
       let allUniqSongs = _.uniq(allSongs);
       return allUniqSongs;
@@ -459,6 +469,10 @@ class Home extends React.Component {
         this.props.setStatus('data set');
       } else {
 
+        this.setState({
+          status2: 'Finding duplicates...'
+        })
+
         let allDuplicateInfo = [];
         let duplicateArtists = {};
 
@@ -505,6 +519,10 @@ class Home extends React.Component {
 
     /*    Find artists data and top artists    */
     async findTopArtists(artists) {
+      this.setState({
+        status2: 'Finding top artists...'
+      })
+
       let duplicateArtists = [];
   
       for (const key in artists) {
@@ -559,6 +577,7 @@ class Home extends React.Component {
         ErrorNoPublicInfo: '',
         mainUsername: "",
         showPopup: false,
+        status2: '',
         userDisplay: true,
         usernames: {},
         users: {}
@@ -595,15 +614,18 @@ class Home extends React.Component {
         )
       } else if (this.props.status === "loading") {
         return (
-          <Loader>
-            <div className="la-line-scale-pulse-out la-dark la-2x">
-                <div></div>
-                <div></div>
-                <div></div>
-                <div></div>
-                <div></div>
-            </div>
-          </Loader>
+          <div>
+            <UpdateText>{this.state.status2}</UpdateText>
+            <Loader>
+              <div className="la-line-scale-pulse-out la-dark la-2x">
+                  <div></div>
+                  <div></div>
+                  <div></div>
+                  <div></div>
+                  <div></div>
+              </div>
+            </Loader>
+          </div>
         )
       } else if (this.props.status === "data set") {
         return (
