@@ -1,6 +1,15 @@
 {
-  "name": "music-match",
+  "name": "music-matcher",
   "version": "0.1.0",
+  "description": "A React app that will find songs in common between Spotify users",
+  "homepage": "https://music-matcher-project.web.app/",
+  "author": {
+    "name": "Ariel Walley",
+    "github": "https://github.com/awalley95/",
+    "email": "arielwalley95@gmail.com"
+  },
+  "license": "MIT",
+  "repository": "https://github.com/awalley95/music-matcher",
   "private": true,
   "dependencies": {
     "@material-ui/core": "^4.11.0",
