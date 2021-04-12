@@ -418,6 +418,7 @@ class Home extends React.Component {
         }
 
         await this.findDuplicateSongs(userDataObject); // Find duplicate songs and top artists
+
       } 
     }
 
@@ -495,22 +496,21 @@ class Home extends React.Component {
           status2: 'Finding duplicates...'
         })
 
-        let allDuplicateInfo = [];
-        let duplicateArtists = {};
+        let duplicateSongs = []; // Will hold the duplicate song data
+        let duplicateArtists = {}; // Will tally how many times an artist is found among the duplicate songs
 
-        while(duplicates.length) {
-          let splitDuplicates = duplicates.splice(0,50);
-          let apiDuplicates = splitDuplicates.join(",");
-          let duplicateInfo = await this.getDuplicatesInfo(apiDuplicates);
+        while(duplicates.length) { 
+          let prepareDuplicates = duplicates.splice(0,50).join(","); // Divide songs into sets of 50 for the API request
+          let duplicateInfo = await this.getDuplicatesInfo(prepareDuplicates);
 
-          for (let song of duplicateInfo.tracks) {
-            let artistsName = [];
+          for (let song of duplicateInfo.tracks) { // For each duplicate song...
+            let artistsName = []; 
             for (let artist of song.artists) {
-              artistsName.push(artist.name);
-              duplicateArtists[artist.id] = duplicateArtists[artist.id] ? [artist.name, (duplicateArtists[artist.id][1] + 1)] : [artist.name, 1];
+              artistsName.push(artist.name); // Gather all artists for each track
+              duplicateArtists[artist.id] = duplicateArtists[artist.id] ? [artist.name, (duplicateArtists[artist.id][1] + 1)] : [artist.name, 1]; // Add to the artist tally for all duplicate songs 
             };
 
-            allDuplicateInfo.push(
+            duplicateSongs.push(
               { "songID": song.id,
                 "name": song.name,
                 "artist": artistsName.join(", "),
@@ -520,7 +520,8 @@ class Home extends React.Component {
             ); 
           };
         }
-        this.props.setSongs(allDuplicateInfo);
+
+        this.props.setSongs(duplicateSongs);
 
         if (Object.keys(duplicateArtists).length > 5) {
           this.findTopArtists(duplicateArtists);
@@ -539,7 +540,7 @@ class Home extends React.Component {
       return await response.json();
     }
 
-    async findTopArtists(artists) { // Find top artist(s) and set in state
+    async findTopArtists(artists) { // Find top artist(s) and set them in state
       this.setState({
         status2: 'Finding top artists...'
       })
@@ -547,45 +548,48 @@ class Home extends React.Component {
       let duplicateArtists = [];
   
       for (const key in artists) {
-        duplicateArtists.push([key, artists[key][0], artists[key][1]]);
+        duplicateArtists.push([key, artists[key][0], artists[key][1]]); // Create a key, the artist name, and their tally
       }
-              
-      let sorted = duplicateArtists.sort((a, b) => b[2] - a[2]);
 
-      this.props.setArtists(sorted);
+      let sorted = duplicateArtists.sort((a, b) => b[2] - a[2]); // Sort by most frequently occuring to least
 
-      let topArtists = [];
+      this.props.setArtists(sorted);    
 
-      if (sorted[0][2] !== sorted[1][2]) {
-        topArtists.push(sorted[0]);
+      let topArtistsCard = [];
+
+      if (sorted[0][2] !== sorted[1][2]) { // Identify whether there are none, one, two, or three top artists
+        topArtistsCard.push(sorted[0]);
       } else if (sorted[1][2] !== sorted[2][2]) {
-        topArtists.push(sorted[0], sorted[1]);
+        topArtistsCard.push(sorted[0], sorted[1]);
       } else if (sorted[2][2] !== sorted[3][2]) {
-        topArtists.push(sorted[0], sorted[1], sorted[2])
+        topArtistsCard.push(sorted[0], sorted[1], sorted[2])
       } 
   
-      let newTopArtists = []; 
+      let topArtistsData = []; 
 
-      if (topArtists.length > 0) {
-        for (const artist of topArtists) {
-          let image = await this.getArtistArt(artist[0]);
-          newTopArtists.push([artist[0], artist[1], image]);
+      if (topArtistsCard.length > 0) {
+        let topArtistsIDs = topArtistsCard.map(arr => arr[0]);
+        let data = await this.getArtistArt(topArtistsIDs.join(","));
+
+        for (const artist of data.artists) {          
+          topArtistsData.push([artist.id, artist.name, artist.images[2].url]);
         }
-        this.props.setTopArtists(newTopArtists);
+
+        this.props.setTopArtists(topArtistsData);
       } 
       
       this.props.setStatus('data set');
     }
 
     getArtistArt = async (artist) => { //API request for artist image
-      let url = `https://api.spotify.com/v1/artists/${artist}`
+      let url = `https://api.spotify.com/v1/artists?ids=${artist}`
       let response = await fetch(url, {
         headers: {
           'Authorization': 'Bearer ' + localStorage.getItem('accessToken')
         },
       });
       let data = await response.json();
-      return data.images[2].url;  
+      return data;
     }
 
     /*    Reset functions    */

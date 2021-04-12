@@ -73,12 +73,12 @@ class DisplaySongs extends React.Component {
     }
 
   formatHeader() {
-    //Determine the display names
+    // Determine the display names
     let mainUserID = this.props.mainUsername;
     let mainUsername = this.props.usernames[mainUserID];
     let usernames = Object.values(this.props.usernames);
 
-    _.pull(usernames, mainUserID, mainUsername); //remove the main user from the display names
+    _.pull(usernames, mainUserID, mainUsername); // Remove the main user from the display names
     if (usernames.length === 1) {
       usernames = ' and ' + usernames
     } else if (usernames.length === 2) {
@@ -88,7 +88,7 @@ class DisplaySongs extends React.Component {
     }
     
     if (this.props.status === 'data set') {
-      //Determine how many songs in common
+      // Determine how many songs in common
       let songs = '';
       if (this.props.duplicateSongs === "none") {
         songs = 'no songs'
@@ -98,7 +98,7 @@ class DisplaySongs extends React.Component {
         songs = `${this.props.duplicateSongs.length} songs`
       }
 
-      //Final phrase
+      // Final phrase
       return <Header>You{usernames} have {songs} in common!</Header>
     } else {
       return <div>Not yet</div>
