@@ -1,6 +1,6 @@
 import React from 'react';
 import Header from './header';
-import DisplaySongs from './displaysongs';
+import DisplaySongs from './displaySongs';
 import TopArtists from './topartists';
 import QueryString from 'querystring';
 import _ from 'lodash';
@@ -17,7 +17,7 @@ import {
   setTopArtists
 } from './redux/actions';
 
-//Styles for gradient background
+// Styles for gradient background
 const GradientWrapper = styled.div`
   height: 100%;
   width: 100%;
@@ -47,7 +47,7 @@ const fadeIn = keyframes`
   }
 `;
 
-//Styles for body
+// Styles for body
 const Body = styled.div`
   height: calc(100% - 57px);
   width: 100%;
@@ -63,7 +63,7 @@ const Body2 = styled(Body)`
   justify-content: center;
 `;
 
-//Styles for username input on start page
+// Styles for username input on start page
 const UserInputContainer = styled.div`
   display: flex;
   flex-direction: column;
@@ -130,7 +130,7 @@ const SubmitButton = styled.button`
   animation: 0.4s ${fadeIn} ease-out;
 `;
 
-//Styles for error
+// Styles for error
 const Error = styled.p`
   margin: 0 auto;
   max-width: 350px;
@@ -140,8 +140,9 @@ const Error = styled.p`
   text-align: center;
 `;
 
-//Styles for loading screen
+// Styles for loading screen
 const UpdateText = styled.h1`
+  text-align: center;
   font-size: 35px;
   margin-bottom: 100px;
 `;
@@ -182,7 +183,7 @@ class Home extends React.Component {
         this.displayError = this.displayError.bind(this);
         this.handleEnter = this.handleEnter.bind(this);  
         this.submitUsernames = this.submitUsernames.bind(this);
-        this.getUserData = this.getUserData.bind(this);
+        this.getUserPlaylists = this.getUserPlaylists.bind(this);
         this.startSongs = this.startSongs.bind(this);
         this.fetchSongs = this.fetchSongs.bind(this);
         this.findDuplicateSongs = this.findDuplicateSongs.bind(this);
@@ -220,7 +221,7 @@ class Home extends React.Component {
     }
 
     /*    Handle user ID input, the input display, and verifying usernames    */
-    handleChangeMainUsername(input) { //Set state with main username input and decide whether to other other users' block
+    handleChangeMainUsername(input) { // Set state with main username input and decide whether to other other users' block
       this.setState(() => ({
         userDisplay: (input.length > 2 || this.state.userDisplay) ? true : false, 
         users: {
@@ -242,7 +243,7 @@ class Home extends React.Component {
       })
     }
 
-    displayOtherUsers() { //Display block for other users' inputs
+    displayOtherUsers() { // Display block for other users' inputs
       if (this.state.userDisplay === true) {
         return (
           <UserInputContainer>       
@@ -258,7 +259,7 @@ class Home extends React.Component {
       }
     }
 
-    handleChangeOtherUsername(event) { //Set state with username input for other users
+    handleChangeOtherUsername(event) { // Set state with username input for other users
       let id = event.target.id;
       let value = event.target.value;
       this.setState(() => ({
@@ -269,10 +270,10 @@ class Home extends React.Component {
       }));
     }
 
-    async verifyUsernames() { //Request display names from API and verify username input
+    async verifyUsernames() { // Request display names from API and verify username input
       let userIDs = Object.values(this.state.users); 
       
-      let users = []; //Trim white space in input fields and eliminate null or empty options
+      let users = []; // Trim white space in input fields and eliminate null or empty options
       for (let user of userIDs) { 
         let trimmedUser = user.trim();
         if (trimmedUser !== "" && trimmedUser !== null) {
@@ -290,9 +291,9 @@ class Home extends React.Component {
         return
       }
 
-      let mainUsername = this.state.users.mainUsername //Identify the main user
+      let mainUsername = this.state.users.mainUsername // Identify the main user
       
-      if (mainUsername === "" || mainUsername === null) { //Check if a main user is listed
+      if (mainUsername === "" || mainUsername === null) { // Check if a main user is listed
         this.setState({
           ErrorNoMain: true
         })
@@ -308,7 +309,7 @@ class Home extends React.Component {
       })  
 
 
-      for (let user of users) { //Fetch request for display names/user verification
+      for (let user of users) { // Fetch request for display names/user verification
         let url = `https://api.spotify.com/v1/users/${user}`
         let response = await fetch(url, {
           headers: {
@@ -316,7 +317,7 @@ class Home extends React.Component {
           },
         });
         let data = await response.json();
-        if (Object.keys(data)[0] === "error" && data.error.status === 404) { //Check that users are valid
+        if (Object.keys(data)[0] === "error" && data.error.status === 404) { // Check that users are valid
           this.setState({
             ErrorInvalidID: true
           })
@@ -332,7 +333,7 @@ class Home extends React.Component {
       }
     }
 
-    displayError() { //Display error is username is invalid
+    displayError() { // Display error is username is invalid
       if (this.state.ErrorNoMain) {
         return (
           <div>
@@ -360,7 +361,7 @@ class Home extends React.Component {
       }
     }
 
-    handleEnter(event) {  //Submit user input if 'Enter' key is pressed   
+    handleEnter(event) {  // Submit user input if 'Enter' key is pressed   
       if (event.key !== undefined) {
         if (event.key === 'Enter') {this.submitUsernames()}
       } else if (event.keyCode !== undefined) {
@@ -368,9 +369,10 @@ class Home extends React.Component {
       }
     }
 
-    /*    Request user, playlist, and song data from Spotify API    */
-    async submitUsernames() { //MAIN FUNCTION, start API request process
-      this.setState((state, props) => ({
+    /*    Requesting user data and identifying duplicates    */
+    async submitUsernames() {  /* CORE FUNCTION */
+
+      this.setState((state, props) => ({ // Reset errors from last submission
         ...this.state,
         ErrorMinUsers: false,
         ErrorNoMain: false,
@@ -379,24 +381,47 @@ class Home extends React.Component {
         ErrorNoPublicInfo: '',
         usernames: {}
       }))
-      await this.verifyUsernames();
-      if (!this.state.ErrorMinUsers && !this.state.ErrorNoMain && !this.state.ErrorInvalidID && !this.state.ErrorNoPublicPlaylists) {
+
+      await this.verifyUsernames(); 
+
+      if (!this.state.ErrorMinUsers && !this.state.ErrorNoMain && !this.state.ErrorInvalidID) {
         this.props.setMainUser(this.state.mainUsername);
-        this.props.setUsers(this.state.usernames);
-        let compareSongs = [];
-        let users = Object.keys(this.props.usernames);
-        for (let user of users) {
-          let songs = await this.getUserData(user); //gets user data and filters our users' duplicate songs (i.e., user added the same song to multiple playlists);
+        this.props.setUsers(this.state.usernames);  
+        let users = Object.keys(this.props.usernames);      
+
+        let userDataObject = {}
+
+        for (let user of users) { // Fetch users' playlist IDs
+          
           if (this.state.ErrorNoPublicPlaylists) {
             return
+          } else {
+            let userPlaylists = await this.getUserPlaylists(user);
+            userDataObject[user] = (userPlaylists);
           }
-          compareSongs.push(songs);
-        };
-        await this.findDuplicateSongs(compareSongs); 
-      }
+        }
+      
+        if (this.state.ErrorNoPublicPlaylists) { // Check all users have a public playlist
+          return
+        } else {
+          this.props.setStatus('loading');
+        }
+
+        for (let user of Object.keys(userDataObject)) { // Fetch the songs for each playlist
+          this.setState({
+            status2: 'Requesting songs for ' + this.state.usernames[user] + '...'
+          })
+
+          let userSongs = await this.startSongs(userDataObject[user]);
+          let uniqUserSongs = _.uniq(userSongs); // In case a user has the same song on multiple playlists, preventing false duplicates
+          userDataObject[user] = (uniqUserSongs);
+        }
+
+        await this.findDuplicateSongs(userDataObject); // Find duplicate songs and top artists
+      } 
     }
 
-    async getUserData(user) { //Requests user's playlists IDs
+    async getUserPlaylists(user) { // Requests user's playlists IDs
       let playlists = [];
       let next = `https://api.spotify.com/v1/users/${user}/playlists?limit=50`;
       while(next != null) {
@@ -405,46 +430,34 @@ class Home extends React.Component {
             'Authorization': 'Bearer ' + localStorage.getItem('accessToken')
           },
         });
-        let data = await response.json();
-          if (data.total === 0) {
-            this.setState({
-              ...this.state,
-              ErrorNoPublicPlaylists: true,
-              ErrorNoPublicInfo: user
-            })
-            return
-          }
 
+        let data = await response.json();
+
+        if (data.total === 0) { // If a user has no public playlists to compare, set an error in state
+          this.setState({
+            ErrorNoPublicPlaylists: true,
+            ErrorNoPublicInfo: user
+          })
+          return
+        } else { // If a user does have public playlists, create an array with all of their playlists IDs
           let playlistsChunk = data.items.map(playlist => { return playlist.id });
           playlists.push(...playlistsChunk);
           next = data.next;
-      }
-      
-      if (this.state.ErrorNoPublicPlaylists) {
-        return
-      } else {
-        this.props.setStatus('loading');
-      }
-      
-      this.setState({
-        status2: 'Requesting songs for ' + this.state.usernames[user] + '...'
-      })
-
-      let allSongs = await this.startSongs(playlists);
-      let allUniqSongs = _.uniq(allSongs);
-      return allUniqSongs;
+        }
+      } 
+      return playlists;
     }
 
-    async startSongs (playlists) { //Loops through playlists to send off requests for each playlists' songs
-      let allSongs = [];
+    async startSongs (playlists) { // Loops through playlists to send off requests for each playlists' songs
+      let usersSongs = [];
       for(let playlistID of playlists) {
         let playlistData = await this.fetchSongs(playlistID);
-        allSongs.push(playlistData);
+        usersSongs.push(playlistData);
       }
-      return allSongs.flat();
+      return usersSongs.flat();
     }
 
-    async fetchSongs(playlistID) { //Requests playlists' songs
+    async fetchSongs(playlistID) { // Requests playlists' songs
       let playlistSongs = [];
       let next = `https://api.spotify.com/v1/playlists/${playlistID}/tracks?fields=items(track(id,name,album(images,name),artists(name))),limit,next,offset,previous,total`
 
@@ -468,8 +481,8 @@ class Home extends React.Component {
       return playlistSongs;
     }
 
-    /*    Find duplicates from data    */ 
-    async findDuplicateSongs(arrays) { //Find duplicates data and set in state
+    async findDuplicateSongs(object) { // Find duplicates data and set in state
+      let arrays = Object.values(object);
       let duplicates = _.intersection(...arrays);
       _.pull(duplicates, null);
 
@@ -517,7 +530,7 @@ class Home extends React.Component {
       }
     }
 
-    async getDuplicatesInfo(duplicates) { //API request for song data (title, artist, album data, etc.) 
+    async getDuplicatesInfo(duplicates) { // API request for song data (title, artist, album data, etc.) 
       let response = await fetch('https://api.spotify.com/v1/tracks/?ids=' + duplicates, {
         headers: {
           'Authorization': 'Bearer ' + localStorage.getItem('accessToken')
@@ -526,8 +539,7 @@ class Home extends React.Component {
       return await response.json();
     }
 
-    /*    Find artists data and top artists    */
-    async findTopArtists(artists) {
+    async findTopArtists(artists) { // Find top artist(s) and set in state
       this.setState({
         status2: 'Finding top artists...'
       })
@@ -565,7 +577,7 @@ class Home extends React.Component {
       this.props.setStatus('data set');
     }
 
-    getArtistArt = async (artist) => {
+    getArtistArt = async (artist) => { //API request for artist image
       let url = `https://api.spotify.com/v1/artists/${artist}`
       let response = await fetch(url, {
         headers: {
