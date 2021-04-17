@@ -190,6 +190,8 @@ class Home extends React.Component {
         this.getDuplicatesInfo = this.getDuplicatesInfo.bind(this);
         this.findTopArtists = this.findTopArtists.bind(this);
         this.getArtistArt = this.getArtistArt.bind(this);
+        this.fetchRetry = this.fetchRetry.bind(this);
+        this.retryDelay = this.retryDelay.bind(this);
         this.reset = this.reset.bind(this);
         this.renderContent = this.renderContent.bind(this);
     }
@@ -317,11 +319,16 @@ class Home extends React.Component {
           },
         });
         let data = await response.json();
+
         if (Object.keys(data)[0] === "error" && data.error.status === 404) { // Check that users are valid
           this.setState({
             ErrorInvalidID: true
           })
           return
+        } 
+        
+        while (Object.keys(data)[0] === "error" && data.error.status === 429) { // Handle rate limiting
+          data = await this.fetchRetry(response, url);
         }
 
         this.setState({
@@ -434,6 +441,10 @@ class Home extends React.Component {
 
         let data = await response.json();
 
+        while (Object.keys(data)[0] === "error" && data.error.status === 429) { // Handle rate limiting
+          data = await this.fetchRetry(response, next);
+        }
+
         if (data.total === 0) { // If a user has no public playlists to compare, set an error in state
           this.setState({
             ErrorNoPublicPlaylists: true,
@@ -470,6 +481,10 @@ class Home extends React.Component {
         });
         
         let data = await response.json();
+        
+        while (Object.keys(data)[0] === "error" && data.error.status === 429) { // Handle rate limiting
+          data = await this.fetchRetry(response, next);
+        }
 
         for (let i = 0; i < data.items.length; i++) {
           if (data.items[i].track !== null) { 
@@ -531,13 +546,20 @@ class Home extends React.Component {
       }
     }
 
-    async getDuplicatesInfo(duplicates) { // API request for song data (title, artist, album data, etc.) 
-      let response = await fetch('https://api.spotify.com/v1/tracks/?ids=' + duplicates, {
+    async getDuplicatesInfo(duplicates) { // API request for song data (title, artist, album art, etc.) 
+      let url = 'https://api.spotify.com/v1/tracks/?ids=' + duplicates;
+      let response = await fetch(url, {
         headers: {
           'Authorization': 'Bearer ' + localStorage.getItem('accessToken')
         }
       });
-      return await response.json();
+      let data = await response.json();
+
+      while (Object.keys(data)[0] === "error" && data.error.status === 429) { // Handle rate limiting
+        data = await this.fetchRetry(response, url);
+      }
+
+      return data;
     }
 
     async findTopArtists(artists) { // Find top artist(s) and set them in state
@@ -581,7 +603,7 @@ class Home extends React.Component {
       this.props.setStatus('data set');
     }
 
-    getArtistArt = async (artist) => { //API request for artist image
+   async getArtistArt (artist) { //API request for artist image
       let url = `https://api.spotify.com/v1/artists?ids=${artist}`
       let response = await fetch(url, {
         headers: {
@@ -589,7 +611,38 @@ class Home extends React.Component {
         },
       });
       let data = await response.json();
+
+      while (Object.keys(data)[0] === "error" && data.error.status === 429) { // Handle rate limiting
+        data = await this.fetchRetry(response, url);
+      }
+      
       return data;
+    }
+
+    async fetchRetry(response, url) {
+      let data;
+      let newResponse;
+
+      for (var pair of response.headers.entries()) {
+        if (pair[0] === "retry-after") {
+          let waitTime = pair[1];
+          await this.retryDelay(waitTime);
+
+          newResponse = await fetch(url, {
+            headers: {
+              'Authorization': 'Bearer ' + localStorage.getItem('accessToken')
+            },
+          });
+
+          data = await newResponse.json();
+
+        }   
+      }
+      return data;
+    }
+
+    retryDelay(waitTime) {
+      return new Promise(resolve => setTimeout(resolve, waitTime));
     }
 
     /*    Reset functions    */
