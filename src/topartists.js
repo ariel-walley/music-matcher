@@ -1,6 +1,12 @@
 import React from 'react';
 import styled, { keyframes } from 'styled-components';
 import { connect } from 'react-redux';
+import ArtistsTable from './artistsTable';
+
+export const Heading = styled.h1`
+  text-align: center;
+  margin: 23px;
+`;
 
 const fadeIn = keyframes`
   0% {
@@ -16,11 +22,6 @@ const MainContainer = styled.div`
   width: 100%;
   font-family: 'Open Sans', sans-serif;
   animation: 1s ${fadeIn} ease-out;
-`;
-
-const Heading = styled.h1`
-  text-align: center;
-  margin: 23px;
 `;
 
 const CardContainer = styled.div`
@@ -57,46 +58,10 @@ const Img = styled.img`
   margin: 10 18px 10 10;
 `;
 
-const Row = styled.div`
-  background-color: green;
-  border-radius: 5px;
-  width: 45%;
-  padding: 15px;
-  margin: 10px auto;
-  display: flex;
-  align-items: center;
-  align-content: center;
-  justify-content: center;
-  border-radius: 15px;
-  background-color: rgba(256,256,256,0.3);
-`;
-
-const Header = styled(Row)`
-  width: 45%
-  font-weight: 700;
-  text-decoration: underline;
-  font-size: 22px;
-`;
-
-const TableData = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 18px;
-  margin: auto 20px;
-  width: 25%;
-  text-align: center;
-`;
-
-const TableArtist = styled(TableData)`
-  width: 50%;
-`;
-
 class TopArtists extends React.Component {
   constructor(props) {
     super(props);        
     this.formatCard = this.formatCard.bind(this);
-    this.assembleTable = this.assembleTable.bind(this);
     this.createHeader = this.createHeader.bind(this);
   }
 
@@ -113,31 +78,6 @@ class TopArtists extends React.Component {
             <ArtistName>{artist[1]}</ArtistName>
           </Card>);
       });
-      return display;
-    } else {
-      return <div></div>
-    }
-  }
-
-  assembleTable() {
-    let display = [(
-      <Header key="header">
-        <TableArtist>Artist</TableArtist>
-        <TableData>No. of Songs</TableData>
-        <TableData>Percent of Songs</TableData>
-      </Header>
-  )];
-
-    if (this.props.duplicateArtists.length > 5) {
-      for (let artist of this.props.duplicateArtists) {
-        display.push(
-          <Row key={artist[0]}>
-            <TableArtist>{artist[1]}</TableArtist>
-            <TableData>{artist[2]}</TableData>
-            <TableData>{((artist[2]/this.props.duplicateSongs.length)*100).toFixed(2) + "%"}</TableData>
-          </Row>      
-        )
-      }
       return display;
     } else {
       return <div></div>
@@ -162,8 +102,7 @@ class TopArtists extends React.Component {
           <CardContainer>
             {this.formatCard()}
           </CardContainer>
-          <Heading>See all of your artists in common:</Heading>
-          {this.assembleTable()}
+          <ArtistsTable/>
         </MainContainer>
       )
     } else {
@@ -175,7 +114,6 @@ class TopArtists extends React.Component {
 function mapStateToProps(state) {
   return {
     status: state.status,
-    duplicateSongs: state.duplicateSongs,
     duplicateArtists: state.duplicateArtists,
     topArtists: state.topArtists
   };

@@ -1,11 +1,11 @@
 import React from 'react';
 import Header from './header';
 import DisplaySongs from './displaySongs';
-import TopArtists from './topartists';
+import TopArtists from './topArtists';
 import QueryString from 'querystring';
 import _ from 'lodash';
 import styled, { keyframes } from 'styled-components';
-import Popup from './instructions';
+import Popup from './popup';
 import GlobalStyle from './globalStyles';
 import { connect } from 'react-redux';
 import { 

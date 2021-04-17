@@ -37,7 +37,6 @@ const Wrapper1 = styled.div`
   justify-content: space-around;
   align-items: center;
   align-content: space-around;
-
 `;
 
 const Text = styled.p`
@@ -58,7 +57,6 @@ const Icon = styled(CloseCircle)`
   position: absolute;
   right: 13px;
   top: 13px;
-
 `;
 
 const Instructions = styled.ol`
