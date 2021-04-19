@@ -1,5 +1,6 @@
 import React from 'react';
 import Header from './header';
+import LoadingPage from './loadingPage';
 import DisplaySongs from './displaySongs';
 import TopArtists from './topArtists';
 import QueryString from 'querystring';
@@ -12,6 +13,7 @@ import {
   setMainUser,
   setUsers,
   setStatus,
+  setStatus2,
   setSongs,
   setArtists,
   setTopArtists
@@ -140,20 +142,6 @@ const Error = styled.p`
   text-align: center;
 `;
 
-// Styles for loading screen
-const UpdateText = styled.h1`
-  text-align: center;
-  font-size: 35px;
-  margin-bottom: 100px;
-`;
-
-
-const Loader = styled.div`
-  margin: 30px auto;
-  width: 100%;
-  animation: 1s ${fadeIn} ease-out;
-`;
-
 class Home extends React.Component {
     constructor(props) {
         super(props);
@@ -165,12 +153,11 @@ class Home extends React.Component {
           ErrorNoPublicInfo: '',
           mainUsername: '',
           showPopup: false,
-          status2: '',
           userDisplay: false,
           usernames: {},
           users: {
             mainUsername: ''
-          }         
+          }                   
         };
 
         this.getAccessToken = this.getAccessToken.bind(this);
@@ -378,7 +365,7 @@ class Home extends React.Component {
 
     /*    Requesting user data and identifying duplicates    */
     async submitUsernames() {  /* CORE FUNCTION */
-
+     
       this.setState((state, props) => ({ // Reset errors from last submission
         ...this.state,
         ErrorMinUsers: false,
@@ -415,9 +402,7 @@ class Home extends React.Component {
         }
 
         for (let user of Object.keys(userDataObject)) { // Fetch the songs for each playlist
-          this.setState({
-            status2: 'Requesting songs for ' + this.state.usernames[user] + '...'
-          })
+          this.props.setStatus2('Requesting songs for ' + this.state.usernames[user] + '...');
 
           let userSongs = await this.startSongs(userDataObject[user]);
           let uniqUserSongs = _.uniq(userSongs); // In case a user has the same song on multiple playlists, preventing false duplicates
@@ -507,10 +492,8 @@ class Home extends React.Component {
         this.props.setStatus('data set');
       } else {
 
-        this.setState({
-          status2: 'Finding duplicates...'
-        })
-
+        this.props.setStatus2('Finding duplicates...');
+        
         let duplicateSongs = []; // Will hold the duplicate song data
         let duplicateArtists = {}; // Will tally how many times an artist is found among the duplicate songs
 
@@ -563,10 +546,9 @@ class Home extends React.Component {
     }
 
     async findTopArtists(artists) { // Find top artist(s) and set them in state
-      this.setState({
-        status2: 'Finding top artists...'
-      })
-
+      
+      this.props.setStatus2('Finding top artists...');
+ 
       let duplicateArtists = [];
   
       for (const key in artists) {
@@ -655,7 +637,6 @@ class Home extends React.Component {
         ErrorNoPublicInfo: '',
         mainUsername: "",
         showPopup: false,
-        status2: '',
         userDisplay: true,
         usernames: {},
         users: {}
@@ -667,6 +648,7 @@ class Home extends React.Component {
       this.props.setArtists([]); 
       this.props.setTopArtists([]);
       this.props.setStatus('start');
+      this.props.setStatus2('');
     }
 
     /*    Render    */
@@ -688,23 +670,10 @@ class Home extends React.Component {
               {this.displayError()}
               {this.displayPopup()}
             </UserInputContainer>
-        </div>
-        )
-      } else if (this.props.status === "loading") {
-        return (
-          <div>
-            <UpdateText>{this.state.status2}</UpdateText>
-            <Loader>
-              <div className="la-line-scale-pulse-out la-dark la-2x">
-                  <div></div>
-                  <div></div>
-                  <div></div>
-                  <div></div>
-                  <div></div>
-              </div>
-            </Loader>
           </div>
-        )
+        ) 
+      } else if (this.props.status === "loading") {
+        return <LoadingPage/>
       } else if (this.props.status === "data set") {
         return (
           <Body2>
@@ -748,6 +717,7 @@ const mapDispatchToProps = {
   setMainUser,
   setUsers,
   setStatus,
+  setStatus2,
   setSongs,
   setArtists,
   setTopArtists
