@@ -62,7 +62,6 @@ const Body = styled.div`
 const Body2 = styled(Body)`
   padding-top: 25px;
   flex-wrap: wrap;
-  justify-content: center;
 `;
 
 // Styles for username input on start page
@@ -329,29 +328,13 @@ class Home extends React.Component {
 
     displayError() { // Display error is username is invalid
       if (this.state.ErrorNoMain) {
-        return (
-          <div>
-            <Error>Please make sure to list your username or a main username.</Error>
-          </div>
-        )
+        return <Error>Please make sure to list your username or a main username.</Error>
       } else if (this.state.ErrorMinUsers) {
-        return (
-          <div>       
-            <Error>Please enter at least two usernames.</Error>
-          </div>
-        )
+        return <Error>Please enter at least two usernames.</Error>
       } else if (this.state.ErrorInvalidID) {
-        return (
-          <div>       
-            <Error>Please enter a valid username.</Error>
-          </div>
-        )  
+        return <Error>Please enter a valid username.</Error>
       } else if (this.state.ErrorNoPublicPlaylists) {
-        return (
-          <div>
-            <Error>Uh oh! One of the users (username: {this.state.ErrorNoPublicInfo}) doesn't have any public playlists so we can't compare your playlists. Please remove their username and try again.</Error>
-          </div>
-        )
+        return <Error>Uh oh! One of the users (username: {this.state.ErrorNoPublicInfo}) doesn't have any public playlists so we can't compare your playlists. Please remove their username and try again.</Error>
       }
     }
 
@@ -637,7 +620,7 @@ class Home extends React.Component {
         ErrorNoPublicInfo: '',
         mainUsername: "",
         showPopup: false,
-        userDisplay: true,
+        userDisplay: false,
         usernames: {},
         users: {}
       })
@@ -655,34 +638,30 @@ class Home extends React.Component {
     renderContent() {
       if (this.props.status === "start") {
         return (
-          <div>
-            <UserInputContainer> 
-              <InputLabels htmlFor="your_username" >Enter your Spotify username here:</InputLabels>
-              <Tutorial onClick={this.togglePopup}>Not sure how to find a Spotify username? <span>Click here for help!</span></Tutorial>
-              <InputDiv>
-                <InputField 
-                  type="text" 
-                  id="your_username" 
-                  onChange={e => this.handleChangeMainUsername(e.target.value)}
-                />
-              </InputDiv>
-              {this.displayOtherUsers()}
-              {this.displayError()}
-              {this.displayPopup()}
-            </UserInputContainer>
-          </div>
+          <UserInputContainer> 
+            <InputLabels htmlFor="your_username" >Enter your Spotify username here:</InputLabels>
+            <Tutorial onClick={this.togglePopup}>Not sure how to find a Spotify username? <span>Click here for help!</span></Tutorial>
+            <InputDiv>
+              <InputField 
+                type="text" 
+                id="your_username" 
+                onChange={e => this.handleChangeMainUsername(e.target.value)}
+              />
+            </InputDiv>
+            {this.displayOtherUsers()}
+            {this.displayError()}
+            {this.displayPopup()}
+          </UserInputContainer>
         ) 
       } else if (this.props.status === "loading") {
         return <LoadingPage/>
       } else if (this.props.status === "data set") {
         return (
           <Body2>
-            <DisplaySongs/>
+            <DisplaySongs function={this.reset}/>
             <TopArtists data={this.state}/>
           </Body2>
         )
-      } else {
-        return <div></div>
       }
     };
     

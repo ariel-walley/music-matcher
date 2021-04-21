@@ -70,7 +70,6 @@ class TopArtists extends React.Component {
     let display = [];
 
     if (this.props.status === 'data set') { 
-
       this.props.topArtists.forEach((artist) => {
         display.push(
           <Card key={artist[0]}>
@@ -106,8 +105,8 @@ class TopArtists extends React.Component {
         </MainContainer>
       )
     } else {
-      return (<div></div>)
-    }    
+      return <div></div>
+    }
   }
 }
 

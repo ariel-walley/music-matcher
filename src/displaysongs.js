@@ -2,6 +2,7 @@ import React from 'react';
 import styled, { keyframes } from 'styled-components';
 import _ from 'lodash';
 import './loading.css';
+import Reset from './reset';
 import { connect } from 'react-redux';
 
 const fadeIn = keyframes`
@@ -20,8 +21,10 @@ const MainContainer = styled.div`
 `;
 
 const Header = styled.h1`
-  text-align: center;
   margin: 20px;
+  text-align: center;
+  font-size: 2em;
+  font-weight: bold;
 `;
 
 const CardContainer = styled.div`
@@ -100,8 +103,6 @@ class DisplaySongs extends React.Component {
 
       // Final phrase
       return <Header>You{usernames} have {songs} in common!</Header>
-    } else {
-      return <div>Not yet</div>
     }
   }
 
@@ -126,26 +127,25 @@ class DisplaySongs extends React.Component {
   }
      
   render() {
-
     if (this.props.duplicateSongs === 'none') {
       return(
         <div>
           {this.formatHeader()}
+          <Reset margin="100px 0 0 0" function={this.props.function} />
         </div>
       )
     } else if (this.props.duplicateSongs.length > 0) {
       return (
-        <div>
-          <MainContainer>
-            {this.formatHeader()}
-            <CardContainer>
-              {this.formatCard()}
-            </CardContainer>
-          </MainContainer>
-        </div>  
+        <MainContainer>
+          {this.formatHeader()}
+          <Reset margin="30px" function={this.props.function} />
+          <CardContainer>
+            {this.formatCard()}
+          </CardContainer>
+        </MainContainer>
       )
     } else {
-      return (<div></div>)
+      return <div></div>
     }
   }
 }
