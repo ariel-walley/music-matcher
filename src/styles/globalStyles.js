@@ -11,7 +11,8 @@ body {
   width: 100%;
   margin: 0 auto;
   padding: 0;
-  color: #080808;
+  font-family: "Open Sans", Arial, sans-serif;
+
 }
 
 span {

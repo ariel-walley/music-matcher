@@ -39,9 +39,9 @@ const Wrapper1 = styled.div`
   align-content: space-around;
 `;
 
-const Text = styled.p`
+const Heading = styled.p`
   font-size: 20px;
-  font-weight: 500;
+  font-weight: 600;
 `;
 
 const Img = styled.img`
@@ -50,7 +50,7 @@ const Img = styled.img`
   padding: 0 20px;
 `;
 
-const Icon = styled(CloseCircle)`
+const CloseIcon = styled(CloseCircle)`
   color: #979797;
   width: 27px;
   cursor: pointer;
@@ -66,6 +66,7 @@ const Instructions = styled.ol`
 
 const List = styled.li`
   margin: 25px 0;
+  font-size: 16px;
 `;
 
 class Popup extends React.Component {  
@@ -73,8 +74,8 @@ class Popup extends React.Component {
     return (  
       <OuterPopup>  
         <InnerPopup>
-          <Icon onClick={this.props.closePopup}/>
-          <Text>How to find a Spotify username:</Text>
+          <CloseIcon onClick={this.props.closePopup}/>
+          <Heading>How to find a Spotify username:</Heading>
           <Wrapper1>                
             <Img src="/howto.gif" />        
             <Instructions>

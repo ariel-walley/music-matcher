@@ -3,11 +3,6 @@ import styled, { keyframes } from 'styled-components';
 import { connect } from 'react-redux';
 import ArtistsTable from './artistsTable';
 
-export const Heading = styled.h1`
-  text-align: center;
-  margin: 23px;
-`;
-
 const fadeIn = keyframes`
   0% {
     opacity: 0;
@@ -20,8 +15,14 @@ const fadeIn = keyframes`
 
 const MainContainer = styled.div`
   width: 100%;
-  font-family: 'Open Sans', sans-serif;
   animation: 1s ${fadeIn} ease-out;
+`;
+
+const Heading = styled.h1`
+  margin: 23px;
+  font-size: 32px;
+  font-weight: 700;
+  text-align: center;
 `;
 
 const CardContainer = styled.div`
@@ -45,8 +46,8 @@ const Card = styled.div`
 `;
 
 const ArtistName = styled.h1`
-  font-size: 24px;
-  font-weight: 700px;
+  font-size: 26px;
+  font-weight: 700;
   margin: 0 0 10px 25px;
   padding: 0;
 `;

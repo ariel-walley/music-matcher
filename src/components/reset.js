@@ -13,8 +13,8 @@ const ResetContainer = styled.div`
 
 const ResetText = styled.p`
   margin: 0 0 0 10px;
-  font-size: 1.5em;
-  font-weight: bold;
+  font-size: 24px; 
+  font-weight: 600;
 `;
 
 class Reset extends React.Component {

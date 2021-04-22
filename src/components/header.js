@@ -8,15 +8,16 @@ const HeaderBlock = styled.h1`
   position: fixed;
   background-color: black;
   color: white;
+  font-family: "Roboto", Arial, sans-serif;
   font-size: 35px;
+  font-weight: 700;
   text-align: center;
 `;
 
 class Header extends React.Component {
   render() {
-    return(
-      <HeaderBlock onClick={this.props.function}>Music Matcher</HeaderBlock>
-    )
+    return <HeaderBlock onClick={this.props.function}>Music Matcher</HeaderBlock>
+
   }
 }
 

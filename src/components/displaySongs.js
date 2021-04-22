@@ -15,15 +15,14 @@ const fadeIn = keyframes`
 `;
 
 const MainContainer = styled.div`
-  font-family: 'Open Sans', sans-serif;
   animation: 1s ${fadeIn} ease-out;
 `;
 
 const Header = styled.h1`
   margin: 20px;
   text-align: center;
-  font-size: 2em;
-  font-weight: bold;
+  font-size: 32px;
+  font-weight: 700;
 `;
 
 const CardContainer = styled.div`
@@ -47,15 +46,14 @@ const Card = styled.div`
 `;
 
 const SongTitle = styled.h1`
-  font-size: 24px;
-  font-weight: 700px;
-  margin: 0 0 10px 25px;
+  font-size: 26px;
+  font-weight: 700;
+  margin: 0 0 7px 25px;
   padding: 0;
 `;
-
+ 
 const Artist = styled.h2`
   font-size: 20px;
-  font-weight: 550px;
   margin: 0 0 0 25px;
   padding: 0;
 `;

@@ -1,7 +1,13 @@
 import React from 'react';
 import styled from 'styled-components';
 import { connect } from 'react-redux';
-import { Heading } from './topArtists';
+
+const Heading = styled.h1`
+  margin: 23px;
+  font-size: 32px;
+  font-weight: 700;
+  text-align: center;
+`;
 
 const Row = styled.div`
   background-color: green;
@@ -15,22 +21,22 @@ const Row = styled.div`
   justify-content: center;
   border-radius: 15px;
   background-color: rgba(256,256,256,0.3);
+  font-size: 18px;
 `;
 
 const Header = styled(Row)`
   width: 45%
-  font-weight: 700;
   text-decoration: underline;
-  font-size: 22px;
+  font-size: 20px;
+  font-weight: 700;
 `;
 
 const TableData = styled.div`
+  width: 25%;  
+  margin: auto 20px;
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 18px;
-  margin: auto 20px;
-  width: 25%;
   text-align: center;
 `;
 

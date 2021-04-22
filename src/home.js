@@ -100,6 +100,7 @@ const InputField = styled.input`
   height: 35px;
   width: 250px;
   border-radius: 5px;
+  font-family: "Roboto", Arial, sans-serif;
 `;
 
 const InputField2 = styled(InputField)`
@@ -114,8 +115,8 @@ const Tutorial = styled.button`
   background-color: rgba(0,0,0,0);
   border-style: none;
   outline-style: none;
-  font-weight: 500;
-  font-size: 15px;
+  font-family: "Roboto", Arial, sans-serif;
+  font-size: 15px; 
   transition: color 5s;
 `;
 
@@ -127,6 +128,7 @@ const SubmitButton = styled.button`
   border-radius: 5px;
   background-color: white;
   text-align: center;
+  font-family: "Roboto", Arial, sans-serif;
   font-size: 16px;
   animation: 0.4s ${fadeIn} ease-out;
 `;
@@ -139,6 +141,7 @@ const Error = styled.p`
   border-radius: 5px;
   padding: 5px;
   text-align: center;
+  font-family: "Roboto", Arial, sans-serif;
 `;
 
 class Home extends React.Component {

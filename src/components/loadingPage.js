@@ -13,9 +13,10 @@ const fadeIn = keyframes`
 `;
 
 const UpdateText = styled.h1`
+  margin-bottom: 100px;
   text-align: center;
   font-size: 35px;
-  margin-bottom: 100px;
+  font-weight: 700;
 `;
 
 const Loader = styled.div`
