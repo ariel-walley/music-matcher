@@ -1,7 +1,6 @@
 import React from 'react';
 import styled, { keyframes } from 'styled-components';
 import _ from 'lodash';
-import './loading.css';
 import Reset from './reset';
 import { connect } from 'react-redux';
 
@@ -11,7 +10,7 @@ const fadeIn = keyframes`
   }
 
   100% {
-    opacity: 1
+    opacity: 1;
   }
 `;
 

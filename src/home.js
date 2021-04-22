@@ -1,13 +1,13 @@
 import React from 'react';
-import Header from './header';
-import LoadingPage from './loadingPage';
-import DisplaySongs from './displaySongs';
-import TopArtists from './topArtists';
+import Header from './components/header';
+import LoadingPage from './components/loadingPage';
+import DisplaySongs from './components/displaySongs';
+import TopArtists from './components/topArtists';
 import QueryString from 'querystring';
 import _ from 'lodash';
 import styled, { keyframes } from 'styled-components';
-import Popup from './popup';
-import GlobalStyle from './globalStyles';
+import Popup from './components/popup';
+import GlobalStyle from './styles/globalStyles';
 import { connect } from 'react-redux';
 import { 
   setMainUser,
@@ -659,7 +659,7 @@ class Home extends React.Component {
         return (
           <Body2>
             <DisplaySongs function={this.reset}/>
-            <TopArtists data={this.state}/>
+            <TopArtists/>
           </Body2>
         )
       }

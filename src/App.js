@@ -1,8 +1,7 @@
 import React from 'react';
 import { BrowserRouter, Route, Switch} from 'react-router-dom';
 import Home from './home';
-import Error from './error';
-import './App.css';
+import Error from './components/error';
 
 function App() {
   return (
