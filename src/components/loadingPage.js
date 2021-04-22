@@ -1,6 +1,7 @@
 import React from 'react';
 import styled, { keyframes } from 'styled-components';
 import { connect } from 'react-redux';
+import "../styles/loading.css";
 
 const fadeIn = keyframes`
   0% {
