@@ -504,6 +504,26 @@ class Home extends React.Component {
             ); 
           };
         }
+        
+        duplicateSongs.sort((a, b) => {
+          let artistLocale = a.artist.localeCompare(b.artist, undefined, {sensitivity: 'base'});
+          let nameLocale = a.name.localeCompare(b.name, undefined, {sensitivity: 'base'});
+          
+          // Sort alphabetically by artist and then, if same artist, by song title
+          if (artistLocale > 0) {
+            return 1
+          } else if (artistLocale === 0) {
+            if (nameLocale > 0) {
+              return 1
+            } else if (nameLocale === 0) {
+              return 0
+            } else {
+              return -1
+            }
+          } else {
+            return -1
+          }
+        })
 
         this.props.setSongs(duplicateSongs);
 
