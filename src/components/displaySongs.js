@@ -18,7 +18,7 @@ const MainContainer = styled.div`
   animation: 1s ${fadeIn} ease-out;
 `;
 
-const Header = styled.h1`
+const Heading = styled.h1`
   margin: 20px;
   text-align: center;
   font-size: 32px;
@@ -99,7 +99,7 @@ class DisplaySongs extends React.Component {
       }
 
       // Final phrase
-      return <Header>You{usernames} have {songs} in common!</Header>
+      return <Heading>You{usernames} have {songs} in common!</Heading>
     }
   }
 
