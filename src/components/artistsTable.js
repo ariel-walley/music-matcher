@@ -24,7 +24,7 @@ const Row = styled.div`
   font-size: 18px;
 `;
 
-const Header = styled(Row)`
+const TableHeader = styled(Row)`
   width: 45%
   text-decoration: underline;
   font-size: 20px;
@@ -52,11 +52,11 @@ class ArtistsTable extends React.Component {
 
   assembleTable() {
     let display = [(
-      <Header key="header">
+      <TableHeader key="tableHeader">
         <TableArtist>Artist</TableArtist>
         <TableData>No. of Songs</TableData>
         <TableData>Percent of Songs</TableData>
-      </Header>
+      </TableHeader>
   )];
 
     if (this.props.duplicateArtists.length > 5) {
