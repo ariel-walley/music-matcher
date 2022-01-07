@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 
-const MainHeader = styled.h1`
+const HeaderBlock = styled.h1`
   width: 100%;
   margin: 0 auto;
   padding: 5px;
@@ -14,6 +14,11 @@ const MainHeader = styled.h1`
   text-align: center;
 `;
 
-export default function MainHeader() {
-  return <MainHeader onClick={this.props.function}>Music Matcher</MainHeader>
+class Header extends React.Component {
+  render() {
+    return <HeaderBlock onClick={this.props.function}>Music Matcher</HeaderBlock>
+
+  }
 }
+
+export default Header;

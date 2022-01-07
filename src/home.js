@@ -1,5 +1,5 @@
 import React from 'react';
-import MainHeader from './components/header';
+import Header from './components/header';
 import LoadingPage from './components/loadingPage';
 import DisplaySongs from './components/displaySongs';
 import TopArtists from './components/topArtists';
@@ -692,7 +692,7 @@ class Home extends React.Component {
       return (
         <GradientWrapper>
           <GlobalStyle/>
-          <MainHeader function={this.reset}/>
+          <Header function={this.reset}/>
           <Gradient color="linear-gradient(to bottom right, #00ff33, #13a9bb)" status={this.props.status === "start"}/>
           <Gradient color="linear-gradient(to bottom right, #13a9bb, #7d00aa)" status={this.props.status === "loading"}/>
           <Gradient color="linear-gradient(to bottom right, #7d00aa, #fa3378)" status={this.props.status === "data set"}/>
