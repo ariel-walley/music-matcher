@@ -13,7 +13,6 @@ import {
   setMainUser,
   setUsers,
   setStatus,
-  setStatus2,
   setSongs,
   setArtists,
   setTopArtists
@@ -155,6 +154,7 @@ class Home extends React.Component {
           ErrorNoPublicInfo: '',
           mainUsername: '',
           showPopup: false,
+          status2: '',
           userDisplay: false,
           usernames: {},
           users: {
@@ -195,6 +195,7 @@ class Home extends React.Component {
       let body = {
         'grant_type': 'client_credentials'
       }
+      
       await fetch('https://accounts.spotify.com/api/token', {
         method: 'POST',
         headers: {
@@ -388,7 +389,7 @@ class Home extends React.Component {
         }
 
         for (let user of Object.keys(userDataObject)) { // Fetch the songs for each playlist
-          this.props.setStatus2('Requesting songs for ' + this.state.usernames[user] + '...');
+          this.setState({status2: 'Requesting songs for ' + this.state.usernames[user] + '...'});
 
           let userSongs = await this.startSongs(userDataObject[user]);
           let uniqUserSongs = _.uniq(userSongs); // In case a user has the same song on multiple playlists, preventing false duplicates
@@ -478,7 +479,7 @@ class Home extends React.Component {
         this.props.setStatus('data set');
       } else {
 
-        this.props.setStatus2('Finding duplicates...');
+        this.setState({status2: 'Finding duplicates...'});
         
         let duplicateSongs = []; // Will hold the duplicate song data
         let duplicateArtists = {}; // Will tally how many times an artist is found among the duplicate songs
@@ -553,7 +554,7 @@ class Home extends React.Component {
 
     async findTopArtists(artists) { // Find top artist(s) and set them in state
       
-      this.props.setStatus2('Finding top artists...');
+      this.setState({status2: 'Finding top artists...'});
  
       let duplicateArtists = [];
   
@@ -654,7 +655,7 @@ class Home extends React.Component {
       this.props.setArtists([]); 
       this.props.setTopArtists([]);
       this.props.setStatus('start');
-      this.props.setStatus2('');
+      this.setState({setStatus2: ''});
     }
 
     /*    Render    */
@@ -677,7 +678,7 @@ class Home extends React.Component {
           </UserInputContainer>
         ) 
       } else if (this.props.status === "loading") {
-        return <LoadingPage/>
+        return <LoadingPage status2={this.state.status2}/>
       } else if (this.props.status === "data set") {
         return (
           <Body2>
@@ -719,7 +720,6 @@ const mapDispatchToProps = {
   setMainUser,
   setUsers,
   setStatus,
-  setStatus2,
   setSongs,
   setArtists,
   setTopArtists

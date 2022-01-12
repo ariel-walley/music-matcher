@@ -1,6 +1,5 @@
 import React from 'react';
 import styled, { keyframes } from 'styled-components';
-import { connect } from 'react-redux';
 import "../styles/loading.css";
 
 const fadeIn = keyframes`
@@ -26,29 +25,19 @@ const Loader = styled.div`
   animation: 1s ${fadeIn} ease-out;
 `;
 
-class LoadingPage extends React.Component {
-  render() {
-    return (
-      <div>
-        <UpdateText>{this.props.status2}</UpdateText>
-        <Loader>
-          <div className="la-line-scale-pulse-out la-dark la-2x">
-            <div></div>
-            <div></div>
-            <div></div>
-            <div></div>
-            <div></div>
-          </div>
-        </Loader>
-      </div>
-    )
-  }
+export default function LoadingPage(props) {
+  return (
+    <div>
+      <UpdateText>{props.status2}</UpdateText>
+      <Loader>
+        <div className="la-line-scale-pulse-out la-dark la-2x">
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+        </div>
+      </Loader>
+    </div>
+  )
 }
-
-function mapStateToProps(state) {
-  return {
-    status2: state.status2
-  };
-}
-
-export default connect(mapStateToProps)(LoadingPage);
