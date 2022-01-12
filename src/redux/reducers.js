@@ -2,8 +2,7 @@ const initialState = {
   mainUsername: '',
   usernames: {},
   duplicateSongs: [],
-  duplicateArtists: [],
-  topArtists: []
+  duplicateArtists: []
 };
 
 function reducer (state = initialState, action) {
@@ -16,8 +15,6 @@ function reducer (state = initialState, action) {
       return { ...state, duplicateSongs: action.payload };
     case 'SET_ARTISTS':
       return { ...state, duplicateArtists: action.payload };
-    case 'SET_TOP_ARTISTS':
-      return { ...state, topArtists: action.payload };
     default: return state;
   }
 };

@@ -108,8 +108,7 @@ class TopArtists extends React.Component {
 
 function mapStateToProps(state) {
   return {
-    duplicateArtists: state.duplicateArtists,
-    topArtists: state.topArtists
+    duplicateArtists: state.duplicateArtists
   };
 }
 

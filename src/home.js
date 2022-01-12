@@ -13,8 +13,7 @@ import {
   setMainUser,
   setUsers,
   setSongs,
-  setArtists,
-  setTopArtists
+  setArtists
 } from './redux/actions';
 
 // Styles for gradient background
@@ -155,6 +154,7 @@ class Home extends React.Component {
           showPopup: false,
           status: 'start',
           status2: '',
+          topArtists: [],
           userDisplay: false,
           usernames: {},
           users: {
@@ -586,7 +586,7 @@ class Home extends React.Component {
           topArtistsData.push([artist.id, artist.name, artist.images[2].url]);
         }
 
-        this.props.setTopArtists(topArtistsData);
+        this.setState({ topArtists: topArtistsData});
       } 
       
       this.setState({status: 'data set'});
@@ -652,9 +652,8 @@ class Home extends React.Component {
       this.props.setMainUser("");
       this.props.setUsers({ });
       this.props.setSongs([]);
-      this.props.setArtists([]); 
-      this.props.setTopArtists([]);
-      this.setState({status: 'start', status2: ''});
+      this.props.setArtists([]);
+      this.setState({status: 'start', status2: '', topArtists: [] });
     }
 
     /*    Render    */
@@ -682,7 +681,7 @@ class Home extends React.Component {
         return (
           <Body2>
             <DisplaySongs function={this.reset} status={this.state.status}/>
-            <TopArtists status={this.state.status}/>
+            <TopArtists status={this.state.status} topArtists={this.state.topArtists}/>
           </Body2>
         )
       }
@@ -709,8 +708,7 @@ function mapStateToProps(state) {
     mainUsername: state.mainUsername,
     usernames: state.usernames,
     duplicateSongs: state.duplicateSongs,
-    duplicateArtists: state.duplicateArtists,
-    topArtists: state.topArtists
+    duplicateArtists: state.duplicateArtists
   };
 }
 
@@ -718,8 +716,7 @@ const mapDispatchToProps = {
   setMainUser,
   setUsers,
   setSongs,
-  setArtists,
-  setTopArtists
+  setArtists
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Home);
