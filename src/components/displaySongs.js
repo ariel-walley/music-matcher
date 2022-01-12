@@ -151,7 +151,6 @@ function mapStateToProps(state) {
   return {
     mainUsername: state.mainUsername,
     usernames: state.usernames,
-    status: state.status,
     duplicateSongs: state.duplicateSongs
   };
 }

@@ -12,7 +12,6 @@ import { connect } from 'react-redux';
 import { 
   setMainUser,
   setUsers,
-  setStatus,
   setSongs,
   setArtists,
   setTopArtists
@@ -154,6 +153,7 @@ class Home extends React.Component {
           ErrorNoPublicInfo: '',
           mainUsername: '',
           showPopup: false,
+          status: 'start',
           status2: '',
           userDisplay: false,
           usernames: {},
@@ -385,7 +385,7 @@ class Home extends React.Component {
         if (this.state.ErrorNoPublicPlaylists) { // Check all users have a public playlist
           return
         } else {
-          this.props.setStatus('loading');
+          this.setState({ status: 'loading'});
         }
 
         for (let user of Object.keys(userDataObject)) { // Fetch the songs for each playlist
@@ -476,7 +476,7 @@ class Home extends React.Component {
 
       if (duplicates.length === 0) {
         this.props.setSongs('none');
-        this.props.setStatus('data set');
+        this.setState({status: 'data set'});
       } else {
 
         this.setState({status2: 'Finding duplicates...'});
@@ -532,7 +532,7 @@ class Home extends React.Component {
           this.findTopArtists(duplicateArtists);
         }  
 
-        this.props.setStatus('data set');
+        this.setState({status: 'data set'});
       }
     }
 
@@ -589,7 +589,7 @@ class Home extends React.Component {
         this.props.setTopArtists(topArtistsData);
       } 
       
-      this.props.setStatus('data set');
+      this.setState({status: 'data set'});
     }
 
    async getArtistArt (artist) { //API request for artist image
@@ -654,13 +654,12 @@ class Home extends React.Component {
       this.props.setSongs([]);
       this.props.setArtists([]); 
       this.props.setTopArtists([]);
-      this.props.setStatus('start');
-      this.setState({setStatus2: ''});
+      this.setState({status: 'start', status2: ''});
     }
 
     /*    Render    */
     renderContent() {
-      if (this.props.status === "start") {
+      if (this.state.status === "start") {
         return (
           <UserInputContainer> 
             <InputLabels htmlFor="your_username" >Enter your Spotify username here:</InputLabels>
@@ -677,13 +676,13 @@ class Home extends React.Component {
             {this.displayPopup()}
           </UserInputContainer>
         ) 
-      } else if (this.props.status === "loading") {
+      } else if (this.state.status === "loading") {
         return <LoadingPage status2={this.state.status2}/>
-      } else if (this.props.status === "data set") {
+      } else if (this.state.status === "data set") {
         return (
           <Body2>
-            <DisplaySongs function={this.reset}/>
-            <TopArtists/>
+            <DisplaySongs function={this.reset} status={this.state.status}/>
+            <TopArtists status={this.state.status}/>
           </Body2>
         )
       }
@@ -694,9 +693,9 @@ class Home extends React.Component {
         <GradientWrapper>
           <GlobalStyle/>
           <MainHeader function={this.reset}/>
-          <Gradient color="linear-gradient(to bottom right, #00ff33, #13a9bb)" status={this.props.status === "start"}/>
-          <Gradient color="linear-gradient(to bottom right, #13a9bb, #7d00aa)" status={this.props.status === "loading"}/>
-          <Gradient color="linear-gradient(to bottom right, #7d00aa, #fa3378)" status={this.props.status === "data set"}/>
+          <Gradient color="linear-gradient(to bottom right, #00ff33, #13a9bb)" status={this.state.status === "start"}/>
+          <Gradient color="linear-gradient(to bottom right, #13a9bb, #7d00aa)" status={this.state.status === "loading"}/>
+          <Gradient color="linear-gradient(to bottom right, #7d00aa, #fa3378)" status={this.state.status === "data set"}/>
           <Body>
             {this.renderContent()}
           </Body>
@@ -709,7 +708,6 @@ function mapStateToProps(state) {
   return {
     mainUsername: state.mainUsername,
     usernames: state.usernames,
-    status: state.status,
     duplicateSongs: state.duplicateSongs,
     duplicateArtists: state.duplicateArtists,
     topArtists: state.topArtists
@@ -719,7 +717,6 @@ function mapStateToProps(state) {
 const mapDispatchToProps = {
   setMainUser,
   setUsers,
-  setStatus,
   setSongs,
   setArtists,
   setTopArtists

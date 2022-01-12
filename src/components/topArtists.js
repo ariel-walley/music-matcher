@@ -67,18 +67,13 @@ class TopArtists extends React.Component {
   }
 
   formatCard() {
-
-    let display = [];
-
     if (this.props.status === 'data set') { 
-      this.props.topArtists.forEach((artist) => {
-        display.push(
-          <Card key={artist[0]}>
-            <Img src={artist[2]} alt={`The artist art for ${artist[1]}`} />
-            <ArtistName>{artist[1]}</ArtistName>
-          </Card>);
-      });
-      return display;
+      return this.props.topArtists.map((artist) => 
+        <Card key={artist[0]}>
+          <Img src={artist[2]} alt={`The artist art for ${artist[1]}`} />
+          <ArtistName>{artist[1]}</ArtistName>
+        </Card>
+      )
     } else {
       return <div></div>
     }
@@ -113,7 +108,6 @@ class TopArtists extends React.Component {
 
 function mapStateToProps(state) {
   return {
-    status: state.status,
     duplicateArtists: state.duplicateArtists,
     topArtists: state.topArtists
   };
