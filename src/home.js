@@ -11,9 +11,7 @@ import GlobalStyle from './styles/globalStyles';
 import { connect } from 'react-redux';
 import { 
   setMainUser,
-  setUsers,
-  setSongs,
-  setArtists
+  setUsers
 } from './redux/actions';
 
 // Styles for gradient background
@@ -145,6 +143,8 @@ class Home extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+          duplicateArtists: [],
+          duplicateSongs: [],
           ErrorMinUsers: false,
           ErrorNoMain: false,
           ErrorInvalidID: false,
@@ -475,8 +475,7 @@ class Home extends React.Component {
       _.pull(duplicates, null);
 
       if (duplicates.length === 0) {
-        this.props.setSongs('none');
-        this.setState({status: 'data set'});
+        this.setState({duplicateSongs: 'none', status: 'data set'});
       } else {
 
         this.setState({status2: 'Finding duplicates...'});
@@ -526,7 +525,7 @@ class Home extends React.Component {
           }
         })
 
-        this.props.setSongs(duplicateSongs);
+        this.setState({duplicateSongs: duplicateSongs});
 
         if (Object.keys(duplicateArtists).length > 5) {
           this.findTopArtists(duplicateArtists);
@@ -564,7 +563,7 @@ class Home extends React.Component {
 
       let sorted = duplicateArtists.sort((a, b) => b[2] - a[2]); // Sort by most frequently occuring to least
 
-      this.props.setArtists(sorted);    
+      this.setState({ duplicateArtists: sorted});
 
       let topArtistsCard = [];
 
@@ -651,9 +650,13 @@ class Home extends React.Component {
 
       this.props.setMainUser("");
       this.props.setUsers({ });
-      this.props.setSongs([]);
-      this.props.setArtists([]);
-      this.setState({status: 'start', status2: '', topArtists: [] });
+      this.setState({
+        duplicateArtists: [],
+        duplicateSongs: [],
+        status: 'start', 
+        status2: '', 
+        topArtists: [] 
+      });
     }
 
     /*    Render    */
@@ -680,8 +683,8 @@ class Home extends React.Component {
       } else if (this.state.status === "data set") {
         return (
           <Body2>
-            <DisplaySongs function={this.reset} status={this.state.status}/>
-            <TopArtists status={this.state.status} topArtists={this.state.topArtists}/>
+            <DisplaySongs function={this.reset} status={this.state.status} duplicateSongs={this.state.duplicateSongs}/>
+            <TopArtists status={this.state.status} duplicateArtists={this.state.duplicateArtists} duplicateSongs={this.state.duplicateSongs} topArtists={this.state.topArtists}/>
           </Body2>
         )
       }
@@ -706,17 +709,13 @@ class Home extends React.Component {
 function mapStateToProps(state) {
   return {
     mainUsername: state.mainUsername,
-    usernames: state.usernames,
-    duplicateSongs: state.duplicateSongs,
-    duplicateArtists: state.duplicateArtists
+    usernames: state.usernames
   };
 }
 
 const mapDispatchToProps = {
   setMainUser,
-  setUsers,
-  setSongs,
-  setArtists
+  setUsers
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Home);

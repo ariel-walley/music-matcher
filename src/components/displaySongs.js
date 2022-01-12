@@ -150,8 +150,7 @@ class DisplaySongs extends React.Component {
 function mapStateToProps(state) {
   return {
     mainUsername: state.mainUsername,
-    usernames: state.usernames,
-    duplicateSongs: state.duplicateSongs
+    usernames: state.usernames
   };
 }
 

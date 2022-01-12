@@ -1,6 +1,5 @@
 import React from 'react';
 import styled from 'styled-components';
-import { connect } from 'react-redux';
 
 const Heading = styled.h1`
   margin: 23px;
@@ -44,7 +43,7 @@ const TableArtist = styled(TableData)`
   width: 50%;
 `;
 
-class ArtistsTable extends React.Component {
+export default class ArtistsTable extends React.Component {
   constructor(props) {
     super(props);
     this.assembleTable = this.assembleTable.bind(this);
@@ -87,12 +86,3 @@ class ArtistsTable extends React.Component {
   }
 
 }
-
-function mapStateToProps(state) {
-  return {
-    duplicateSongs: state.duplicateSongs,
-    duplicateArtists: state.duplicateArtists
-  };
-}
-
-export default connect(mapStateToProps)(ArtistsTable);

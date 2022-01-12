@@ -1,6 +1,5 @@
 import React from 'react';
 import styled, { keyframes } from 'styled-components';
-import { connect } from 'react-redux';
 import ArtistsTable from './artistsTable';
 
 const fadeIn = keyframes`
@@ -59,7 +58,7 @@ const Img = styled.img`
   margin: 10 18px 10 10;
 `;
 
-class TopArtists extends React.Component {
+export default class TopArtists extends React.Component {
   constructor(props) {
     super(props);        
     this.formatCard = this.formatCard.bind(this);
@@ -97,7 +96,7 @@ class TopArtists extends React.Component {
           <CardContainer>
             {this.formatCard()}
           </CardContainer>
-          <ArtistsTable/>
+          <ArtistsTable duplicateArtists={this.props.duplicateArtists} duplicateSongs={this.props.duplicateSongs}/>
         </MainContainer>
       )
     } else {
@@ -105,11 +104,3 @@ class TopArtists extends React.Component {
     }
   }
 }
-
-function mapStateToProps(state) {
-  return {
-    duplicateArtists: state.duplicateArtists
-  };
-}
-
-export default connect(mapStateToProps)(TopArtists);
