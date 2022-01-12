@@ -65,18 +65,12 @@ const Img = styled.img`
   margin: 10 18px 10 10;
 `;
 
-class DisplaySongs extends React.Component {
-  constructor(props) {
-    super(props);        
-    this.formatHeader = this.formatHeader.bind(this);
-    this.formatCard = this.formatCard.bind(this);
-    }
-
-  formatHeader() {
+function DisplaySongs(props) {
+  const formatHeader = () => {
     // Determine the display names
-    let mainUserID = this.props.mainUsername;
-    let mainUsername = this.props.usernames[mainUserID];
-    let usernames = Object.values(this.props.usernames);
+    let mainUserID = props.mainUsername;
+    let mainUsername = props.usernames[mainUserID];
+    let usernames = Object.values(props.usernames);
 
     _.pull(usernames, mainUserID, mainUsername); // Remove the main user from the display names
     if (usernames.length === 1) {
@@ -87,15 +81,15 @@ class DisplaySongs extends React.Component {
       usernames = `, ${usernames[0]}, ${usernames[1]}, and ${usernames[2]}`
     }
     
-    if (this.props.status === 'data set') {
+    if (props.status === 'data set') {
       // Determine how many songs in common
       let songs = '';
-      if (this.props.duplicateSongs === "none") {
+      if (props.duplicateSongs === "none") {
         songs = 'no songs'
-      } else if (this.props.duplicateSongs.length === 1) {
+      } else if (props.duplicateSongs.length === 1) {
         songs = '1 song'
       } else {
-        songs = `${this.props.duplicateSongs.length} songs`
+        songs = `${props.duplicateSongs.length} songs`
       }
 
       // Final phrase
@@ -103,41 +97,37 @@ class DisplaySongs extends React.Component {
     }
   }
 
-  formatCard() {
-    let display = [];
-
-    if (this.props.status === 'data set') {
-      this.props.duplicateSongs.forEach((duplicate) => {
-        display.push(
+  const formatCard = () => {
+    if (props.status === 'data set') {
+      return props.duplicateSongs.map((duplicate) => 
         <Card key={duplicate.songID}>
           <Img src={duplicate.image} alt={`The cover art of the song's album, "${duplicate.albumName}"`}/>
           <div>
             <SongTitle>{duplicate.name}</SongTitle>
             <Artist> by {duplicate.artist}</Artist>
           </div>
-        </Card>);
-      })
-      return display;
+        </Card>
+      )
     } else {
       return <div></div>
     }
   }
      
-  render() {
-    if (this.props.duplicateSongs === 'none') {
+  const render = () => {
+    if (props.duplicateSongs === 'none') {
       return(
         <div>
-          {this.formatHeader()}
-          <Reset margin="100px 0 0 0" function={this.props.function} />
+          {formatHeader()}
+          <Reset margin="100px 0 0 0" function={props.function} />
         </div>
       )
-    } else if (this.props.duplicateSongs.length > 0) {
+    } else if (props.duplicateSongs.length > 0) {
       return (
         <MainContainer>
-          {this.formatHeader()}
-          <Reset margin="30px" function={this.props.function} />
+          {formatHeader()}
+          <Reset margin="30px" function={props.function} />
           <CardContainer>
-            {this.formatCard()}
+            {formatCard()}
           </CardContainer>
         </MainContainer>
       )
@@ -145,6 +135,8 @@ class DisplaySongs extends React.Component {
       return <div></div>
     }
   }
+
+  return render();
 }
 
 function mapStateToProps(state) {
