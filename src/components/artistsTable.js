@@ -43,13 +43,8 @@ const TableArtist = styled(TableData)`
   width: 50%;
 `;
 
-export default class ArtistsTable extends React.Component {
-  constructor(props) {
-    super(props);
-    this.assembleTable = this.assembleTable.bind(this);
-  }
-
-  assembleTable() {
+export default function ArtistsTable(props) {
+  const assembleTable = () => {
     let display = [(
       <TableHeader key="tableHeader">
         <TableArtist>Artist</TableArtist>
@@ -58,13 +53,13 @@ export default class ArtistsTable extends React.Component {
       </TableHeader>
   )];
 
-    if (this.props.duplicateArtists.length > 5) {
-      for (let artist of this.props.duplicateArtists) {
+    if (props.duplicateArtists.length > 5) {
+      for (let artist of props.duplicateArtists) {
         display.push(
           <Row key={artist[0]}>
             <TableArtist>{artist[1]}</TableArtist>
             <TableData>{artist[2]}</TableData>
-            <TableData>{((artist[2]/this.props.duplicateSongs.length)*100).toFixed(2) + "%"}</TableData>
+            <TableData>{((artist[2]/props.duplicateSongs.length)*100).toFixed(2) + "%"}</TableData>
           </Row>      
         )
       }
@@ -74,15 +69,17 @@ export default class ArtistsTable extends React.Component {
     }
   }
 
-  render() {
-    if (this.props.duplicateArtists.length > 5) {
+  const render = () => {
+    if (props.duplicateArtists.length > 5) {
       return(
         <div>
           <Heading>See all of your artists in common:</Heading>
-          {this.assembleTable()}
+          {assembleTable()}
         </div>  
       )
     }
   }
+
+  return render();
 
 }

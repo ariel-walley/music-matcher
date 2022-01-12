@@ -58,16 +58,10 @@ const Img = styled.img`
   margin: 10 18px 10 10;
 `;
 
-export default class TopArtists extends React.Component {
-  constructor(props) {
-    super(props);        
-    this.formatCard = this.formatCard.bind(this);
-    this.createHeader = this.createHeader.bind(this);
-  }
-
-  formatCard() {
-    if (this.props.status === 'data set') { 
-      return this.props.topArtists.map((artist) => 
+export default function TopArtists(props) {
+  const formatCard = () => {
+    if (props.status === 'data set') { 
+      return props.topArtists.map((artist) => 
         <Card key={artist[0]}>
           <Img src={artist[2]} alt={`The artist art for ${artist[1]}`} />
           <ArtistName>{artist[1]}</ArtistName>
@@ -78,29 +72,31 @@ export default class TopArtists extends React.Component {
     }
   }
 
-  createHeader() {
-    if (this.props.topArtists.length > 1) {
+  const createHeader = () => {
+    if (props.topArtists.length > 1) {
       return <Heading>Here are your top artists in common:</Heading>
-    } else if (this.props.topArtists.length > 0) {
+    } else if (props.topArtists.length > 0) {
       return <Heading>Here is your top artist in common:</Heading>
     } else {
       return <div></div>
     }
   }
 
-  render() {
-    if (this.props.duplicateArtists.length > 5) {
+  const render = () => {
+    if (props.duplicateArtists.length > 5) {
       return(
         <MainContainer>
-          {this.createHeader()}
+          {createHeader()}
           <CardContainer>
-            {this.formatCard()}
+            {formatCard()}
           </CardContainer>
-          <ArtistsTable duplicateArtists={this.props.duplicateArtists} duplicateSongs={this.props.duplicateSongs}/>
+          <ArtistsTable duplicateArtists={props.duplicateArtists} duplicateSongs={props.duplicateSongs}/>
         </MainContainer>
       )
     } else {
       return <div></div>
     }
   }
+
+  return render()
 }
