@@ -17,15 +17,11 @@ const ResetText = styled.p`
   font-weight: 600;
 `;
 
-class Reset extends React.Component {
-  render () {
-    return(
-      <ResetContainer onClick={this.props.function}>
-        <ReplayIcon/>
-        <ResetText>Reset</ResetText>
-      </ResetContainer>
-    )
-  }
+export default function Reset(props) {
+  return(
+    <ResetContainer onClick={props.function}>
+      <ReplayIcon/>
+      <ResetText>Reset</ResetText>
+    </ResetContainer>
+  )
 }
-
-export default Reset;
