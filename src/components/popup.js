@@ -73,7 +73,7 @@ export default function Popup(props) {
   return (  
     <MainPageDarken>
       <PopupContainer>
-        <CloseIcon onClick={props.closePopup}/>
+        <CloseIcon onClick={() => props.closePopup(false)}/>
         <Heading>How to find a Spotify username:</Heading>
         <PopupBodyContainer>                
           <Img src="/howto.gif" />        

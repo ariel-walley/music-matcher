@@ -1,12 +1,12 @@
 import React from 'react';
 import MainHeader from './components/header';
+import StartPage from './startPage';
 import LoadingPage from './components/loadingPage';
 import DisplaySongs from './components/displaySongs';
 import TopArtists from './components/topArtists';
 import QueryString from 'querystring';
 import _ from 'lodash';
-import styled, { keyframes } from 'styled-components';
-import Popup from './components/popup';
+import styled from 'styled-components';
 import GlobalStyle from './styles/globalStyles';
 import { connect } from 'react-redux';
 import { 
@@ -34,16 +34,6 @@ const Gradient = styled.div`
   z-index: -1;
 `;
 
-const fadeIn = keyframes`
-  0% {
-    opacity: 0;
-  }
-
-  100% {
-    opacity: 1
-  }
-`;
-
 // Styles for body
 const Body = styled.div`
   height: calc(100% - 57px);
@@ -59,86 +49,6 @@ const Body2 = styled(Body)`
   flex-wrap: wrap;
 `;
 
-// Styles for username input on start page
-const UserInputContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-items: center;
-  transition: color 5s;
-`;
-
-const InputLabels = styled.label`
-  margin: 10px;
-  font-weight: 600;
-  font-size: 20px;
-  text-align: center;
-`;
-
-const InputLabels2 = styled(InputLabels)`
-  transition: color 5s;
-  animation: 0.4s ${fadeIn} ease-out;
-`;
-
-const InputDiv = styled.div`
-  margin: 0 auto;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-items: center;
-`;
-
-const InputField = styled.input`
-  margin: 20px;
-  border: 0;
-  height: 35px;
-  width: 250px;
-  border-radius: 5px;
-  font-family: "Roboto", Arial, sans-serif;
-`;
-
-const InputField2 = styled(InputField)`
-  animation: 0.4s ${fadeIn} ease-out;
-`;
-
-const Tutorial = styled.button`
-  margin: -2px auto 7px auto;
-  padding: 3px;
-  width: 550px;
-  cursor: pointer;
-  background-color: rgba(0,0,0,0);
-  border-style: none;
-  outline-style: none;
-  font-family: "Roboto", Arial, sans-serif;
-  font-size: 15px; 
-  transition: color 5s;
-`;
-
-const SubmitButton = styled.button`
-  margin: 10px auto;
-  width: 70px;
-  padding: 7px;
-  border: 0;
-  border-radius: 5px;
-  background-color: white;
-  text-align: center;
-  font-family: "Roboto", Arial, sans-serif;
-  font-size: 16px;
-  animation: 0.4s ${fadeIn} ease-out;
-`;
-
-// Styles for error
-const Error = styled.p`
-  margin: 0 auto;
-  max-width: 350px;
-  background-color: red;
-  border-radius: 5px;
-  padding: 5px;
-  text-align: center;
-  font-family: "Roboto", Arial, sans-serif;
-`;
-
 class Home extends React.Component {
     constructor(props) {
         super(props);
@@ -151,11 +61,9 @@ class Home extends React.Component {
           ErrorNoPublicPlaylists: false,
           ErrorNoPublicInfo: '',
           mainUsername: '',
-          showPopup: false,
           status: 'start',
           status2: '',
           topArtists: [],
-          userDisplay: false,
           usernames: {},
           users: {
             mainUsername: ''
@@ -163,14 +71,7 @@ class Home extends React.Component {
         };
 
         this.getAccessToken = this.getAccessToken.bind(this);
-        this.handleChangeMainUsername = this.handleChangeMainUsername.bind(this);
-        this.displayPopup = this.displayPopup.bind(this);
-        this.togglePopup = this.togglePopup.bind(this);
-        this.displayOtherUsers = this.displayOtherUsers.bind(this);
-        this.handleChangeOtherUsername = this.handleChangeOtherUsername.bind(this);
         this.verifyUsernames = this.verifyUsernames.bind(this);
-        this.displayError = this.displayError.bind(this);
-        this.handleEnter = this.handleEnter.bind(this);  
         this.submitUsernames = this.submitUsernames.bind(this);
         this.getUserPlaylists = this.getUserPlaylists.bind(this);
         this.startSongs = this.startSongs.bind(this);
@@ -212,56 +113,7 @@ class Home extends React.Component {
       })
     }
 
-    /*    Handle user ID input, the input display, and verifying usernames    */
-    handleChangeMainUsername(input) { // Set state with main username input and decide whether to other other users' block
-      this.setState(() => ({
-        userDisplay: (input.length > 2 || this.state.userDisplay) ? true : false, 
-        users: {
-          ...this.state.users,
-          mainUsername: input
-        }
-      }));
-    } 
-
-    displayPopup() {
-      if (this.state.showPopup) {
-        return <Popup closePopup={this.togglePopup}/>
-      }
-    }
-
-    togglePopup() {
-      this.setState({
-        showPopup: !this.state.showPopup
-      })
-    }
-
-    displayOtherUsers() { // Display block for other users' inputs
-      if (this.state.userDisplay === true) {
-        return (
-          <UserInputContainer>       
-            <InputLabels2>Enter up to three other Spotify usernames to compare your music picks:</InputLabels2>
-            <InputDiv>
-              <InputField2 type="text" id="username0" onChange={this.handleChangeOtherUsername} onKeyDown={this.handleEnter}/>
-              <InputField2 type="text" id="username1" onChange={this.handleChangeOtherUsername} onKeyDown={this.handleEnter}/>
-              <InputField2 type="text" id="username2" onChange={this.handleChangeOtherUsername} onKeyDown={this.handleEnter}/>
-            </InputDiv>
-            <SubmitButton type="submit" onClick={this.submitUsernames}>Submit</SubmitButton>
-          </UserInputContainer>
-        )  
-      }
-    }
-
-    handleChangeOtherUsername(event) { // Set state with username input for other users
-      let id = event.target.id;
-      let value = event.target.value;
-      this.setState(() => ({
-        users: {
-          ...this.state.users, 
-          [id]: value
-        }
-      }));
-    }
-
+    /*    Handle verifying usernames    */
     async verifyUsernames() { // Request display names from API and verify username input
       let userIDs = Object.values(this.state.users); 
       
@@ -330,30 +182,9 @@ class Home extends React.Component {
       }
     }
 
-    displayError() { // Display error is username is invalid
-      if (this.state.ErrorNoMain) {
-        return <Error>Please make sure to list your username or a main username.</Error>
-      } else if (this.state.ErrorMinUsers) {
-        return <Error>Please enter at least two usernames.</Error>
-      } else if (this.state.ErrorInvalidID) {
-        return <Error>Please enter a valid username.</Error>
-      } else if (this.state.ErrorNoPublicPlaylists) {
-        return <Error>Uh oh! One of the users (username: {this.state.ErrorNoPublicInfo}) doesn't have any public playlists so we can't compare your playlists. Please remove their username and try again.</Error>
-      }
-    }
-
-    handleEnter(event) {  // Submit user input if 'Enter' key is pressed   
-      if (event.key !== undefined) {
-        if (event.key === 'Enter') {this.submitUsernames()}
-      } else if (event.keyCode !== undefined) {
-        if (event.keyCode === 13) {this.submitUsernames()};
-      }
-    }
-
-    /*    Requesting user data and identifying duplicates    */
     async submitUsernames() {  /* CORE FUNCTION */
      
-      this.setState((state, props) => ({ // Reset errors from last submission
+      this.setState((state, props) => ({ // Reset s from last submission
         ...this.state,
         ErrorMinUsers: false,
         ErrorNoMain: false,
@@ -366,7 +197,7 @@ class Home extends React.Component {
       await this.verifyUsernames(); 
 
       if (!this.state.ErrorMinUsers && !this.state.ErrorNoMain && !this.state.ErrorInvalidID) {
-        this.props.setMainUser(this.state.mainUsername);
+        this.props(this.state.mainUsername);
         this.props.setUsers(this.state.usernames);  
         let users = Object.keys(this.props.usernames);      
 
@@ -636,48 +467,29 @@ class Home extends React.Component {
     /*    Reset functions    */
     async reset() {
       this.setState({
+        duplicateArtists: [],
+        duplicateSongs: [],
         ErrorMinUsers: false,
         ErrorNoMain: false,
         ErrorInvalidID: false,
         ErrorNoPublicPlaylists: false,
         ErrorNoPublicInfo: '',
         mainUsername: "",
-        showPopup: false,
-        userDisplay: false,
+        status: 'start', 
+        status2: '', 
+        topArtists: [],
         usernames: {},
         users: {}
       })
 
-      this.props.setMainUser("");
-      this.props.setUsers({ });
-      this.setState({
-        duplicateArtists: [],
-        duplicateSongs: [],
-        status: 'start', 
-        status2: '', 
-        topArtists: [] 
-      });
+      this.props.setMainUser('');
+      this.props.setUsers({});
     }
 
     /*    Render    */
     renderContent() {
       if (this.state.status === "start") {
-        return (
-          <UserInputContainer> 
-            <InputLabels htmlFor="your_username" >Enter your Spotify username here:</InputLabels>
-            <Tutorial onClick={this.togglePopup}>Not sure how to find a Spotify username? <span>Click here for help!</span></Tutorial>
-            <InputDiv>
-              <InputField 
-                type="text" 
-                id="your_username" 
-                onChange={e => this.handleChangeMainUsername(e.target.value)}
-              />
-            </InputDiv>
-            {this.displayOtherUsers()}
-            {this.displayError()}
-            {this.displayPopup()}
-          </UserInputContainer>
-        ) 
+        return <StartPage/>
       } else if (this.state.status === "loading") {
         return <LoadingPage status2={this.state.status2}/>
       } else if (this.state.status === "data set") {
