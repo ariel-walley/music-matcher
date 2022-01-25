@@ -14,7 +14,6 @@
   "dependencies": {
     "@material-ui/core": "^4.11.0",
     "@material-ui/icons": "^4.9.1",
-    "@reduxjs/toolkit": "^1.4.0",
     "@styled-icons/ionicons-outline": "^10.14.1",
     "@styled-icons/ionicons-sharp": "^10.14.1",
     "@testing-library/jest-dom": "^4.2.4",
@@ -26,7 +25,6 @@
     "react": "^16.13.1",
     "react-data-grid": "^7.0.0-canary.18",
     "react-dom": "^16.13.1",
-    "react-redux": "^7.2.1",
     "react-router-dom": "^5.2.0",
     "react-scripts": "^3.4.4",
     "react-transition-group": "^4.4.1",

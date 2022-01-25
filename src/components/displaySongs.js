@@ -2,7 +2,6 @@ import React from 'react';
 import styled, { keyframes } from 'styled-components';
 import _ from 'lodash';
 import Reset from './reset';
-import { connect } from 'react-redux';
 
 const fadeIn = keyframes`
   0% {
@@ -138,12 +137,3 @@ function DisplaySongs(props) {
 
   return render();
 }
-
-function mapStateToProps(state) {
-  return {
-    mainUsername: state.mainUsername,
-    usernames: state.usernames
-  };
-}
-
-export default connect(mapStateToProps)(DisplaySongs);

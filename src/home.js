@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState} from 'react';
 import MainHeader from './components/header';
 import StartPage from './startPage';
 import LoadingPage from './components/loadingPage';
@@ -8,11 +8,6 @@ import QueryString from 'querystring';
 import _ from 'lodash';
 import styled from 'styled-components';
 import GlobalStyle from './styles/globalStyles';
-import { connect } from 'react-redux';
-import { 
-  setMainUser,
-  setUsers
-} from './redux/actions';
 
 // Styles for gradient background
 const GradientWrapper = styled.div`
@@ -49,7 +44,89 @@ const Body2 = styled(Body)`
   flex-wrap: wrap;
 `;
 
-class Home extends React.Component {
+export default function Home() {
+  const [errors, toggleErrors] = useState({
+    NotMinUsers: false,
+    NoMainUser: false,
+    InvalidID: false,
+    InvalidIDInfo: '',
+    NoPublicPlaylists: false,
+    NoPublicInfo: ''
+  })
+  const [mainUsername, setMainUsername] = useState('');
+  const [usernames, setUsernames] = useState({});
+  const [status, setState] = useState('start');
+  const [status2, setStatus2] = useState('');
+
+  useEffect(() => {
+    const fetchAccessToken = async() => {
+      let body = {
+        'grant_type': 'client_credentials'
+      }
+      await fetch('https://accounts.spotify.com/api/token', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'Authorization': 'Basic ' + window.btoa(process.env.REACT_APP_CLIENT_ID + ':' + process.env.REACT_APP_SECRET_KEY)
+        },
+        body: QueryString.stringify(body)
+      }).then((data) => {
+        return data.json();
+      }).then((data) => {
+        localStorage.setItem('accessToken', data.access_token);
+      }).catch((err) => {
+        console.log(err);
+      })
+    }
+
+    fetchAccessToken();
+  }, [])
+
+  /*    Render    */
+  const renderContent = () => {
+    if (status === "start") {
+      const errorsState = { errors, toggleErrors};
+      const mainUsernameState = { mainUsername, setMainUsername };
+      const usernamesState = { usernames, setUsernames };
+    
+      return <StartPage 
+        /* fetchRetry={fetchRetry} */
+        errorsState={errorsState}
+        mainUsernameState={mainUsernameState}
+        usernamesState={usernamesState}
+      />
+    } else {
+      return <LoadingPage status2={status2}/>
+    /*} else if (status === "data set") { 
+      return (
+        <Body2>
+          <DisplaySongs function={this.reset} status={status} duplicateSongs={this.state.duplicateSongs}/>
+          <TopArtists 
+            status={status} 
+            duplicateArtists={this.state.duplicateArtists} 
+            duplicateSongs={this.state.duplicateSongs} 
+            topArtists={this.state.topArtists}
+          />
+        </Body2>
+      ) */
+    } 
+  };
+
+  return (
+    <GradientWrapper>
+      <GlobalStyle/>
+      <MainHeader /* function={reset}*//>
+      <Gradient color="linear-gradient(to bottom right, #00ff33, #13a9bb)" status={status === "start"}/>
+      <Gradient color="linear-gradient(to bottom right, #13a9bb, #7d00aa)" status={status === "loading"}/>
+      <Gradient color="linear-gradient(to bottom right, #7d00aa, #fa3378)" status={status === "data set"}/>
+      <Body>
+        {renderContent()}
+      </Body>
+    </GradientWrapper>
+  )
+}
+
+class Home2 extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -70,8 +147,6 @@ class Home extends React.Component {
           }                   
         };
 
-        this.getAccessToken = this.getAccessToken.bind(this);
-        this.verifyUsernames = this.verifyUsernames.bind(this);
         this.submitUsernames = this.submitUsernames.bind(this);
         this.getUserPlaylists = this.getUserPlaylists.bind(this);
         this.startSongs = this.startSongs.bind(this);
@@ -86,105 +161,9 @@ class Home extends React.Component {
         this.renderContent = this.renderContent.bind(this);
     }
 
-    /*    Requesting access token    */
-
-    async componentDidMount() {
-      await this.getAccessToken();
-    }
-
-    async getAccessToken() {
-      let body = {
-        'grant_type': 'client_credentials'
-      }
-      
-      await fetch('https://accounts.spotify.com/api/token', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-          'Authorization': 'Basic ' + window.btoa(process.env.REACT_APP_CLIENT_ID + ':' + process.env.REACT_APP_SECRET_KEY)
-        },
-        body: QueryString.stringify(body)
-      }).then((data) => {
-        return data.json();
-      }).then((data) => {
-        localStorage.setItem('accessToken', data.access_token);
-      }).catch((err) => {
-        console.log(err);
-      })
-    }
-
-    /*    Handle verifying usernames    */
-    async verifyUsernames() { // Request display names from API and verify username input
-      let userIDs = Object.values(this.state.users); 
-      
-      let users = []; // Trim white space in input fields and eliminate null or empty options
-      for (let user of userIDs) { 
-        let trimmedUser = user.trim();
-        if (trimmedUser !== "" && trimmedUser !== null) {
-          if (trimmedUser.search("spotify:user:") > -1 ) {
-            trimmedUser = trimmedUser.slice(13);
-          }
-          users.push(trimmedUser);
-        }
-      }
-
-      if (users.length < 2) {
-        this.setState({
-          ErrorMinUsers: true
-        })      
-        return
-      }
-
-      let mainUsername = this.state.users.mainUsername // Identify the main user
-      
-      if (mainUsername === "" || mainUsername === null) { // Check if a main user is listed
-        this.setState({
-          ErrorNoMain: true
-        })
-        return
-      }
-
-      if (mainUsername.search("spotify:user:") > -1 ) {
-        mainUsername = mainUsername.slice(13);
-      }
-
-      this.setState({
-          mainUsername: mainUsername
-      })  
-
-
-      for (let user of users) { // Fetch request for display names/user verification
-        let url = `https://api.spotify.com/v1/users/${user}`
-        let response = await fetch(url, {
-          headers: {
-            'Authorization': 'Bearer ' + localStorage.getItem('accessToken')
-          },
-        });
-        let data = await response.json();
-
-        if (Object.keys(data)[0] === "error" && data.error.status === 404) { // Check that users are valid
-          this.setState({
-            ErrorInvalidID: true
-          })
-          return
-        } 
-        
-        while (Object.keys(data)[0] === "error" && data.error.status === 429) { // Handle rate limiting
-          data = await this.fetchRetry(response, url);
-        }
-
-        this.setState({
-          usernames: {
-            ...this.state.usernames,
-            [user]: data.display_name
-          }
-        })          
-      }
-    }
-
     async submitUsernames() {  /* CORE FUNCTION */
      
-      this.setState((state, props) => ({ // Reset s from last submission
+      this.setState((state, props) => ({ // Resets from last submission
         ...this.state,
         ErrorMinUsers: false,
         ErrorNoMain: false,
@@ -194,7 +173,7 @@ class Home extends React.Component {
         usernames: {}
       }))
 
-      await this.verifyUsernames(); 
+      //await this.verifyUsernames(); 
 
       if (!this.state.ErrorMinUsers && !this.state.ErrorNoMain && !this.state.ErrorInvalidID) {
         this.props(this.state.mainUsername);
@@ -485,49 +464,4 @@ class Home extends React.Component {
       this.props.setMainUser('');
       this.props.setUsers({});
     }
-
-    /*    Render    */
-    renderContent() {
-      if (this.state.status === "start") {
-        return <StartPage/>
-      } else if (this.state.status === "loading") {
-        return <LoadingPage status2={this.state.status2}/>
-      } else if (this.state.status === "data set") {
-        return (
-          <Body2>
-            <DisplaySongs function={this.reset} status={this.state.status} duplicateSongs={this.state.duplicateSongs}/>
-            <TopArtists status={this.state.status} duplicateArtists={this.state.duplicateArtists} duplicateSongs={this.state.duplicateSongs} topArtists={this.state.topArtists}/>
-          </Body2>
-        )
-      }
-    };
-    
-    render () {
-      return (
-        <GradientWrapper>
-          <GlobalStyle/>
-          <MainHeader function={this.reset}/>
-          <Gradient color="linear-gradient(to bottom right, #00ff33, #13a9bb)" status={this.state.status === "start"}/>
-          <Gradient color="linear-gradient(to bottom right, #13a9bb, #7d00aa)" status={this.state.status === "loading"}/>
-          <Gradient color="linear-gradient(to bottom right, #7d00aa, #fa3378)" status={this.state.status === "data set"}/>
-          <Body>
-            {this.renderContent()}
-          </Body>
-        </GradientWrapper>
-      );
-    }
 };
-
-function mapStateToProps(state) {
-  return {
-    mainUsername: state.mainUsername,
-    usernames: state.usernames
-  };
-}
-
-const mapDispatchToProps = {
-  setMainUser,
-  setUsers
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(Home);

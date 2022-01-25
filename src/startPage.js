@@ -93,19 +93,9 @@ const SubmitButton = styled.button`
 export default function StartPage(props) {
   const [showPopup, togglePopup] = useState(false);
   const [userDisplay, toggleOtherUsers] = useState(false);
-  const [errors, toggleErrors] = useState({
-    NotMinUsers: false,
-    NoMainUser: false,
-    InvalidID: false,
-    InvalidIDInfo: '',
-    NoPublicPlaylists: false,
-    NoPublicInfo: ''
-  })
-  const [userInputs, updateUserInputs] = useState({ // These are just the inputs; usernames (below) are the cleaned-up usernames
+  const [userInputs, updateUserInputs] = useState({
     mainUsername: ''
   })
-  const [mainUsername, setMainUsername] = useState('');
-  const [usernames, setUsernames] = useState({});
 
   const displayPopup = () => {
     if (showPopup) {
@@ -113,18 +103,20 @@ export default function StartPage(props) {
     }
   }
 
-  const handleChangeMainUsername = (input) => { // Set state with main username input and decide whether to display other users' inputs
+  // Set state with main username input and decide whether to display other users' inputs
+  const handleChangeMainUsername = (input) => { 
     toggleOtherUsers((input.length > 2 || userDisplay) ? true : false);
     updateUserInputs({...userInputs, mainUsername: input});
   } 
 
-  const handleChangeOtherUsername = (event) => { // Set state with username input for other users
+  // Set state with username input for other users
+  const handleChangeOtherUsername = (event) => { 
     let id = event.target.id;
     let value = event.target.value;
     updateUserInputs({...userInputs, [id]: value})
   }
 
-  const handleEnter = (event) => {  // Submit user input if 'Enter' key is pressed   
+  const handleEnter = (event) => { 
     if (event.key !== undefined) {
       if (event.key === 'Enter') {submitInputs()}
     } else if (event.keyCode !== undefined) {
@@ -132,7 +124,8 @@ export default function StartPage(props) {
     }
   }
 
-  const displayOtherUsers = () => { // Display block for other users' inputs
+  // Conditional rendering of the display block with other users' inputs
+  const displayOtherUsers = () => { 
     if (userDisplay) {
       return (
         <UserInputContainer>       
@@ -148,19 +141,19 @@ export default function StartPage(props) {
     }
   }
 
-  const displayError = () => { // Display error is username is invalid
-    if (errors.NoMainUser) {
+  const displayError = () => {
+    if (props.errorsState.errors.NoMainUser) {
       return <Error>Please make sure to list your username or a main username.</Error>
-    } else if (errors.NotMinUsers) {
+    } else if (props.errorsState.errors.NotMinUsers) {
       return <Error>Please enter at least two usernames.</Error>
-    } else if (errors.InvalidID) {
-      return <Error>{errors.InvalidIDInfo} is not a valid username. Please try again.</Error>
-    } else if (errors.NoPublicPlaylists) {
-      return <Error>Uh oh! One of the users (username: {errors.ErrorNoPublicInfo}) doesn't have any public playlists so we can't compare your playlists. Please remove their username and try again.</Error>
+    } else if (props.errorsState.errors.InvalidID) {
+      return <Error>{props.errorsState.errors.InvalidIDInfo} is not a valid username. Please try again.</Error>
+    } else if (props.errorsState.errors.NoPublicPlaylists) {
+      return <Error>Uh oh! One of the users (username: {props.errorsState.errors.NoPublicInfo}) doesn't have any public playlists so we can't compare your playlists. Please remove their username and try again.</Error>
     }
   }
 
-  const verifyUsernames = async () => { // Request display names from API and verify username input  
+  const verifyUsernames = async () => { 
 
     // Trim white space in input fields and eliminate null or empty options
     let trimmedUsers = Object.values(userInputs).map((user) => { 
@@ -169,20 +162,20 @@ export default function StartPage(props) {
         if (trimmedUser.search("spotify:user:") > -1 ) {
           trimmedUser = trimmedUser.slice(13);
         }
-        if (user === userInputs.mainUsername) { setMainUsername(trimmedUser)};
+        if (user === userInputs.mainUsername) { props.mainUsernameState.setMainUsername(trimmedUser) };
         return trimmedUser;
       }
     }).filter(Boolean); // Remove undefined values (i.e., empty inputs that were not returned to .map)
 
     // Check there are two users at minimum
     if (trimmedUsers.length < 2) { 
-      toggleErrors({...errors, NotMinUsers: true})   
+      props.errorsState.toggleErrors({...props.errorsState.errors, NotMinUsers: true})   
       return
     }
     
     // Check if a main user is listed
     if (userInputs.mainUsername === "" || userInputs.mainUsername === null) { 
-      toggleErrors({...errors, NoMainUser: true})
+      props.errorsState.toggleErrors({...props.errorsState.errors, NoMainUser: true})
       return
     }
 
@@ -190,8 +183,6 @@ export default function StartPage(props) {
     let newUsernames = {};
 
     for (let user of trimmedUsers) { 
-      const mainUserCheck = (user === 'mainUsername');
-
       let url = `https://api.spotify.com/v1/users/${user}`
       let response = await fetch(url, {
         headers: {
@@ -202,28 +193,26 @@ export default function StartPage(props) {
 
       // Check that users are valid
       if (Object.keys(data)[0] === "error" && data.error.status === 404) { 
-        toggleErrors({...errors, InvalidID: true, InvalidIDInfo: user})   
+        props.errorsState.toggleErrors({...props.errorsState.errors, InvalidID: true, InvalidIDInfo: user})   
         return
       } 
       
       // Handle rate limiting
       while (Object.keys(data)[0] === "error" && data.error.status === 429) { 
-        data = await this.fetchRetry(response, url);
+        data = await props.fetchRetry(response, url);
       }
 
       // Update state
       newUsernames[user] = data.display_name;
     }
-    setUsernames(newUsernames);
+    props.usernamesState.setUsernames(newUsernames);
   }
 
   const submitInputs = () => {
-    console.log('SUBMITTED!');
-
     // Resetting any info from previous submits
-    setMainUsername('');
-    setUsernames({});
-    toggleErrors({ 
+    props.mainUsernameState.setMainUsername('');
+    props.usernamesState.setUsernames({});
+    props.errorsState.toggleErrors({ 
       NotMinUsers: false,
       NoMainUser: false,
       InvalidID: false,
@@ -233,7 +222,6 @@ export default function StartPage(props) {
     });
     
     verifyUsernames();
-//  submitUsernames();
   }
 
   return (
