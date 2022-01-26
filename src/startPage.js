@@ -149,11 +149,42 @@ export default function StartPage(props) {
     } else if (props.errorsState.errors.InvalidID) {
       return <Error>{props.errorsState.errors.InvalidIDInfo} is not a valid username. Please try again.</Error>
     } else if (props.errorsState.errors.NoPublicPlaylists) {
-      return <Error>Uh oh! One of the users (username: {props.errorsState.errors.NoPublicInfo}) doesn't have any public playlists so we can't compare your playlists. Please remove their username and try again.</Error>
+      return <Error>Uh oh! One of the users ({props.errorsState.errors.NoPublicInfo}) doesn't have any public playlists so we can't compare your playlists. Please remove their username and try again.</Error>
     }
   }
 
-  const verifyUsernames = async () => { 
+  const verifyUsernames = async (trimmedUsers) => {
+    let newUsernames = {};
+
+    for (let user of trimmedUsers) { 
+      let url = `https://api.spotify.com/v1/users/${user}`
+      let response = await fetch(url, {
+        headers: {
+          'Authorization': 'Bearer ' + localStorage.getItem('accessToken')
+        },
+      });
+      let data = await response.json();
+
+      // Check that users are valid
+      if (Object.keys(data)[0] === "error" && data.error.status === 404) {
+        props.errorsState.toggleErrors({...props.errorsState.errors, InvalidID: true, InvalidIDInfo: user})
+        return
+      } 
+      
+      // Handle rate limiting
+      while (Object.keys(data)[0] === "error" && data.error.status === 429) {
+        data = await props.fetchRetry(response.headers, url);
+      }
+
+      // Update state
+      newUsernames[user] = data.display_name;
+    }
+    props.usernamesState.setUsernames(newUsernames);
+  }
+
+  const submitInputs = async () => {
+    // Resetting any info from previous submits
+    props.reset(); 
 
     // Trim white space in input fields and eliminate null or empty options
     let trimmedUsers = Object.values(userInputs).map((user) => { 
@@ -180,48 +211,10 @@ export default function StartPage(props) {
     }
 
     // Fetch request for display names/user verification
-    let newUsernames = {};
+    await verifyUsernames(trimmedUsers);
 
-    for (let user of trimmedUsers) { 
-      let url = `https://api.spotify.com/v1/users/${user}`
-      let response = await fetch(url, {
-        headers: {
-          'Authorization': 'Bearer ' + localStorage.getItem('accessToken')
-        },
-      });
-      let data = await response.json();
-
-      // Check that users are valid
-      if (Object.keys(data)[0] === "error" && data.error.status === 404) { 
-        props.errorsState.toggleErrors({...props.errorsState.errors, InvalidID: true, InvalidIDInfo: user})   
-        return
-      } 
-      
-      // Handle rate limiting
-      while (Object.keys(data)[0] === "error" && data.error.status === 429) { 
-        data = await props.fetchRetry(response, url);
-      }
-
-      // Update state
-      newUsernames[user] = data.display_name;
-    }
-    props.usernamesState.setUsernames(newUsernames);
-  }
-
-  const submitInputs = () => {
-    // Resetting any info from previous submits
-    props.mainUsernameState.setMainUsername('');
-    props.usernamesState.setUsernames({});
-    props.errorsState.toggleErrors({ 
-      NotMinUsers: false,
-      NoMainUser: false,
-      InvalidID: false,
-      InvalidIDInfo: '',
-      NoPublicPlaylists: false,
-      NoPublicInfo: ''
-    });
-    
-    verifyUsernames();
+    // Update the app status in home.js
+    props.setStatus('fetchPlaylists');
   }
 
   return (

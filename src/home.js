@@ -55,8 +55,11 @@ export default function Home() {
   })
   const [mainUsername, setMainUsername] = useState('');
   const [usernames, setUsernames] = useState({});
-  const [status, setState] = useState('start');
+  const [status, setStatus] = useState('start');
   const [status2, setStatus2] = useState('');
+  const [duplicateArtists, setDuplicateArtists] = useState([]);
+  const [duplicateSongs, setDuplicateSongs] = useState([]);
+  const [topArtists, setTopArtists] = useState([]);
 
   useEffect(() => {
     const fetchAccessToken = async() => {
@@ -82,18 +85,92 @@ export default function Home() {
     fetchAccessToken();
   }, [])
 
+  useEffect(() => {
+    fetchPlaylists();
+  }, [status]);
+
+  /* Rate Limiting Functions */
+
+  const retryDelay = (waitTime) => {
+    return new Promise(resolve => setTimeout(resolve, waitTime));
+  }
+  
+  const fetchRetry = async(headers, url) => {
+    let data;
+    let newResponse;
+
+    for (var pair of headers.entries()) {
+      if (pair[0] === "retry-after") {
+        const waitTime = pair[1];
+        await retryDelay(waitTime);
+
+        newResponse = await fetch(url, {
+          headers: {
+            'Authorization': 'Bearer ' + localStorage.getItem('accessToken')
+          },
+        });
+
+        data = await newResponse.json();
+      }   
+    }
+    return data;
+  }
+
+  /* API Requests */
+
+  const fetchPlaylists = async () => {
+    if (status === 'fetchPlaylists') {
+      let userDataObject = {}
+
+      // Fetch users' playlist IDs
+      for (const user of Object.keys(usernames)) {
+        let playlistIDs = [];
+        let next = `https://api.spotify.com/v1/users/${user}/playlists?limit=50`;
+        while(next != null) {
+          let response = await fetch(next, {
+            headers: {
+              'Authorization': 'Bearer ' + localStorage.getItem('accessToken')
+            },
+          });
+
+          let data = await response.json();
+
+          // Handle rate limiting
+          while (Object.keys(data)[0] === "error" && data.error.status === 429) { 
+            data = await fetchRetry(response.headers, next);
+          }
+
+          // Checking for users with no public playlists
+          if (data.total === 0) {
+            toggleErrors({...errors, NoPublicPlaylists: true, NoPublicInfo: [...errors.NoPublicInfo, user]}); 
+            return
+          } else { // Creating an array with all of their playlists IDs
+            let playlistsChunk = data.items.map(playlist => { return playlist.id });
+            playlistIDs.push(...playlistsChunk);
+            next = data.next;
+          }
+        } 
+        userDataObject[user] = (playlistIDs);
+      }
+
+      setStatus('loading');
+    }
+  }
+    
   /*    Render    */
   const renderContent = () => {
-    if (status === "start") {
+    if (status === "start" || status === 'fetchPlaylists') {
       const errorsState = { errors, toggleErrors};
       const mainUsernameState = { mainUsername, setMainUsername };
       const usernamesState = { usernames, setUsernames };
     
       return <StartPage 
-        /* fetchRetry={fetchRetry} */
+        fetchRetry={fetchRetry}
         errorsState={errorsState}
         mainUsernameState={mainUsernameState}
         usernamesState={usernamesState}
+        setStatus={setStatus}
+        reset={reset}
       />
     } else {
       return <LoadingPage status2={status2}/>
@@ -112,11 +189,29 @@ export default function Home() {
     } 
   };
 
+  const reset = () => {
+    toggleErrors({
+      NotMinUsers: false,
+      NoMainUser: false,
+      InvalidID: false,
+      InvalidIDInfo: '',
+      NoPublicPlaylists: false,
+      NoPublicInfo: ''
+    })
+    setMainUsername('');
+    setUsernames({});
+    setStatus('start');
+    setStatus2('');
+    setDuplicateArtists([]);
+    setDuplicateSongs([]);
+    setTopArtists([]);
+  }
+
   return (
     <GradientWrapper>
       <GlobalStyle/>
-      <MainHeader /* function={reset}*//>
-      <Gradient color="linear-gradient(to bottom right, #00ff33, #13a9bb)" status={status === "start"}/>
+      <MainHeader function={reset}/>
+      <Gradient color="linear-gradient(to bottom right, #00ff33, #13a9bb)" status={status === "start" || status === 'fetchPlaylists'}/>
       <Gradient color="linear-gradient(to bottom right, #13a9bb, #7d00aa)" status={status === "loading"}/>
       <Gradient color="linear-gradient(to bottom right, #7d00aa, #fa3378)" status={status === "data set"}/>
       <Body>
@@ -147,99 +242,13 @@ class Home2 extends React.Component {
           }                   
         };
 
-        this.submitUsernames = this.submitUsernames.bind(this);
-        this.getUserPlaylists = this.getUserPlaylists.bind(this);
         this.startSongs = this.startSongs.bind(this);
         this.fetchSongs = this.fetchSongs.bind(this);
         this.findDuplicateSongs = this.findDuplicateSongs.bind(this);
         this.getDuplicatesInfo = this.getDuplicatesInfo.bind(this);
         this.findTopArtists = this.findTopArtists.bind(this);
         this.getArtistArt = this.getArtistArt.bind(this);
-        this.fetchRetry = this.fetchRetry.bind(this);
-        this.retryDelay = this.retryDelay.bind(this);
-        this.reset = this.reset.bind(this);
         this.renderContent = this.renderContent.bind(this);
-    }
-
-    async submitUsernames() {  /* CORE FUNCTION */
-     
-      this.setState((state, props) => ({ // Resets from last submission
-        ...this.state,
-        ErrorMinUsers: false,
-        ErrorNoMain: false,
-        ErrorInvalidID: false,
-        ErrorNoPublicPlaylists: false,
-        ErrorNoPublicInfo: '',
-        usernames: {}
-      }))
-
-      //await this.verifyUsernames(); 
-
-      if (!this.state.ErrorMinUsers && !this.state.ErrorNoMain && !this.state.ErrorInvalidID) {
-        this.props(this.state.mainUsername);
-        this.props.setUsers(this.state.usernames);  
-        let users = Object.keys(this.props.usernames);      
-
-        let userDataObject = {}
-
-        for (let user of users) { // Fetch users' playlist IDs
-          
-          if (this.state.ErrorNoPublicPlaylists) {
-            return
-          } else {
-            let userPlaylists = await this.getUserPlaylists(user);
-            userDataObject[user] = (userPlaylists);
-          }
-        }
-      
-        if (this.state.ErrorNoPublicPlaylists) { // Check all users have a public playlist
-          return
-        } else {
-          this.setState({ status: 'loading'});
-        }
-
-        for (let user of Object.keys(userDataObject)) { // Fetch the songs for each playlist
-          this.setState({status2: 'Requesting songs for ' + this.state.usernames[user] + '...'});
-
-          let userSongs = await this.startSongs(userDataObject[user]);
-          let uniqUserSongs = _.uniq(userSongs); // In case a user has the same song on multiple playlists, preventing false duplicates
-          userDataObject[user] = (uniqUserSongs);
-        }
-
-        await this.findDuplicateSongs(userDataObject); // Find duplicate songs and top artists
-
-      } 
-    }
-
-    async getUserPlaylists(user) { // Requests user's playlists IDs
-      let playlists = [];
-      let next = `https://api.spotify.com/v1/users/${user}/playlists?limit=50`;
-      while(next != null) {
-        let response = await fetch(next, {
-          headers: {
-            'Authorization': 'Bearer ' + localStorage.getItem('accessToken')
-          },
-        });
-
-        let data = await response.json();
-
-        while (Object.keys(data)[0] === "error" && data.error.status === 429) { // Handle rate limiting
-          data = await this.fetchRetry(response, next);
-        }
-
-        if (data.total === 0) { // If a user has no public playlists to compare, set an error in state
-          this.setState({
-            ErrorNoPublicPlaylists: true,
-            ErrorNoPublicInfo: user
-          })
-          return
-        } else { // If a user does have public playlists, create an array with all of their playlists IDs
-          let playlistsChunk = data.items.map(playlist => { return playlist.id });
-          playlists.push(...playlistsChunk);
-          next = data.next;
-        }
-      } 
-      return playlists;
     }
 
     async startSongs (playlists) { // Loops through playlists to send off requests for each playlists' songs
@@ -265,7 +274,7 @@ class Home2 extends React.Component {
         let data = await response.json();
         
         while (Object.keys(data)[0] === "error" && data.error.status === 429) { // Handle rate limiting
-          data = await this.fetchRetry(response, next);
+          data = await this.fetchRetry(response.headers, next);
         }
 
         for (let i = 0; i < data.items.length; i++) {
@@ -355,7 +364,7 @@ class Home2 extends React.Component {
       let data = await response.json();
 
       while (Object.keys(data)[0] === "error" && data.error.status === 429) { // Handle rate limiting
-        data = await this.fetchRetry(response, url);
+        data = await this.fetchRetry(response.headers, url);
       }
 
       return data;
@@ -411,57 +420,9 @@ class Home2 extends React.Component {
       let data = await response.json();
 
       while (Object.keys(data)[0] === "error" && data.error.status === 429) { // Handle rate limiting
-        data = await this.fetchRetry(response, url);
+        data = await this.fetchRetry(response.headers, url);
       }
       
       return data;
-    }
-
-    async fetchRetry(response, url) {
-      let data;
-      let newResponse;
-
-      for (var pair of response.headers.entries()) {
-        if (pair[0] === "retry-after") {
-          let waitTime = pair[1];
-          await this.retryDelay(waitTime);
-
-          newResponse = await fetch(url, {
-            headers: {
-              'Authorization': 'Bearer ' + localStorage.getItem('accessToken')
-            },
-          });
-
-          data = await newResponse.json();
-
-        }   
-      }
-      return data;
-    }
-
-    retryDelay(waitTime) {
-      return new Promise(resolve => setTimeout(resolve, waitTime));
-    }
-
-    /*    Reset functions    */
-    async reset() {
-      this.setState({
-        duplicateArtists: [],
-        duplicateSongs: [],
-        ErrorMinUsers: false,
-        ErrorNoMain: false,
-        ErrorInvalidID: false,
-        ErrorNoPublicPlaylists: false,
-        ErrorNoPublicInfo: '',
-        mainUsername: "",
-        status: 'start', 
-        status2: '', 
-        topArtists: [],
-        usernames: {},
-        users: {}
-      })
-
-      this.props.setMainUser('');
-      this.props.setUsers({});
     }
 };
