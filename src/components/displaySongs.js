@@ -64,7 +64,7 @@ const Img = styled.img`
   margin: 10 18px 10 10;
 `;
 
-function DisplaySongs(props) {
+export default function DisplaySongs(props) {
   const formatHeader = () => {
     // Determine the display names
     let mainUserID = props.mainUsername;

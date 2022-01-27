@@ -154,12 +154,187 @@ export default function Home() {
       }
 
       setStatus('loading');
+      fetchSongs(userDataObject);
     }
   }
+
+  const fetchSongs = async (userDataObject) => {
+    for (let user of Object.keys(userDataObject)) { // For... loop for each user
+      setStatus2('Requesting songs for ' + usernames[user] + '...');
+      let userSongs = [];
+
+      for (let playlistID of userDataObject[user]) { // For... loop for each playlist
+        let playlistSongs = [];
+        let next = `https://api.spotify.com/v1/playlists/${playlistID}/tracks?fields=items(track(id,name,album(images,name),artists(name))),limit,next,offset,previous,total`
+        while(next !=null) {
+          let response = await fetch(next, {
+            headers: {
+              'Authorization': 'Bearer ' + localStorage.getItem('accessToken')
+              }
+          });
+          
+          let data = await response.json();
+          
+          while (Object.keys(data)[0] === "error" && data.error.status === 429) { // Handle rate limiting
+            data = await fetchRetry(response.headers, next);
+          }
     
+          for (let i = 0; i < data.items.length; i++) {
+            if (data.items[i].track !== null) { 
+              playlistSongs.push(data.items[i].track.id);
+            }
+          }
+    
+          next = data.next;
+        }
+        userSongs.push(playlistSongs);
+      }
+
+      userSongs = userSongs.flat().filter(Boolean);
+      let uniqUserSongs = _.uniq(userSongs); // In case a user has the same song on multiple playlists, preventing false duplicates
+      userDataObject[user] = (uniqUserSongs);
+    }
+    identifyDuplicateSongs(userDataObject);
+  }   
+  
+  const identifyDuplicateSongs = async (userDataObject) => {
+    let arrays = Object.values(userDataObject);
+    let duplicates = _.intersection(...arrays);
+    _.pull(duplicates, null);
+
+    if (duplicates.length === 0) {
+      setDuplicateSongs('none');
+      setStatus('data set');
+    } else {
+      setStatus2('Finding duplicates...');
+
+      let duplicateInfo = [];
+
+      while(duplicates.length) {
+        let url = 'https://api.spotify.com/v1/tracks/?ids=' + duplicates.splice(0,50).join(","); // Divide songs into sets of 50 for the API request
+        let response = await fetch(url, {
+          headers: {
+            'Authorization': 'Bearer ' + localStorage.getItem('accessToken')
+          }
+        });
+        let data = await response.json();
+
+        // Handle rate limiting
+        while (Object.keys(data)[0] === "error" && data.error.status === 429) { 
+          data = await fetchRetry(response.headers, url);
+        }
+
+        duplicateInfo.push(data.tracks);
+
+      };
+      
+      let duplicateSongsLocal = []; // Will hold the duplicate song data
+      let duplicateArtistsLocal = {}; // Will tally how many times an artist is found among the duplicate songs
+
+      for (let song of duplicateInfo.flat()) {
+        let artistsName = []; // Gather all artists for each track
+        for (let artist of song.artists) {
+          artistsName.push(artist.name); 
+          duplicateArtistsLocal[artist.id] = duplicateArtistsLocal[artist.id] ? [artist.name, (duplicateArtistsLocal[artist.id][1] + 1)] : [artist.name, 1]; // Add to the artist tally for all duplicate songs 
+        };
+
+        duplicateSongsLocal.push(
+          { "songID": song.id,
+            "name": song.name,
+            "artist": artistsName.join(", "),
+            "image": song.album.images[1].url,
+            "albumName": song.album.name
+          }
+        ); 
+      }
+      
+      duplicateSongsLocal.sort((a, b) => {
+        let artistLocale = a.artist.localeCompare(b.artist, undefined, {sensitivity: 'base'});
+        let nameLocale = a.name.localeCompare(b.name, undefined, {sensitivity: 'base'});
+        
+        // Sort alphabetically by artist and then, if same artist, by song title
+        if (artistLocale > 0) {
+          return 1
+        } else if (artistLocale === 0) {
+          if (nameLocale > 0) {
+            return 1
+          } else if (nameLocale === 0) {
+            return 0
+          } else {
+            return -1
+          }
+        } else {
+          return -1
+        }
+      })
+
+      setDuplicateSongs(duplicateSongsLocal);
+
+      if (Object.keys(duplicateArtistsLocal).length > 5) {
+        identifyDuplicateArtists(duplicateArtistsLocal);
+      } else {
+        setStatus('data set');
+      }
+    }
+  }
+
+  const identifyDuplicateArtists = async (artists) => {
+    setStatus('Finding top artists...');
+
+    let duplicateArtists = [];
+
+    for (const key in artists) {
+      duplicateArtists.push([key, artists[key][0], artists[key][1]]); // Create a key, the artist name, and their tally
+    }
+
+    let sorted = duplicateArtists.sort((a, b) => b[2] - a[2]); // Sort by most frequently occuring to least
+
+    setDuplicateArtists(sorted);
+    identifyTopArtists(sorted);
+  }  
+
+  const identifyTopArtists = async (sorted) => {
+    let topArtistsCard = [];
+
+    if (sorted[0][2] !== sorted[1][2]) { // Identify whether there are none, one, two, or three top artists
+      topArtistsCard.push(sorted[0]);
+    } else if (sorted[1][2] !== sorted[2][2]) {
+      topArtistsCard.push(sorted[0], sorted[1]);
+    } else if (sorted[2][2] !== sorted[3][2]) {
+      topArtistsCard.push(sorted[0], sorted[1], sorted[2])
+    } 
+
+    let topArtistsData = []; 
+
+    if (topArtistsCard.length > 0) {
+      let topArtistsIDs = topArtistsCard.map(arr => arr[0]);
+
+      let url = `https://api.spotify.com/v1/artists?ids=${topArtistsIDs.join(",")}`;
+      let response = await fetch(url, {
+        headers: {
+          'Authorization': 'Bearer ' + localStorage.getItem('accessToken')
+        },
+      });
+      let data = await response.json();
+
+      // Handle rate limiting
+      while (Object.keys(data)[0] === "error" && data.error.status === 429) { 
+        data = await fetchRetry(response.headers, url);
+      }
+
+      for (const artist of data.artists) {          
+        topArtistsData.push([artist.id, artist.name, artist.images[2].url]);
+      }
+
+      setTopArtists(topArtistsData);
+    } 
+    
+    setStatus('data set');
+  }
+
   /*    Render    */
   const renderContent = () => {
-    if (status === "start" || status === 'fetchPlaylists') {
+    if (status === 'start' || status === 'fetchPlaylists') {
       const errorsState = { errors, toggleErrors};
       const mainUsernameState = { mainUsername, setMainUsername };
       const usernamesState = { usernames, setUsernames };
@@ -172,20 +347,20 @@ export default function Home() {
         setStatus={setStatus}
         reset={reset}
       />
-    } else {
+    } else if (status === 'loading') {
       return <LoadingPage status2={status2}/>
-    /*} else if (status === "data set") { 
+    } else if (status === 'data set') { 
       return (
         <Body2>
-          <DisplaySongs function={this.reset} status={status} duplicateSongs={this.state.duplicateSongs}/>
+          <DisplaySongs function={reset} status={status} duplicateSongs={duplicateSongs} mainUsername={mainUsername} usernames={usernames}/>
           <TopArtists 
             status={status} 
-            duplicateArtists={this.state.duplicateArtists} 
-            duplicateSongs={this.state.duplicateSongs} 
-            topArtists={this.state.topArtists}
+            duplicateArtists={duplicateArtists} 
+            duplicateSongs={duplicateSongs} 
+            topArtists={topArtists}
           />
         </Body2>
-      ) */
+      )
     } 
   };
 
@@ -220,209 +395,3 @@ export default function Home() {
     </GradientWrapper>
   )
 }
-
-class Home2 extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-          duplicateArtists: [],
-          duplicateSongs: [],
-          ErrorMinUsers: false,
-          ErrorNoMain: false,
-          ErrorInvalidID: false,
-          ErrorNoPublicPlaylists: false,
-          ErrorNoPublicInfo: '',
-          mainUsername: '',
-          status: 'start',
-          status2: '',
-          topArtists: [],
-          usernames: {},
-          users: {
-            mainUsername: ''
-          }                   
-        };
-
-        this.startSongs = this.startSongs.bind(this);
-        this.fetchSongs = this.fetchSongs.bind(this);
-        this.findDuplicateSongs = this.findDuplicateSongs.bind(this);
-        this.getDuplicatesInfo = this.getDuplicatesInfo.bind(this);
-        this.findTopArtists = this.findTopArtists.bind(this);
-        this.getArtistArt = this.getArtistArt.bind(this);
-        this.renderContent = this.renderContent.bind(this);
-    }
-
-    async startSongs (playlists) { // Loops through playlists to send off requests for each playlists' songs
-      let usersSongs = [];
-      for(let playlistID of playlists) {
-        let playlistData = await this.fetchSongs(playlistID);
-        usersSongs.push(playlistData);
-      }
-      return usersSongs.flat();
-    }
-
-    async fetchSongs(playlistID) { // Requests playlists' songs
-      let playlistSongs = [];
-      let next = `https://api.spotify.com/v1/playlists/${playlistID}/tracks?fields=items(track(id,name,album(images,name),artists(name))),limit,next,offset,previous,total`
-
-      while(next !=null) {
-        let response = await fetch(next, {
-          headers: {
-            'Authorization': 'Bearer ' + localStorage.getItem('accessToken')
-            }
-        });
-        
-        let data = await response.json();
-        
-        while (Object.keys(data)[0] === "error" && data.error.status === 429) { // Handle rate limiting
-          data = await this.fetchRetry(response.headers, next);
-        }
-
-        for (let i = 0; i < data.items.length; i++) {
-          if (data.items[i].track !== null) { 
-            playlistSongs.push(data.items[i].track.id);
-          }
-        }
-
-        next = data.next;
-      }
-      return playlistSongs;
-    }
-
-    async findDuplicateSongs(object) { // Find duplicates data and set in state
-      let arrays = Object.values(object);
-      let duplicates = _.intersection(...arrays);
-      _.pull(duplicates, null);
-
-      if (duplicates.length === 0) {
-        this.setState({duplicateSongs: 'none', status: 'data set'});
-      } else {
-
-        this.setState({status2: 'Finding duplicates...'});
-        
-        let duplicateSongs = []; // Will hold the duplicate song data
-        let duplicateArtists = {}; // Will tally how many times an artist is found among the duplicate songs
-
-        while(duplicates.length) { 
-          let prepareDuplicates = duplicates.splice(0,50).join(","); // Divide songs into sets of 50 for the API request
-          let duplicateInfo = await this.getDuplicatesInfo(prepareDuplicates);
-
-          for (let song of duplicateInfo.tracks) { // For each duplicate song...
-            let artistsName = []; 
-            for (let artist of song.artists) {
-              artistsName.push(artist.name); // Gather all artists for each track
-              duplicateArtists[artist.id] = duplicateArtists[artist.id] ? [artist.name, (duplicateArtists[artist.id][1] + 1)] : [artist.name, 1]; // Add to the artist tally for all duplicate songs 
-            };
-
-            duplicateSongs.push(
-              { "songID": song.id,
-                "name": song.name,
-                "artist": artistsName.join(", "),
-                "image": song.album.images[1].url,
-                "albumName": song.album.name
-              }
-            ); 
-          };
-        }
-        
-        duplicateSongs.sort((a, b) => {
-          let artistLocale = a.artist.localeCompare(b.artist, undefined, {sensitivity: 'base'});
-          let nameLocale = a.name.localeCompare(b.name, undefined, {sensitivity: 'base'});
-          
-          // Sort alphabetically by artist and then, if same artist, by song title
-          if (artistLocale > 0) {
-            return 1
-          } else if (artistLocale === 0) {
-            if (nameLocale > 0) {
-              return 1
-            } else if (nameLocale === 0) {
-              return 0
-            } else {
-              return -1
-            }
-          } else {
-            return -1
-          }
-        })
-
-        this.setState({duplicateSongs: duplicateSongs});
-
-        if (Object.keys(duplicateArtists).length > 5) {
-          this.findTopArtists(duplicateArtists);
-        }  
-
-        this.setState({status: 'data set'});
-      }
-    }
-
-    async getDuplicatesInfo(duplicates) { // API request for song data (title, artist, album art, etc.) 
-      let url = 'https://api.spotify.com/v1/tracks/?ids=' + duplicates;
-      let response = await fetch(url, {
-        headers: {
-          'Authorization': 'Bearer ' + localStorage.getItem('accessToken')
-        }
-      });
-      let data = await response.json();
-
-      while (Object.keys(data)[0] === "error" && data.error.status === 429) { // Handle rate limiting
-        data = await this.fetchRetry(response.headers, url);
-      }
-
-      return data;
-    }
-
-    async findTopArtists(artists) { // Find top artist(s) and set them in state
-      
-      this.setState({status2: 'Finding top artists...'});
- 
-      let duplicateArtists = [];
-  
-      for (const key in artists) {
-        duplicateArtists.push([key, artists[key][0], artists[key][1]]); // Create a key, the artist name, and their tally
-      }
-
-      let sorted = duplicateArtists.sort((a, b) => b[2] - a[2]); // Sort by most frequently occuring to least
-
-      this.setState({ duplicateArtists: sorted});
-
-      let topArtistsCard = [];
-
-      if (sorted[0][2] !== sorted[1][2]) { // Identify whether there are none, one, two, or three top artists
-        topArtistsCard.push(sorted[0]);
-      } else if (sorted[1][2] !== sorted[2][2]) {
-        topArtistsCard.push(sorted[0], sorted[1]);
-      } else if (sorted[2][2] !== sorted[3][2]) {
-        topArtistsCard.push(sorted[0], sorted[1], sorted[2])
-      } 
-  
-      let topArtistsData = []; 
-
-      if (topArtistsCard.length > 0) {
-        let topArtistsIDs = topArtistsCard.map(arr => arr[0]);
-        let data = await this.getArtistArt(topArtistsIDs.join(","));
-
-        for (const artist of data.artists) {          
-          topArtistsData.push([artist.id, artist.name, artist.images[2].url]);
-        }
-
-        this.setState({ topArtists: topArtistsData});
-      } 
-      
-      this.setState({status: 'data set'});
-    }
-
-   async getArtistArt (artist) { //API request for artist image
-      let url = `https://api.spotify.com/v1/artists?ids=${artist}`
-      let response = await fetch(url, {
-        headers: {
-          'Authorization': 'Bearer ' + localStorage.getItem('accessToken')
-        },
-      });
-      let data = await response.json();
-
-      while (Object.keys(data)[0] === "error" && data.error.status === 429) { // Handle rate limiting
-        data = await this.fetchRetry(response.headers, url);
-      }
-      
-      return data;
-    }
-};
