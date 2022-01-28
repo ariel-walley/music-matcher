@@ -118,39 +118,49 @@ export default function Home() {
 
   /* API Requests */
 
+  const requestData = async (endpoint, criteria) => {
+    let next = `https://api.spotify.com/v1/${endpoint}`
+    let container = [];
+
+    while (next !== null) {
+      let response = await fetch(next, {
+        headers: {
+          'Authorization': 'Bearer ' + localStorage.getItem('accessToken')
+        },
+      });
+
+      let data = await response.json();      
+
+      // Handle rate limiting
+      while (Object.keys(data)[0] === "error" && data.error.status === 429) { 
+        data = await fetchRetry(response.headers, next);
+      }
+
+      container.push(data[criteria]);
+
+      if (data.next) {
+        next = data.next
+      } else {
+        next = null;
+      }
+    }
+    return container.flat();
+  }
+
   const fetchPlaylists = async () => {
     if (status === 'fetchPlaylists') {
       let userDataObject = {}
 
       // Fetch users' playlist IDs
       for (const user of Object.keys(usernames)) {
-        let playlistIDs = [];
-        let next = `https://api.spotify.com/v1/users/${user}/playlists?limit=50`;
-        while(next != null) {
-          let response = await fetch(next, {
-            headers: {
-              'Authorization': 'Bearer ' + localStorage.getItem('accessToken')
-            },
-          });
-
-          let data = await response.json();
-
-          // Handle rate limiting
-          while (Object.keys(data)[0] === "error" && data.error.status === 429) { 
-            data = await fetchRetry(response.headers, next);
-          }
-
-          // Checking for users with no public playlists
-          if (data.total === 0) {
-            toggleErrors({...errors, NoPublicPlaylists: true, NoPublicInfo: [...errors.NoPublicInfo, user]}); 
-            return
-          } else { // Creating an array with all of their playlists IDs
-            let playlistsChunk = data.items.map(playlist => { return playlist.id });
-            playlistIDs.push(...playlistsChunk);
-            next = data.next;
-          }
-        } 
-        userDataObject[user] = (playlistIDs);
+        let data = await requestData(`users/${user}/playlists?limit=50`, 'items');
+        // Checking for users with no public playlists
+        if (data.total === 0) {
+          toggleErrors({...errors, NoPublicPlaylists: true, NoPublicInfo: [...errors.NoPublicInfo, user]}); 
+          return
+        } else {
+          userDataObject[user] = data.map(playlist => playlist.id);
+        }
       }
 
       setStatus('loading');
@@ -164,30 +174,8 @@ export default function Home() {
       let userSongs = [];
 
       for (let playlistID of userDataObject[user]) { // For... loop for each playlist
-        let playlistSongs = [];
-        let next = `https://api.spotify.com/v1/playlists/${playlistID}/tracks?fields=items(track(id,name,album(images,name),artists(name))),limit,next,offset,previous,total`
-        while(next !=null) {
-          let response = await fetch(next, {
-            headers: {
-              'Authorization': 'Bearer ' + localStorage.getItem('accessToken')
-              }
-          });
-          
-          let data = await response.json();
-          
-          while (Object.keys(data)[0] === "error" && data.error.status === 429) { // Handle rate limiting
-            data = await fetchRetry(response.headers, next);
-          }
-    
-          for (let i = 0; i < data.items.length; i++) {
-            if (data.items[i].track !== null) { 
-              playlistSongs.push(data.items[i].track.id);
-            }
-          }
-    
-          next = data.next;
-        }
-        userSongs.push(playlistSongs);
+        let data = await requestData(`playlists/${playlistID}/tracks?fields=items(track(id,name,album(images,name),artists(name))),limit,next,offset,previous,total`, 'items');
+        userSongs.push(data.map(song => song.track.id).filter(Boolean));
       }
 
       userSongs = userSongs.flat().filter(Boolean);
@@ -211,21 +199,8 @@ export default function Home() {
       let duplicateInfo = [];
 
       while(duplicates.length) {
-        let url = 'https://api.spotify.com/v1/tracks/?ids=' + duplicates.splice(0,50).join(","); // Divide songs into sets of 50 for the API request
-        let response = await fetch(url, {
-          headers: {
-            'Authorization': 'Bearer ' + localStorage.getItem('accessToken')
-          }
-        });
-        let data = await response.json();
-
-        // Handle rate limiting
-        while (Object.keys(data)[0] === "error" && data.error.status === 429) { 
-          data = await fetchRetry(response.headers, url);
-        }
-
-        duplicateInfo.push(data.tracks);
-
+        let data = await requestData(`tracks/?ids=${duplicates.splice(0,50).join(",")}`, 'tracks'); // Divide songs into sets of 50 for the API request
+        duplicateInfo.push(data);
       };
       
       let duplicateSongsLocal = []; // Will hold the duplicate song data
@@ -297,35 +272,17 @@ export default function Home() {
     let topArtistsCard = [];
 
     if (sorted[0][2] !== sorted[1][2]) { // Identify whether there are none, one, two, or three top artists
-      topArtistsCard.push(sorted[0]);
+      topArtistsCard = [sorted[0]];
     } else if (sorted[1][2] !== sorted[2][2]) {
-      topArtistsCard.push(sorted[0], sorted[1]);
+      topArtistsCard = [sorted[0], sorted[1]];
     } else if (sorted[2][2] !== sorted[3][2]) {
-      topArtistsCard.push(sorted[0], sorted[1], sorted[2])
+      topArtistsCard = [sorted[0], sorted[1], sorted[2]];
     } 
-
-    let topArtistsData = []; 
 
     if (topArtistsCard.length > 0) {
       let topArtistsIDs = topArtistsCard.map(arr => arr[0]);
-
-      let url = `https://api.spotify.com/v1/artists?ids=${topArtistsIDs.join(",")}`;
-      let response = await fetch(url, {
-        headers: {
-          'Authorization': 'Bearer ' + localStorage.getItem('accessToken')
-        },
-      });
-      let data = await response.json();
-
-      // Handle rate limiting
-      while (Object.keys(data)[0] === "error" && data.error.status === 429) { 
-        data = await fetchRetry(response.headers, url);
-      }
-
-      for (const artist of data.artists) {          
-        topArtistsData.push([artist.id, artist.name, artist.images[2].url]);
-      }
-
+      let data = await requestData(`artists?ids=${topArtistsIDs.join(",")}`, 'artists');
+      let topArtistsData = data.map(artist => [artist.id, artist.name, artist.images[2].url]);
       setTopArtists(topArtistsData);
     } 
     
