@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Popup from './components/popup';
-import styled, { keyframes } from 'styled-components';
+import styled from 'styled-components';
+import { fadeIn, Heading3 } from './styles/styles';
 
 const UserInputContainer = styled.div`
   display: flex;
@@ -11,17 +12,18 @@ const UserInputContainer = styled.div`
   transition: color 5s;
 `;
 
-const TutorialText = styled.button`
-  margin: -2px auto 7px auto;
+const TutorialText = styled.div`
+  margin-top: 15px;
   padding: 3px;
   width: 550px;
-  cursor: pointer;
+  font-family: "Roboto", Arial, sans-serif;
   background-color: rgba(0,0,0,0);
   border-style: none;
   outline-style: none;
-  font-family: "Roboto", Arial, sans-serif;
-  font-size: 15px; 
+  cursor: pointer;
   transition: color 5s;
+  font-size: 16px;
+  text-align: center;
 `;
 
 const InputDiv = styled.div`
@@ -30,13 +32,6 @@ const InputDiv = styled.div`
   flex-wrap: wrap;
   justify-content: center;
   align-items: center;
-`;
-
-const InputLabel = styled.label`
-  margin: 10px;
-  font-weight: 600;
-  font-size: 20px;
-  text-align: center;
 `;
 
 const Input = styled.input`
@@ -48,17 +43,7 @@ const Input = styled.input`
   font-family: "Roboto", Arial, sans-serif;
 `;
 
-const fadeIn = keyframes`
-  0% {
-    opacity: 0;
-  }
-
-  100% {
-    opacity: 1
-  }
-`;
-
-const InputLabelsFade = styled(InputLabel)`
+const Heading3sFade = styled(Heading3)`
   transition: color 5s;
   animation: 0.4s ${fadeIn} ease-out;
 `;
@@ -67,7 +52,7 @@ const InputFade = styled(Input)`
   animation: 0.4s ${fadeIn} ease-out;
 `;
 
-const Error = styled.p`
+const Error = styled.div`
   margin: 0 auto;
   max-width: 350px;
   background-color: red;
@@ -75,6 +60,7 @@ const Error = styled.p`
   padding: 5px;
   text-align: center;
   font-family: "Roboto", Arial, sans-serif;
+  font-size: 16px;
 `;
 
 const SubmitButton = styled.button`
@@ -129,7 +115,7 @@ export default function StartPage(props) {
     if (userDisplay) {
       return (
         <UserInputContainer>       
-          <InputLabelsFade>Enter up to three other Spotify usernames to compare your music picks:</InputLabelsFade>
+          <Heading3sFade>Enter up to three other Spotify usernames to compare your music picks:</Heading3sFade>
           <InputDiv>
             <InputFade type="text" id="username0" onChange={handleChangeOtherUsername} onKeyDown={handleEnter}/>
             <InputFade type="text" id="username1" onChange={handleChangeOtherUsername} onKeyDown={handleEnter}/>
@@ -219,7 +205,7 @@ export default function StartPage(props) {
 
   return (
     <UserInputContainer> 
-      <InputLabel htmlFor="your_username" >Enter your Spotify username here:</InputLabel>
+      <Heading3 htmlFor="your_username" >Enter your Spotify username here:</Heading3>
       <TutorialText onClick={() => {togglePopup(!showPopup)}}>Not sure how to find a Spotify username? <span>Click here for help!</span></TutorialText>
       <InputDiv>
         <Input

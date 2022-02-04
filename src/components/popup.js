@@ -1,5 +1,6 @@
 import React from 'react';  
 import styled from 'styled-components';
+import { Heading3 } from '../styles/styles';
 import { CloseCircle } from '@styled-icons/ionicons-outline/CloseCircle';
 
 const MainPageDarken = styled.div`
@@ -24,6 +25,7 @@ const PopupContainer = styled.div`
   bottom: 15%;   
   display: flex;
   align-items: center;
+  justify-content: center;
   flex-direction: column;
   border-radius: 20px;  
   background: white;  
@@ -37,11 +39,6 @@ const PopupBodyContainer = styled.div`
   justify-content: space-around;
   align-items: center;
   align-content: space-around;
-`;
-
-const Heading = styled.p`
-  font-size: 20px;
-  font-weight: 600;
 `;
 
 const Img = styled.img`
@@ -74,7 +71,7 @@ export default function Popup(props) {
     <MainPageDarken>
       <PopupContainer>
         <CloseIcon onClick={() => props.closePopup(false)}/>
-        <Heading>How to find a Spotify username:</Heading>
+        <Heading3>How to find a Spotify username:</Heading3>
         <PopupBodyContainer>                
           <Img src="/howto.gif" />        
           <ListContainer>

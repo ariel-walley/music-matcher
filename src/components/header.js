@@ -1,17 +1,15 @@
 import React from 'react';
 import styled from 'styled-components';
+import { Heading1 } from '../styles/styles';
 
-const Header = styled.h1`
+const Header = styled(Heading1)`
   width: 100%;
   margin: 0 auto;
-  padding: 5px;
+  padding: 10px;
   position: fixed;
   background-color: black;
   color: white;
   font-family: "Roboto", Arial, sans-serif;
-  font-size: 35px;
-  font-weight: 700;
-  text-align: center;
 `;
 
 export default function MainHeader(props) {

@@ -1,12 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-
-const Heading = styled.h1`
-  margin: 23px;
-  font-size: 32px;
-  font-weight: 700;
-  text-align: center;
-`;
+import { Heading1 } from '../styles/styles';
 
 const Row = styled.div`
   background-color: green;
@@ -20,7 +14,6 @@ const Row = styled.div`
   justify-content: center;
   border-radius: 15px;
   background-color: rgba(256,256,256,0.3);
-  font-size: 18px;
 `;
 
 const TableHeader = styled(Row)`
@@ -31,25 +24,22 @@ const TableHeader = styled(Row)`
 `;
 
 const TableData = styled.div`
-  width: 25%;  
+  width: ${props => props.artist ? "50%" : "25%"};
   margin: auto 20px;
   display: flex;
   justify-content: center;
   align-items: center;
   text-align: center;
-`;
-
-const TableArtist = styled(TableData)`
-  width: 50%;
+  font-size: ${props => props.heading ? "22px" : "18px"};
 `;
 
 export default function ArtistsTable(props) {
   const assembleTable = () => {
     let display = [(
       <TableHeader key="tableHeader">
-        <TableArtist>Artist</TableArtist>
-        <TableData>No. of Songs</TableData>
-        <TableData>Percent of Songs</TableData>
+        <TableData artist heading>Artist</TableData>
+        <TableData heading>No. of Songs</TableData>
+        <TableData heading>Song Percentage</TableData>
       </TableHeader>
   )];
 
@@ -57,10 +47,10 @@ export default function ArtistsTable(props) {
       for (let artist of props.duplicateArtists) {
         display.push(
           <Row key={artist[0]}>
-            <TableArtist>{artist[1]}</TableArtist>
+            <TableData artist>{artist[1]}</TableData>
             <TableData>{artist[2]}</TableData>
             <TableData>{((artist[2]/props.duplicateSongs.length)*100).toFixed(2) + "%"}</TableData>
-          </Row>      
+          </Row>
         )
       }
       return display;
@@ -73,7 +63,7 @@ export default function ArtistsTable(props) {
     if (props.duplicateArtists.length > 5) {
       return(
         <div>
-          <Heading>See all of your artists in common:</Heading>
+          <Heading1>See all of your artists in common:</Heading1>
           {assembleTable()}
         </div>  
       )

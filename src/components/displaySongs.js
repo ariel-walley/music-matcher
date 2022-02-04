@@ -1,27 +1,11 @@
 import React from 'react';
-import styled, { keyframes } from 'styled-components';
+import styled from 'styled-components';
+import { fadeIn, Heading1, Heading2, Heading3 } from '../styles/styles'
 import _ from 'lodash';
 import Reset from './reset';
 
-const fadeIn = keyframes`
-  0% {
-    opacity: 0;
-  }
-
-  100% {
-    opacity: 1;
-  }
-`;
-
 const MainContainer = styled.div`
   animation: 1s ${fadeIn} ease-out;
-`;
-
-const Heading = styled.h1`
-  margin: 20px;
-  text-align: center;
-  font-size: 32px;
-  font-weight: 700;
 `;
 
 const CardContainer = styled.div`
@@ -44,17 +28,14 @@ const Card = styled.div`
   background-color: rgba(256,256,256,0.3);
 `;
 
-const SongTitle = styled.h1`
-  font-size: 26px;
-  font-weight: 700;
-  margin: 0 0 7px 25px;
-  padding: 0;
+const CardSongTitle = styled(Heading2)`
+  text-align: left;
+  margin-block-start: auto;
+  margin-block-end: auto;
 `;
- 
-const Artist = styled.h2`
-  font-size: 20px;
-  margin: 0 0 0 25px;
-  padding: 0;
+
+const CardArtist = styled(Heading3)`
+  text-align: left;
 `;
 
 const Img = styled.img`
@@ -92,7 +73,7 @@ export default function DisplaySongs(props) {
       }
 
       // Final phrase
-      return <Heading>You{usernames} have {songs} in common!</Heading>
+      return <Heading1>You{usernames} have {songs} in common!</Heading1>
     }
   }
 
@@ -102,8 +83,8 @@ export default function DisplaySongs(props) {
         <Card key={duplicate.songID}>
           <Img src={duplicate.image} alt={`The cover art of the song's album, "${duplicate.albumName}"`}/>
           <div>
-            <SongTitle>{duplicate.name}</SongTitle>
-            <Artist> by {duplicate.artist}</Artist>
+            <CardSongTitle>{duplicate.name}</CardSongTitle>
+            <CardArtist> by {duplicate.artist}</CardArtist>
           </div>
         </Card>
       )
