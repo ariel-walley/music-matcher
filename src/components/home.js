@@ -1,48 +1,16 @@
 import React, { useEffect, useState} from 'react';
-import MainHeader from './components/header';
-import StartPage from './components/start-page/startPage';
-import LoadingPage from './components/loadingPage';
-import DisplaySongs from './components/results-page/displaySongs';
-import TopArtists from './components/results-page/topArtists';
+
+import MainHeader from './header';
+import StartPage from './start-page/startPage';
+import LoadingPage from './loadingPage';
+import DisplaySongs from './results-page/displaySongs';
+import TopArtists from './results-page/topArtists';
+
 import QueryString from 'querystring';
 import _ from 'lodash';
-import styled from 'styled-components';
-import GlobalStyle from './styles/globalStyles';
 
-// Styles for gradient background
-const GradientWrapper = styled.div`
-  height: 100%;
-  width: 100%;
-  position: relative;
-  background-color: rgba(256, 256, 256, 0.02);
-  background-attachment: fixed;
-`;
-
-const Gradient = styled.div`
-  height: 100%;
-  width: 100%;
-  background: ${props => props.color};
-  background-attachment: fixed;
-  transition: opacity 8s;
-  opacity: ${props => props.status ? 1 : 0};
-  position: fixed;
-  z-index: -1;
-`;
-
-// Styles for body
-const Body = styled.div`
-  height: calc(100% - 57px);
-  width: 100%;
-  padding-top: 57px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-`;
-
-const Body2 = styled(Body)`
-  padding-top: 25px;
-  flex-wrap: wrap;
-`;
+import GlobalStyle from '../styles/globalStyles';
+import * as styles from './homeStyles';
 
 export default function Home() {
   const [errors, toggleErrors] = useState({
@@ -308,7 +276,7 @@ export default function Home() {
       return <LoadingPage status2={status2}/>
     } else if (status === 'data set') { 
       return (
-        <Body2>
+        <styles.Body2>
           <DisplaySongs function={reset} status={status} duplicateSongs={duplicateSongs} mainUsername={mainUsername} usernames={usernames}/>
           <TopArtists 
             status={status} 
@@ -316,7 +284,7 @@ export default function Home() {
             duplicateSongs={duplicateSongs} 
             topArtists={topArtists}
           />
-        </Body2>
+        </styles.Body2>
       )
     } 
   };
@@ -340,15 +308,15 @@ export default function Home() {
   }
 
   return (
-    <GradientWrapper>
+    <styles.GradientWrapper>
       <GlobalStyle/>
       <MainHeader function={reset}/>
-      <Gradient color="linear-gradient(to bottom right, #00ff33, #13a9bb)" status={status === "start" || status === 'fetchPlaylists'}/>
-      <Gradient color="linear-gradient(to bottom right, #13a9bb, #7d00aa)" status={status === "loading"}/>
-      <Gradient color="linear-gradient(to bottom right, #7d00aa, #fa3378)" status={status === "data set"}/>
-      <Body>
+      <styles.Gradient color="linear-gradient(to bottom right, #00ff33, #13a9bb)" status={status === "start" || status === 'fetchPlaylists'}/>
+      <styles.Gradient color="linear-gradient(to bottom right, #13a9bb, #7d00aa)" status={status === "loading"}/>
+      <styles.Gradient color="linear-gradient(to bottom right, #7d00aa, #fa3378)" status={status === "data set"}/>
+      <styles.Body>
         {renderContent()}
-      </Body>
-    </GradientWrapper>
+      </styles.Body>
+    </styles.GradientWrapper>
   )
 }
