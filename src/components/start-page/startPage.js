@@ -1,80 +1,8 @@
 import React, { useState } from 'react';
-import Popup from './components/popup';
-import styled from 'styled-components';
-import { fadeIn, Heading3 } from './styles/styles';
+import Popup from './popup';
 
-const UserInputContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-items: center;
-  transition: color 5s;
-`;
-
-const TutorialText = styled.div`
-  margin-top: 15px;
-  padding: 3px;
-  width: 550px;
-  font-family: "Roboto", Arial, sans-serif;
-  background-color: rgba(0,0,0,0);
-  border-style: none;
-  outline-style: none;
-  cursor: pointer;
-  transition: color 5s;
-  font-size: 16px;
-  text-align: center;
-`;
-
-const InputDiv = styled.div`
-  margin: 0 auto;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-items: center;
-`;
-
-const Input = styled.input`
-  margin: 20px;
-  border: 0;
-  height: 35px;
-  width: 250px;
-  border-radius: 5px;
-  font-family: "Roboto", Arial, sans-serif;
-`;
-
-const Heading3sFade = styled(Heading3)`
-  transition: color 5s;
-  animation: 0.4s ${fadeIn} ease-out;
-`;
-
-const InputFade = styled(Input)`
-  animation: 0.4s ${fadeIn} ease-out;
-`;
-
-const Error = styled.div`
-  margin: 0 auto;
-  max-width: 350px;
-  background-color: red;
-  border-radius: 5px;
-  padding: 5px;
-  text-align: center;
-  font-family: "Roboto", Arial, sans-serif;
-  font-size: 16px;
-`;
-
-const SubmitButton = styled.button`
-  margin: 10px auto;
-  width: 70px;
-  padding: 7px;
-  border: 0;
-  border-radius: 5px;
-  background-color: white;
-  text-align: center;
-  font-family: "Roboto", Arial, sans-serif;
-  font-size: 16px;
-  animation: 0.4s ${fadeIn} ease-out;
-`;
+import * as styles from './startPageStyles';
+import { Heading3 } from '../../styles/styles';
 
 export default function StartPage(props) {
   const [showPopup, togglePopup] = useState(false);
@@ -114,28 +42,28 @@ export default function StartPage(props) {
   const displayOtherUsers = () => { 
     if (userDisplay) {
       return (
-        <UserInputContainer>       
-          <Heading3sFade>Enter up to three other Spotify usernames to compare your music picks:</Heading3sFade>
-          <InputDiv>
-            <InputFade type="text" id="username0" onChange={handleChangeOtherUsername} onKeyDown={handleEnter}/>
-            <InputFade type="text" id="username1" onChange={handleChangeOtherUsername} onKeyDown={handleEnter}/>
-            <InputFade type="text" id="username2" onChange={handleChangeOtherUsername} onKeyDown={handleEnter}/>
-          </InputDiv>
-          <SubmitButton type="submit" onClick={submitInputs}>Submit</SubmitButton>
-        </UserInputContainer>
+        <styles.UserInputContainer>       
+          <styles.Heading3sFade>Enter up to three other Spotify usernames to compare your music picks:</styles.Heading3sFade>
+          <styles.InputDiv>
+            <styles.InputFade type="text" id="username0" onChange={handleChangeOtherUsername} onKeyDown={handleEnter}/>
+            <styles.InputFade type="text" id="username1" onChange={handleChangeOtherUsername} onKeyDown={handleEnter}/>
+            <styles.InputFade type="text" id="username2" onChange={handleChangeOtherUsername} onKeyDown={handleEnter}/>
+          </styles.InputDiv>
+          <styles.SubmitButton type="submit" onClick={submitInputs}>Submit</styles.SubmitButton>
+        </styles.UserInputContainer>
       )  
     }
   }
 
   const displayError = () => {
     if (props.errorsState.errors.NoMainUser) {
-      return <Error>Please make sure to list your username or a main username.</Error>
+      return <styles.Error>Please make sure to list your username or a main username.</styles.Error>
     } else if (props.errorsState.errors.NotMinUsers) {
-      return <Error>Please enter at least two usernames.</Error>
+      return <styles.Error>Please enter at least two usernames.</styles.Error>
     } else if (props.errorsState.errors.InvalidID) {
-      return <Error>{props.errorsState.errors.InvalidIDInfo} is not a valid username. Please try again.</Error>
+      return <styles.Error>{props.errorsState.errors.InvalidIDInfo} is not a valid username. Please try again.</styles.Error>
     } else if (props.errorsState.errors.NoPublicPlaylists) {
-      return <Error>Uh oh! One of the users ({props.errorsState.errors.NoPublicInfo}) doesn't have any public playlists so we can't compare your playlists. Please remove their username and try again.</Error>
+      return <styles.Error>Uh oh! One of the users ({props.errorsState.errors.NoPublicInfo}) doesn't have any public playlists so we can't compare your playlists. Please remove their username and try again.</styles.Error>
     }
   }
 
@@ -204,19 +132,19 @@ export default function StartPage(props) {
   }
 
   return (
-    <UserInputContainer> 
+    <styles.UserInputContainer> 
       <Heading3 htmlFor="your_username" >Enter your Spotify username here:</Heading3>
-      <TutorialText onClick={() => {togglePopup(!showPopup)}}>Not sure how to find a Spotify username? <span>Click here for help!</span></TutorialText>
-      <InputDiv>
-        <Input
+      <styles.TutorialText onClick={() => {togglePopup(!showPopup)}}>Not sure how to find a Spotify username? <span>Click here for help!</span></styles.TutorialText>
+      <styles.InputDiv>
+        <styles.Input
           type="text"
           id="your_username"
           onChange={e => handleChangeMainUsername(e.target.value)}
         />
-      </InputDiv>
+      </styles.InputDiv>
       {displayOtherUsers()}
       {displayError()}
       {displayPopup()} 
-    </UserInputContainer>
+    </styles.UserInputContainer>
   )
 }

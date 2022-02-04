@@ -1,49 +1,9 @@
 import React from 'react';
-import styled from 'styled-components';
-import { fadeIn, Heading1, Heading2, Heading3 } from '../styles/styles'
-import _ from 'lodash';
 import Reset from './reset';
+import _ from 'lodash';
 
-const MainContainer = styled.div`
-  animation: 1s ${fadeIn} ease-out;
-`;
-
-const CardContainer = styled.div`
-  display: flex;
-  align-items: center;
-  align-content: center;
-  flex-wrap: wrap;
-  justify-content: center;
-`;
-
-const Card = styled.div`
-  width: 30%;
-  padding: 15px;
-  margin: 15px 40px;
-  display: flex;
-  align-items: center;
-  align-content: center;
-  justify-content: flex-start;
-  border-radius: 15px;
-  background-color: rgba(256,256,256,0.3);
-`;
-
-const CardSongTitle = styled(Heading2)`
-  text-align: left;
-  margin-block-start: auto;
-  margin-block-end: auto;
-`;
-
-const CardArtist = styled(Heading3)`
-  text-align: left;
-`;
-
-const Img = styled.img`
-  width: 100px;
-  height: 100px;
-  border-radius: 10px;
-  margin: 10 18px 10 10;
-`;
+import * as styles from './displaySongsStyles';
+import { Heading1 } from '../../styles/styles'
 
 export default function DisplaySongs(props) {
   const formatHeader = () => {
@@ -80,13 +40,13 @@ export default function DisplaySongs(props) {
   const formatCard = () => {
     if (props.status === 'data set') {
       return props.duplicateSongs.map((duplicate) => 
-        <Card key={duplicate.songID}>
-          <Img src={duplicate.image} alt={`The cover art of the song's album, "${duplicate.albumName}"`}/>
+        <styles.Card key={duplicate.songID}>
+          <styles.Img src={duplicate.image} alt={`The cover art of the song's album, "${duplicate.albumName}"`}/>
           <div>
-            <CardSongTitle>{duplicate.name}</CardSongTitle>
-            <CardArtist> by {duplicate.artist}</CardArtist>
+            <styles.CardSongTitle>{duplicate.name}</styles.CardSongTitle>
+            <styles.CardArtist> by {duplicate.artist}</styles.CardArtist>
           </div>
-        </Card>
+        </styles.Card>
       )
     } else {
       return <div></div>
@@ -103,13 +63,13 @@ export default function DisplaySongs(props) {
       )
     } else if (props.duplicateSongs.length > 0) {
       return (
-        <MainContainer>
+        <styles.MainContainer>
           {formatHeader()}
           <Reset margin="30px" function={props.function} />
-          <CardContainer>
+          <styles.CardContainer>
             {formatCard()}
-          </CardContainer>
-        </MainContainer>
+          </styles.CardContainer>
+        </styles.MainContainer>
       )
     } else {
       return <div></div>

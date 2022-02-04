@@ -1,9 +1,9 @@
 import React, { useEffect, useState} from 'react';
 import MainHeader from './components/header';
-import StartPage from './startPage';
+import StartPage from './components/start-page/startPage';
 import LoadingPage from './components/loadingPage';
-import DisplaySongs from './components/displaySongs';
-import TopArtists from './components/topArtists';
+import DisplaySongs from './components/results-page/displaySongs';
+import TopArtists from './components/results-page/topArtists';
 import QueryString from 'querystring';
 import _ from 'lodash';
 import styled from 'styled-components';
