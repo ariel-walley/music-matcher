@@ -1,5 +1,7 @@
 import styled from 'styled-components';
-import { CloseCircle } from '@styled-icons/ionicons-outline/CloseCircle';
+import CloseIcon from '@material-ui/icons/Close';
+import ArrowBackIcon from '@material-ui/icons/ArrowBack';
+import { Container } from '../styles/styles';
 
 export const MainPageDarken = styled.div`
   width: 100%;  
@@ -39,19 +41,30 @@ export const PopupBodyContainer = styled.div`
   align-content: space-around;
 `;
 
-export const Img = styled.img`
-  width: 409px;
-  height: 318px;
-  padding: 0 20px;
-`;
-
-export const CloseIcon = styled(CloseCircle)`
-  color: #979797;
+export const StyledBackIcon = styled(ArrowBackIcon)`
+  color: #5B5B5B;
   width: 27px;
   cursor: pointer;
   position: absolute;
-  right: 13px;
   top: 13px;
+  left: 13px;
+`;
+
+export const StyledCloseIcon = styled(CloseIcon)`
+  color: #5B5B5B;
+  width: 27px;
+  cursor: pointer;
+  position: absolute;
+  top: 13px;
+  right: 13px;
+`;
+
+export const OptionContainer = styled(Container)`
+  flex-direction: row;
+`;
+
+export const OptionContainer2 = styled(Container)`
+  flex-basis: 33.333%;
 `;
 
 export const ListContainer = styled.ol`
@@ -62,5 +75,9 @@ export const ListContainer = styled.ol`
 export const List = styled.li`
   margin: 25px 0;
   font-size: 16px;
+`;
+
+export const Text = styled.p`
+  text-align: center;
 `;
 

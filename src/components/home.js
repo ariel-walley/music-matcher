@@ -10,7 +10,7 @@ import QueryString from 'querystring';
 import _ from 'lodash';
 
 import GlobalStyle from '../styles/globalStyles';
-import * as styles from './homeStyles';
+import * as styles from '../styles/homeStyles';
 
 export default function Home() {
   const [errors, toggleErrors] = useState({

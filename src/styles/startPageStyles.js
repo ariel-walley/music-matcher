@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { fadeIn, Heading3 } from '../../styles/styles';
+import { fadeIn, Heading3 } from './styles';
 
 export const UserInputContainer = styled.div`
   display: flex;

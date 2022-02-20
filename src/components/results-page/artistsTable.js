@@ -1,6 +1,6 @@
 import React from 'react';
 
-import * as styles from './artistsTableStyles';
+import * as styles from '../../styles/artistsTableStyles';
 import { Heading1 } from '../../styles/styles';
 
 export default function ArtistsTable(props) {

@@ -1,8 +1,7 @@
 import styled from 'styled-components';
-import { fadeIn } from '../../styles/styles';
+import { fadeIn, Heading2, Heading3 } from './styles'
 
 export const MainContainer = styled.div`
-  width: 100%;
   animation: 1s ${fadeIn} ease-out;
 `;
 
@@ -15,15 +14,25 @@ export const CardContainer = styled.div`
 `;
 
 export const Card = styled.div`
-  width: 25%;
+  width: 30%;
   padding: 15px;
-  margin: 15px;
+  margin: 15px 40px;
   display: flex;
   align-items: center;
   align-content: center;
   justify-content: flex-start;
   border-radius: 15px;
   background-color: rgba(256,256,256,0.3);
+`;
+
+export const CardSongTitle = styled(Heading2)`
+  text-align: left;
+  margin-block-start: auto;
+  margin-block-end: auto;
+`;
+
+export const CardArtist = styled(Heading3)`
+  text-align: left;
 `;
 
 export const Img = styled.img`
