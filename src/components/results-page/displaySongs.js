@@ -3,7 +3,7 @@ import Reset from './reset';
 import _ from 'lodash';
 
 import * as styles from '../../styles/displaySongsStyles';
-import { Heading1 } from '../../styles/styles'
+import { WrapContainer, Heading1 } from '../../styles/styles'
 
 export default function DisplaySongs(props) {
   const formatHeader = () => {
@@ -66,9 +66,9 @@ export default function DisplaySongs(props) {
         <styles.MainContainer>
           {formatHeader()}
           <Reset margin="30px" function={props.function} />
-          <styles.CardContainer>
+          <WrapContainer>
             {formatCard()}
-          </styles.CardContainer>
+          </WrapContainer>
         </styles.MainContainer>
       )
     } else {

@@ -10,6 +10,17 @@ export const fadeIn = keyframes`
   }
 `;
 
+export const Container = styled.div`
+  display: flex;
+  align-items: center;
+  align-content: center;
+  justify-content: center;
+`;
+
+export const WrapContainer = styled(Container)`
+  flex-wrap: wrap;
+`;
+
 export const Heading1 = styled.h1`
   font-size: 36px;
   font-weight: 700;

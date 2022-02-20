@@ -1,12 +1,9 @@
 import styled from 'styled-components';
-import { fadeIn, Heading3 } from './styles';
+import { fadeIn, Container, Heading3 } from './styles';
 
-export const UserInputContainer = styled.div`
-  display: flex;
+export const UserInputContainer = styled(Container)`
   flex-direction: column;
   flex-wrap: wrap;
-  justify-content: center;
-  align-items: center;
   transition: color 5s;
 `;
 
@@ -24,12 +21,9 @@ export const TutorialText = styled.div`
   text-align: center;
 `;
 
-export const InputDiv = styled.div`
+export const InputDiv = styled(Container)`
   margin: 0 auto;
-  display: flex;
   flex-wrap: wrap;
-  justify-content: center;
-  align-items: center;
 `;
 
 export const Input = styled.input`

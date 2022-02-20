@@ -2,7 +2,7 @@ import React from 'react';
 import ArtistsTable from './artistsTable';
 
 import * as styles from '../../styles/topArtistsStyles';
-import { Heading1, Heading2 } from '../../styles/styles';
+import { WrapContainer, Heading1, Heading2 } from '../../styles/styles';
 
 export default function TopArtists(props) {
   const formatCard = () => {
@@ -33,9 +33,9 @@ export default function TopArtists(props) {
       return(
         <styles.MainContainer>
           {createHeader()}
-          <styles.CardContainer>
+          <WrapContainer>
             {formatCard()}
-          </styles.CardContainer>
+          </WrapContainer>
           <ArtistsTable duplicateArtists={props.duplicateArtists} duplicateSongs={props.duplicateSongs}/>
         </styles.MainContainer>
       )

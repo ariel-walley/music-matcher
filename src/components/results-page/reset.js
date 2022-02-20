@@ -1,15 +1,10 @@
 import React from 'react';
 import ReplayIcon from '@material-ui/icons/Replay';
 import styled from 'styled-components';
-import { Heading2 } from '../../styles/styles';
+import { Container, Heading2 } from '../../styles/styles';
 
-const ResetContainer = styled.div`
+const ResetContainer = styled(Container)`
   margin: ${props => props.margin};
-  display: flex;
-  flex-wrap: nowrap;
-  justify-content: center;
-  align-items: center;
-  align-content: center;
 `;
 
 export default function Reset(props) {

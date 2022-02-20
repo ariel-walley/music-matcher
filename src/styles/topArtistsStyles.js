@@ -1,26 +1,15 @@
 import styled from 'styled-components';
-import { fadeIn } from './styles';
+import { fadeIn, Container } from './styles';
 
 export const MainContainer = styled.div`
   width: 100%;
   animation: 1s ${fadeIn} ease-out;
 `;
 
-export const CardContainer = styled.div`
-  display: flex;
-  align-items: center;
-  align-content: center;
-  flex-wrap: wrap;
-  justify-content: center;
-`;
-
-export const Card = styled.div`
+export const Card = styled(Container)`
   width: 25%;
   padding: 15px;
   margin: 15px;
-  display: flex;
-  align-items: center;
-  align-content: center;
   justify-content: flex-start;
   border-radius: 15px;
   background-color: rgba(256,256,256,0.3);
