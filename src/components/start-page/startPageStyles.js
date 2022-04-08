@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { fadeIn, Container, Heading3 } from './styles';
+import { fadeIn, Container, Heading3 } from '../../styles/styles';
 
 export const UserInputContainer = styled(Container)`
   flex-direction: column;

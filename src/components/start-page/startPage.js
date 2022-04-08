@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Popup from './popup';
 
-import * as styles from '../../styles/startPageStyles';
+import * as styles from './startPageStyles';
 import { Heading3 } from '../../styles/styles';
 
 export default function StartPage(props) {

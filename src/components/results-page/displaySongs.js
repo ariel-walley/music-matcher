@@ -2,7 +2,7 @@ import React from 'react';
 import Reset from './reset';
 import _ from 'lodash';
 
-import * as styles from '../../styles/displaySongsStyles';
+import * as styles from './displaySongsStyles';
 import { WrapContainer, Heading1 } from '../../styles/styles'
 
 export default function DisplaySongs(props) {

@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { fadeIn, Container, Heading2, Heading3 } from './styles'
+import { fadeIn, Container, Heading2, Heading3 } from '../../styles/styles'
 
 export const MainContainer = styled.div`
   animation: 1s ${fadeIn} ease-out;

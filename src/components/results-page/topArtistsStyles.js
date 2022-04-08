@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { fadeIn, Container } from './styles';
+import { fadeIn, Container } from '../../styles/styles';
 
 export const MainContainer = styled.div`
   width: 100%;

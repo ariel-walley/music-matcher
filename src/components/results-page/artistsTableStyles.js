@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { Container } from '../styles/styles';
+import { Container } from '../../styles/styles';
  
 export const Row = styled(Container)`
   background-color: green;

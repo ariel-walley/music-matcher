@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 import CloseIcon from '@material-ui/icons/Close';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
-import { Container } from '../styles/styles';
+import { Container } from '../../styles/styles';
 
 export const MainPageDarken = styled.div`
   width: 100%;  
@@ -15,29 +15,23 @@ export const MainPageDarken = styled.div`
   background-color: rgba(0,0,0, 0.5);  
 `;
 
-export const PopupContainer = styled.div`
-  margin: 0 auto; 
+export const PopupContainer = styled(Container)`
+  margin: 0 auto;
   padding: 10px;
-  position: absolute;  
-  left: 15%;  
-  right: 15%;  
-  top: 15%;  
-  bottom: 15%;   
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  position: absolute;
+  left: 15%;
+  right: 15%;
+  top: 15%;
+  bottom: 15%;
   flex-direction: column;
   border-radius: 20px;  
   background: white;  
   color: black;
 `;
 
-export const PopupBodyContainer = styled.div`
-  display: flex;
-  flex-wrap: nowrap;
+export const PopupBodyContainer = styled(Container)`
   margin: 0 auto;
   justify-content: space-around;
-  align-items: center;
   align-content: space-around;
 `;
 
@@ -60,10 +54,6 @@ export const StyledCloseIcon = styled(CloseIcon)`
 `;
 
 export const OptionContainer = styled(Container)`
-  flex-direction: row;
-`;
-
-export const OptionContainer2 = styled(Container)`
   flex-basis: 33.333%;
 `;
 
@@ -81,3 +71,8 @@ export const Text = styled.p`
   text-align: center;
 `;
 
+export const Img = styled.img`
+  width: 409px;
+  height: 318px;
+  padding: 0 20px;
+`;
