@@ -18,7 +18,7 @@
     "@testing-library/react": "^9.5.0",
     "@testing-library/user-event": "^7.2.1",
     "@types/react-transition-group": "^1.1.6",
-    "lodash": "^4.17.15",
+    "lodash": "^4.17.21",
     "querystring": "^0.2.0",
     "react": "^16.13.1",
     "react-data-grid": "^7.0.0-canary.18",
